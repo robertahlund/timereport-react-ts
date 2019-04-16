@@ -1,31 +1,29 @@
-import React, { Component } from "react";
-import logo from "./logo.svg";
+import React, {Component} from "react";
 import "./App.css";
-import { Menu } from "./components/Menu";
-import { MenuItem } from "./components/MenuItem";
+import {Menu} from "./components/Menu";
+import Routes from "./components/routes/Routes";
+import {BrowserRouter} from "react-router-dom";
 
 interface AppState {
-
+    auth: boolean
 }
 
 class App extends Component<{}, AppState> {
-  componentDidMount = (): void => {};
+    state: AppState = {
+        auth: false
+    };
 
-  x = (event: React.MouseEvent): void => {
-    console.log(event.target);
-  };
-
-  render() {
-    return (
-      <div className="App">
-        <Menu title="Testeroni">
-          <MenuItem text="qwe" />
-          <MenuItem text="Abc" />
-          <MenuItem text="Qwerty" />
-        </Menu>
-      </div>
-    );
-  }
+    render() {
+        const {auth} = this.state;
+        return (
+            <BrowserRouter>
+                <div className="App">
+                    <Menu auth={auth}/>
+                    <Routes auth={auth}/>
+                </div>
+            </BrowserRouter>
+        );
+    }
 }
 
 export default App;

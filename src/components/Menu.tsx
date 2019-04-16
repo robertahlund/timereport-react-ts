@@ -1,16 +1,59 @@
-import { MenuItem } from "./MenuItem";
-import React, { ReactNode, FunctionComponent, Fragment } from "react";
+import React, {FunctionComponent, Fragment} from "react";
+import styled from 'styled-components';
+import {MenuItem} from "./MenuItem";
+import Logo from "./Logo";
+import {NavLink} from "react-router-dom";
 
-interface Props {
-  children: ReactNode[] | ReactNode;
-  title: string;
-};
+const List = styled.ul`
+    list-style: none;
+    display: flex;
+    align-items: center;
+    padding: 0;
+    margin: 0;
+`;
 
-export const Menu: FunctionComponent<Props> = props => {
-  return (
-    <Fragment>
-        <p>{props.title}</p>
-      <div>{props.children}</div>
-    </Fragment>
-  );
+const Nav = styled.nav`
+    background-color: #FEC861;
+    display: flex;
+    justify-content: space-between;
+    padding: 30px 75px;
+    color: #393E41;
+    a {
+        text-decoration: none;
+        color: #393E41;
+        padding: 0 30px;
+        text-transform: uppercase;
+        font-weight: 300;
+        letter-spacing: .5px;
+    }
+    a:last-child {
+        padding-right: 0;
+    }
+    a.active {
+        background: #fff;
+        padding-top: 7px;
+        padding-bottom: 7px;
+        border-radius: 3px;
+    }
+`;
+
+interface MenuProps {
+    auth: boolean;
+}
+
+export const Menu: FunctionComponent<MenuProps> = props => {
+    return (
+        <Nav>
+            <NavLink to="/time" activeClassName=""><Logo/></NavLink>
+            {props.auth ? (
+                <List>
+                    <NavLink to="/time" activeClassName="active"><MenuItem text="Time"/></NavLink>
+                    <NavLink to="/companies" activeClassName="active"><MenuItem text="Companies"/></NavLink>
+                    <NavLink to="/employees" activeClassName="active"><MenuItem text="Employees"/></NavLink>
+                    <NavLink to="#" activeClassName="active"><MenuItem text="My Account"/></NavLink>
+                    <NavLink to="#" activeClassName="active"><MenuItem text="Log out"/></NavLink>
+                </List>
+            ) : null}
+        </Nav>
+    );
 };
