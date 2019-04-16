@@ -9,6 +9,7 @@ const ButtonItem = styled.button`
     border-radius: 3px;
     background-color: #FEC861;
     margin-top: 25px;
+    font-size: 14px;
     color: #393E41;
     cursor: pointer;
 `;
