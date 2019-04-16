@@ -1,10 +1,10 @@
-import React from 'react';
+import React, {useState} from 'react';
 import styled from "styled-components";
 import LoginForm from "./LoginForm";
 import LoginLinks from "./LoginLinks";
 import Button from "../Button";
 
-const Section = styled.div`
+export const Section = styled.div`
     display: flex;
     justify-content: center;
     border-radius: 3px;
@@ -18,21 +18,28 @@ const Section = styled.div`
     }
 `;
 
-const Wrapper = styled.section`
+export const Wrapper = styled.section`
     display: flex;
     align-items: center;
     justify-content: center;
     height: 85vh;
 `;
 
+const formSubmit = (email: string, password: string): void => {
+    console.log(email, password);
+};
+
 const Login = () => {
+    const [emailInput, setEmailInput] = useState("");
+    const [passwordInput, setPasswordInput] = useState("");
     return (
         <Wrapper>
             <Section>
                 <h3>Login</h3>
-                <LoginForm/>
+                <LoginForm email={emailInput} password={passwordInput} onEmailChange={setEmailInput}
+                           onPasswordChange={setPasswordInput}/>
                 <LoginLinks/>
-                <Button type="button" text="Login"/>
+                <Button type="button" text="Login" onSubmit={() => formSubmit(emailInput, passwordInput)}/>
             </Section>
         </Wrapper>
     )

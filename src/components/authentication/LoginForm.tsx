@@ -1,11 +1,19 @@
-import React from 'react';
+import React, {FunctionComponent} from 'react';
 import Input from "../Input";
 
-const LoginForm = () => {
+interface LoginFormProps {
+    email: string;
+    password: string;
+    onEmailChange: (value: string) => void;
+    onPasswordChange: (value: string) => void;
+}
+
+const LoginForm: FunctionComponent<LoginFormProps> = props => {
     return (
         <form>
-            <Input name="email" value={"Email"} labelValue="Email" type="text"/>
-            <Input name="password" value={"Password"} labelValue="Password" type="password"/>
+            <Input name="email" value={props.email} labelValue="Email" type="text" onFormChange={props.onEmailChange} width="300px"/>
+            <Input name="password" value={props.password} labelValue="Password" type="password"
+                   onFormChange={props.onPasswordChange} width="300px"/>
         </form>
     )
 };

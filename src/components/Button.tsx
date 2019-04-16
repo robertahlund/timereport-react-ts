@@ -1,10 +1,5 @@
-import React from 'react';
+import React, {FunctionComponent} from 'react';
 import styled from "styled-components";
-
-interface ButtonProps {
-    type: 'button' | 'submit';
-    text: string;
-}
 
 const ButtonItem = styled.button`
     align-self: flex-end;
@@ -18,8 +13,14 @@ const ButtonItem = styled.button`
     cursor: pointer;
 `;
 
-const Button = (props: ButtonProps) => {
-    return <ButtonItem type={props.type}>{props.text}</ButtonItem>
+interface ButtonProps {
+    type: 'button' | 'submit';
+    text: string;
+    onSubmit: () => void;
+}
+
+const Button: FunctionComponent<ButtonProps> = (props) => {
+    return <ButtonItem type={props.type} onClick={props.onSubmit}>{props.text}</ButtonItem>
 };
 
 export default Button;

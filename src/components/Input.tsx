@@ -1,12 +1,5 @@
-import React, {Fragment} from 'react';
+import React, {Fragment, FunctionComponent} from 'react';
 import styled from "styled-components";
-
-interface InputProps {
-    value: string;
-    labelValue: string;
-    type: 'number' | 'text' | 'password';
-    name: string;
-}
 
 const Label = styled.label`
     display: block;
@@ -26,11 +19,21 @@ const InputField = styled.input`
     width: 300px;
 `;
 
-const Input = (props: InputProps) => {
+interface InputProps {
+    value: string;
+    labelValue: string;
+    type: 'number' | 'text' | 'password';
+    name: string;
+    onFormChange: (value: string) => void;
+    width: string;
+}
+
+const Input: FunctionComponent<InputProps> = props => {
     return (
         <Fragment>
             <Label htmlFor={props.name}>{props.labelValue}</Label>
-            <InputField id={props.name} name={props.name} value={props.value} type={props.type}/>
+            <InputField id={props.name} name={props.name} value={props.value} type={props.type}
+                        onChange={(event: any) => props.onFormChange(event.target.value)} autoComplete="off"/>
         </Fragment>
     );
 };

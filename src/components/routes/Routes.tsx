@@ -1,4 +1,4 @@
-import React, {ReactNode} from 'react';
+import React, {FunctionComponent, ReactNode} from 'react';
 import {Route, Redirect, Switch} from 'react-router-dom';
 import Login from '../authentication/Login';
 import Time from "../Time";
@@ -11,7 +11,7 @@ interface RouterProps {
     auth: boolean
 }
 
-const Routes = (props: RouterProps) => {
+const Routes: FunctionComponent<RouterProps> = props => {
     const {auth} = props;
     return (
         <Switch>
