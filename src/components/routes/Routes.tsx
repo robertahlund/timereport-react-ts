@@ -4,6 +4,8 @@ import Login from '../authentication/Login';
 import Time from "../Time";
 import Companies from "../Companies";
 import Employees from "../Employees";
+import ForgotPassword from "../authentication/ForgotPassword";
+import Register from "../authentication/Register";
 
 interface RouterProps {
     auth: boolean
@@ -18,6 +20,8 @@ const Routes = (props: RouterProps) => {
             <Route exact path="/companies" render={(): ReactNode => auth ? <Companies/> : <Redirect to="/"/>}/>
             <Route exact path="/employees" render={(): ReactNode => auth ? <Employees/> : <Redirect to="/"/>}/>
             <Route exact path="/login" render={(): ReactNode => auth ? <Redirect to="/"/> : <Login/>}/>
+            <Route exact path="/forgot-password" render={(): ReactNode => auth ? <Redirect to="/"/> : <ForgotPassword/>}/>
+            <Route exact path="/create-account" render={(): ReactNode => auth ? <Redirect to="/"/> : <Register/>}/>
             <Route render={() => <p>TODO: 404</p>}/>
         </Switch>
     )
