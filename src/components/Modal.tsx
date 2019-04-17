@@ -1,6 +1,7 @@
 import React, {FunctionComponent} from 'react';
 import {AuthContextConsumer} from "../App";
 import styled from "styled-components";
+import CloseIcon from "../Icons/CloseIcon";
 
 interface ModalProps {
 
@@ -18,12 +19,22 @@ const ModalBackground = styled.div`
   background-color: rgba(0, 0, 0, .39);
 `;
 
+const ModalContent = styled.div`
+  width: 500px;
+  height: 400px;
+  border-radius: 3px;
+  background-color: #fff;
+`;
+
 const Modal: FunctionComponent<ModalProps> = props => {
   return (
     <AuthContextConsumer>
       {authContext => (
         <ModalBackground>
-          {typeof authContext !== 'boolean' ? <p>{authContext.firstName} {authContext.lastName}</p> : null}
+          <ModalContent>
+            <CloseIcon color="#fff"/>
+            {typeof authContext !== 'boolean' ? <p>{authContext.firstName} {authContext.lastName}</p> : null}
+          </ModalContent>
         </ModalBackground>
       )}
     </AuthContextConsumer>
