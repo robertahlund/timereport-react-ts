@@ -2,9 +2,12 @@ import React, {useState} from 'react';
 import Button from "../Button";
 import {Section, Wrapper} from "./Login";
 import RegisterForm from "./RegisterForm";
+import firebase from '../../firebaseConfig';
 
-const formSubmit = (firstName: string, lastName: string, email: string, password: string): void => {
+const formSubmit = async (firstName: string, lastName: string, email: string, password: string): Promise<void> => {
+    await firebase.auth().createUserWithEmailAndPassword(email, password);
     console.log(firstName, lastName, email, password);
+
 };
 
 const Register = () => {
