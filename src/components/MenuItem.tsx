@@ -1,9 +1,10 @@
-import React, { FunctionComponent } from "react";
+import React, {FunctionComponent} from "react";
 
 interface MenuItemProps {
-    text: string
+  text: string;
+  signOut?: () => Promise<void>;
 }
 
 export const MenuItem: FunctionComponent<MenuItemProps> = props => {
-    return <li>{props.text}</li>;
+  return <li onClick={props.signOut}>{props.text}</li>;
 };

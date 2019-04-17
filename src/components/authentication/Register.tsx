@@ -3,31 +3,45 @@ import Button from "../Button";
 import {Section, Wrapper} from "./Login";
 import RegisterForm from "./RegisterForm";
 import firebase from '../../firebaseConfig';
+import {AuthObject} from "../../App";
 
 const formSubmit = async (firstName: string, lastName: string, email: string, password: string): Promise<void> => {
+  try {
     await firebase.auth().createUserWithEmailAndPassword(email, password);
-    console.log(firstName, lastName, email, password);
+    const {uid} = await firebase.auth().currentUser!;
+    const userDocument: AuthObject = {
+      firstName,
+      lastName,
+      uid
+    };
+    const db = firebase.firestore();
+    await db.collection('users').doc().set(userDocument);
+    console.log('Account created');
+  } catch (error) {
+    console.log(error)
+  }
 
+  console.log(firstName, lastName, email, password);
 };
 
 const Register = () => {
-    const [firstNameInput, setFirstNameInput] = useState("");
-    const [lastNameInput, setLastNameInput] = useState("");
-    const [emailInput, setEmailInput] = useState("");
-    const [passwordInput, setPasswordInput] = useState("");
-    return (
-        <Wrapper>
-            <Section>
-                <h3>Create new account</h3>
-                <RegisterForm email={emailInput} password={passwordInput} firstName={firstNameInput}
-                              lastName={lastNameInput} onEmailChange={setEmailInput}
-                              onFirstNameChange={setFirstNameInput} onLastNameChange={setLastNameInput}
-                              onPasswordChange={setPasswordInput}/>
-                <Button type="button" text="Create"
-                        onSubmit={() => formSubmit(firstNameInput, lastNameInput, emailInput, passwordInput)}/>
-            </Section>
-        </Wrapper>
-    )
+  const [firstNameInput, setFirstNameInput] = useState("");
+  const [lastNameInput, setLastNameInput] = useState("");
+  const [emailInput, setEmailInput] = useState("");
+  const [passwordInput, setPasswordInput] = useState("");
+  return (
+    <Wrapper>
+      <Section>
+        <h3>Create new account</h3>
+        <RegisterForm email={emailInput} password={passwordInput} firstName={firstNameInput}
+                      lastName={lastNameInput} onEmailChange={setEmailInput}
+                      onFirstNameChange={setFirstNameInput} onLastNameChange={setLastNameInput}
+                      onPasswordChange={setPasswordInput}/>
+        <Button type="button" text="Create"
+                onSubmit={() => formSubmit(firstNameInput, lastNameInput, emailInput, passwordInput)}/>
+      </Section>
+    </Wrapper>
+  )
 };
 
 export default Register;

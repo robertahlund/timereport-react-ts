@@ -1,8 +1,10 @@
-import React, { FunctionComponent, Fragment } from "react";
+import React from "react";
 import styled from "styled-components";
-import { MenuItem } from "./MenuItem";
+import {MenuItem} from "./MenuItem";
 import Logo from "./Logo";
-import { NavLink } from "react-router-dom";
+import {NavLink} from "react-router-dom";
+import firebase from '../firebaseConfig';
+import {AuthContextConsumer} from "../App";
 
 const List = styled.ul`
   list-style: none;
@@ -40,35 +42,39 @@ const Nav = styled.nav`
   }
 `;
 
-interface MenuProps {
-  auth: boolean;
-}
+const signOut = async (): Promise<void> => {
+  await firebase.auth().signOut();
+};
 
-export const Menu: FunctionComponent<MenuProps> = props => {
+export const Menu = () => {
   return (
-    <Nav>
-      <NavLink to="/time" activeClassName="" className="logo">
-        <Logo width="100px"/>
-      </NavLink>
-      {props.auth ? (
-        <List>
-          <NavLink to="/time" activeClassName="active">
-            <MenuItem text="Time" />
+    <AuthContextConsumer>
+      {authContext => (
+        <Nav>
+          <NavLink to="/time" activeClassName="" className="logo">
+            <Logo width="100px"/>
           </NavLink>
-          <NavLink to="/companies" activeClassName="active">
-            <MenuItem text="Companies" />
-          </NavLink>
-          <NavLink to="/employees" activeClassName="active">
-            <MenuItem text="Employees" />
-          </NavLink>
-          <NavLink to="#" activeClassName="active">
-            <MenuItem text="My Account" />
-          </NavLink>
-          <NavLink to="#" activeClassName="active">
-            <MenuItem text="Log out" />
-          </NavLink>
-        </List>
-      ) : null}
-    </Nav>
+          {authContext !== false ? (
+            <List>
+              <NavLink to="/time" activeClassName="active">
+                <MenuItem text="Time"/>
+              </NavLink>
+              <NavLink to="/companies" activeClassName="active">
+                <MenuItem text="Companies"/>
+              </NavLink>
+              <NavLink to="/employees" activeClassName="active">
+                <MenuItem text="Employees"/>
+              </NavLink>
+              <NavLink to="#" activeClassName="active">
+                <MenuItem text="My Account"/>
+              </NavLink>
+              <NavLink to="#" activeClassName="active">
+                <MenuItem text="Log out" signOut={signOut}/>
+              </NavLink>
+            </List>
+          ) : null}
+        </Nav>
+      )}
+    </AuthContextConsumer>
   );
 };

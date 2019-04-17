@@ -4,12 +4,24 @@ import {Menu} from "./components/Menu";
 import Routes from "./components/routes/Routes";
 import {BrowserRouter} from "react-router-dom";
 import firebase from './firebaseConfig';
+import Modal from "./components/Modal";
 
 const db = firebase.firestore();
 
-interface AppState {
-  auth: boolean
+export interface AuthObject {
+  firstName?: string;
+  lastName?: string;
+  uid?: string;
 }
+
+interface AppState {
+  auth: AuthObject | boolean;
+}
+
+const AuthContext = React.createContext<AuthObject | boolean>(false);
+
+export const AuthContextProvider = AuthContext.Provider;
+export const AuthContextConsumer = AuthContext.Consumer;
 
 class App extends Component<{}, AppState> {
   state: AppState = {
@@ -24,8 +36,15 @@ class App extends Component<{}, AppState> {
     firebase.auth().onAuthStateChanged(async user => {
       if (user) {
         console.log('Logged in');
+        const usersCollection = db.collection('users');
+        let userData: AuthObject = {};
+        await usersCollection
+          .where('uid', '==', user.uid)
+          .limit(1)
+          .get()
+          .then((querySnapshot) => querySnapshot.docs.map(doc => userData = doc.data()));
         this.setState({
-          auth: true
+          auth: userData
         })
       } else {
         console.log('Logged out');
@@ -41,8 +60,11 @@ class App extends Component<{}, AppState> {
     return (
       <BrowserRouter>
         <div className="App">
-          <Menu auth={auth}/>
-          <Routes auth={auth}/>
+          <AuthContextProvider value={auth}>
+            <Menu/>
+            <Modal/>
+            <Routes auth={auth}/>
+          </AuthContextProvider>
         </div>
       </BrowserRouter>
     );

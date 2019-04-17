@@ -3,6 +3,7 @@ import styled from "styled-components";
 import LoginForm from "./LoginForm";
 import LoginLinks from "./LoginLinks";
 import Button from "../Button";
+import firebase from '../../firebaseConfig';
 
 export const Section = styled.div`
     display: flex;
@@ -25,24 +26,24 @@ export const Wrapper = styled.section`
     height: 85vh;
 `;
 
-const formSubmit = (email: string, password: string): void => {
-    console.log(email, password);
+const formSubmit = async (email: string, password: string): Promise<void> => {
+  await firebase.auth().signInWithEmailAndPassword(email, password);
 };
 
 const Login = () => {
-    const [emailInput, setEmailInput] = useState("");
-    const [passwordInput, setPasswordInput] = useState("");
-    return (
-        <Wrapper>
-            <Section>
-                <h3>Login</h3>
-                <LoginForm email={emailInput} password={passwordInput} onEmailChange={setEmailInput}
-                           onPasswordChange={setPasswordInput}/>
-                <LoginLinks/>
-                <Button type="button" text="Login" onSubmit={() => formSubmit(emailInput, passwordInput)}/>
-            </Section>
-        </Wrapper>
-    )
+  const [emailInput, setEmailInput] = useState("");
+  const [passwordInput, setPasswordInput] = useState("");
+  return (
+    <Wrapper>
+      <Section>
+        <h3>Login</h3>
+        <LoginForm email={emailInput} password={passwordInput} onEmailChange={setEmailInput}
+                   onPasswordChange={setPasswordInput}/>
+        <LoginLinks/>
+        <Button type="button" text="Login" onSubmit={() => formSubmit(emailInput, passwordInput)}/>
+      </Section>
+    </Wrapper>
+  )
 };
 
 export default Login;
