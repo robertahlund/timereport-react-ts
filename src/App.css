@@ -3,3 +3,21 @@ html, body {
   color: #393E41;
   font-family: 'Roboto', sans-serif;
 }
+
+.modal-transition-enter {
+  opacity: 0.01;
+}
+
+.modal-transition-enter.modal-transition-enter-active {
+  opacity: 1;
+  transition: opacity 200ms ease-in;
+}
+
+.modal-transition-leave {
+  opacity: 1;
+}
+
+.modal-transition-leave.modal-transition-leave-active {
+  opacity: 0.01;
+  transition: opacity 200ms ease-in;
+}

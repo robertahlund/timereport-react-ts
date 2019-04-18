@@ -1,10 +1,10 @@
 import React, {FunctionComponent} from "react";
 import styled from "styled-components";
 import {MenuItem} from "./MenuItem";
-import Logo from "./Logo";
+import Logo from "../Logo";
 import {NavLink} from "react-router-dom";
-import firebase from '../firebaseConfig';
-import {AuthContextConsumer} from "../App";
+import firebase from '../../firebaseConfig';
+import {AuthContextConsumer} from "../../App";
 
 const List = styled.ul`
   list-style: none;
@@ -39,6 +39,7 @@ const Nav = styled.nav`
     padding-top: 7px;
     padding-bottom: 7px;
     border-radius: 3px;
+    transition: background-color .3s;
   }
 `;
 

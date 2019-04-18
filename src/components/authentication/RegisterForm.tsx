@@ -1,12 +1,12 @@
-import React, {ChangeEvent, FunctionComponent} from "react";
+import React, { ChangeEvent, FunctionComponent } from "react";
 import Input from "../Input";
 import styled from "styled-components";
 import { PaddingRow } from "./LoginForm";
-import {RegisterFormState} from "./Register";
+import { RegisterFormState } from "./Register";
 
 interface RegisterFormProps {
   onFormChange: (event: ChangeEvent<HTMLInputElement>) => void;
-  form: RegisterFormState
+  form: RegisterFormState;
 }
 
 interface RowProps {
@@ -25,7 +25,7 @@ export const Row = styled.div`
 `;
 
 const RegisterForm: FunctionComponent<RegisterFormProps> = props => {
-  const {firstName, lastName, email, password} = props.form;
+  const { firstName, lastName, email, password } = props.form;
   return (
     <form autoComplete="off">
       <Row direction="row">

@@ -2,6 +2,7 @@ import React, { FunctionComponent } from "react";
 import { AuthContextConsumer } from "../../App";
 import styled from "styled-components";
 import CloseIcon from "../../Icons/CloseIcon";
+import ModalForm from "./ModalForm";
 
 const ModalBackground = styled.div`
   height: 100vh;
@@ -45,10 +46,12 @@ const MyAccountModal: FunctionComponent<MyAccountModalProps> = props => {
           <ModalContent>
             <ModalHeader>
               {typeof authContext !== "boolean" ? (
-                  <ModalTitle>
-                    {authContext.firstName} {authContext.lastName}
-                  </ModalTitle>
-              ) : <ModalTitle>Katten Jansson</ModalTitle>}
+                <ModalTitle>
+                  {authContext.firstName} {authContext.lastName}
+                </ModalTitle>
+              ) : (
+                <ModalTitle>Katten Jansson</ModalTitle>
+              )}
               <CloseIcon
                 color="#fff"
                 background={true}
@@ -56,6 +59,7 @@ const MyAccountModal: FunctionComponent<MyAccountModalProps> = props => {
                 toggleModal={props.toggleModal}
               />
             </ModalHeader>
+            <ModalForm/>
           </ModalContent>
         </ModalBackground>
       )}

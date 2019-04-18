@@ -13,22 +13,25 @@ const formSubmit = async (
 ): Promise<void> => {
   try {
     await firebase.auth().createUserWithEmailAndPassword(email, password);
-    const { uid } = await firebase.auth().currentUser!;
-    const userDocument: AuthObject = {
-      firstName,
-      lastName,
-      uid
-    };
-    const db = firebase.firestore();
-    await db
-      .collection("users")
-      .doc()
-      .set(userDocument);
-    console.log("Account created");
+    const user = await firebase.auth().currentUser;
+    let uid;
+    if (user) {
+      uid = user.uid;
+      const userDocument: AuthObject = {
+        firstName,
+        lastName,
+        uid
+      };
+      const db = firebase.firestore();
+      await db
+        .collection("users")
+        .doc()
+        .set(userDocument);
+      console.log("Account created");
+    }
   } catch (error) {
     console.log(error);
   }
-
   console.log(firstName, lastName, email, password);
 };
 
@@ -58,10 +61,7 @@ const Register: FunctionComponent = () => {
     <Wrapper>
       <Section>
         <h3>Create new account</h3>
-        <RegisterForm
-          onFormChange={handleFormChange}
-          form={form}
-        />
+        <RegisterForm onFormChange={handleFormChange} form={form} />
         <Button
           type="button"
           text="Create"
