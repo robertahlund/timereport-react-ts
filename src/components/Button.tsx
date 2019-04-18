@@ -17,7 +17,7 @@ const ButtonItem = styled.button`
 interface ButtonProps {
     type: 'button' | 'submit';
     text: string;
-    onSubmit: () => void;
+    onSubmit: () => Promise<void>;
 }
 
 const Button: FunctionComponent<ButtonProps> = (props) => {

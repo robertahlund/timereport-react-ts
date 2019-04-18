@@ -2,10 +2,10 @@ import React, { Component } from "react";
 import "./App.css";
 import Menu from "./components/menu/Menu";
 import Routes from "./components/routes/Routes";
-import { BrowserRouter } from "react-router-dom";
 import firebase from "./firebaseConfig";
 import MyAccountModal from "./components/account/MyAccountModal";
 import ReactCSSTransitionGroup from "react-addons-css-transition-group";
+import { User } from "firebase";
 
 const db = firebase.firestore();
 
@@ -13,6 +13,7 @@ export interface AuthObject {
   firstName?: string;
   lastName?: string;
   uid?: string;
+  email?: string;
 }
 
 interface AppState {
@@ -28,7 +29,7 @@ export const AuthContextConsumer = AuthContext.Consumer;
 class App extends Component<{}, AppState> {
   state: AppState = {
     auth: false,
-    showMyAccountModal: true
+    showMyAccountModal: false,
   };
 
   async componentDidMount(): Promise<void> {
@@ -39,19 +40,7 @@ class App extends Component<{}, AppState> {
     try {
       firebase.auth().onAuthStateChanged(async user => {
         if (user) {
-          console.log("Logged in");
-          const usersCollection = db.collection("users");
-          let userData: AuthObject = {};
-          await usersCollection
-            .where("uid", "==", user.uid)
-            .limit(1)
-            .get()
-            .then(querySnapshot =>
-              querySnapshot.docs.map(doc => (userData = doc.data()))
-            );
-          this.setState({
-            auth: userData
-          });
+          await this.setUserInfo(user);
         } else {
           console.log("Logged out");
           this.setState({
@@ -62,6 +51,25 @@ class App extends Component<{}, AppState> {
     } catch (error) {
       console.log(error);
     }
+  };
+
+  setUserInfo = async (user: User): Promise<void> => {
+    console.log("Logged in");
+    const usersCollection = db.collection("users");
+    let userData: AuthObject = {};
+    await usersCollection
+      .doc(user.uid)
+      .get()
+      .then(doc => {
+        if (doc.exists) {
+          // @ts-ignore
+          userData = doc.data();
+        }
+      });
+    userData.email = user.email !== null ? user.email : "";
+    this.setState({
+      auth: userData
+    });
   };
 
   toggleMyAccountModal = (event: React.MouseEvent): void => {
@@ -85,7 +93,16 @@ class App extends Component<{}, AppState> {
             transitionLeaveTimeout={0}
           >
             {showMyAccountModal && (
-              <MyAccountModal toggleModal={this.toggleMyAccountModal} key="1" />
+              <AuthContextConsumer>
+                {authContext => (
+                  <MyAccountModal
+                    toggleModal={this.toggleMyAccountModal}
+                    context={authContext}
+                    setUserInfo={this.setUserInfo}
+                    key="1"
+                  />
+                )}
+              </AuthContextConsumer>
             )}
           </ReactCSSTransitionGroup>
           <Routes auth={auth} />

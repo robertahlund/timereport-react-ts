@@ -12,7 +12,7 @@ const Text = styled.p`
   margin-bottom: 25px;
 `;
 
-const formSubmit = (email: string): void => {
+const formSubmit = async (email: string): Promise<void> => {
   console.log(email);
 };
 

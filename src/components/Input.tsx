@@ -2,7 +2,7 @@ import React, { ChangeEvent, Fragment, FunctionComponent } from "react";
 import styled from "styled-components";
 
 interface InputProps {
-  value: string;
+  value?: string;
   labelValue: string;
   type: "number" | "text" | "password";
   name: string;

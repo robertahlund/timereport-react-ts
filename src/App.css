@@ -19,5 +19,24 @@ html, body {
 
 .modal-transition-leave.modal-transition-leave-active {
   opacity: 0.01;
-  transition: opacity 200ms ease-in;
+  transition: opacity 100ms ease-in;
+}
+
+
+.input-transition-enter {
+  opacity: 0.01;
+}
+
+.input-transition-enter.input-transition-enter-active {
+  opacity: 1;
+  transition: opacity 300ms ease-in;
+}
+
+.input-transition-leave {
+  opacity: 1;
+}
+
+.input-transition-leave.input-transition-leave-active {
+  opacity: 0.01;
+  transition: opacity 300ms ease-in;
 }

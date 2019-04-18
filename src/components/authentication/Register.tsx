@@ -16,6 +16,9 @@ const formSubmit = async (
     const user = await firebase.auth().currentUser;
     let uid;
     if (user) {
+      await user.updateProfile({
+        displayName: `${firstName} ${lastName}`
+      });
       uid = user.uid;
       const userDocument: AuthObject = {
         firstName,
@@ -25,7 +28,7 @@ const formSubmit = async (
       const db = firebase.firestore();
       await db
         .collection("users")
-        .doc()
+        .doc(uid)
         .set(userDocument);
       console.log("Account created");
     }
@@ -36,10 +39,10 @@ const formSubmit = async (
 };
 
 export interface RegisterFormState {
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  password?: string;
 }
 
 const Register: FunctionComponent = () => {

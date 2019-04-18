@@ -2,7 +2,7 @@ import React from 'react';
 import {NavLink} from "react-router-dom";
 import styled from "styled-components";
 
-const LinkWrapper = styled.div`
+export const LinkWrapper = styled.div`
     display: flex;
     justify-content: space-between;
     width: 100%;
