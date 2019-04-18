@@ -1,9 +1,9 @@
-import React, {FunctionComponent} from 'react';
+import React, {ChangeEvent, FunctionComponent} from 'react';
 import Input from "../Input";
 
 interface ForgotPasswordFormProps {
     email: string;
-    onEmailChange: (value: string) => void;
+    onEmailChange: (event: ChangeEvent<HTMLInputElement>) => void;
 }
 
 const ForgotPasswordForm: FunctionComponent<ForgotPasswordFormProps> = props => {

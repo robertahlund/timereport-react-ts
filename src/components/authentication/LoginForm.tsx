@@ -1,12 +1,11 @@
-import React, { FunctionComponent } from "react";
+import React, { ChangeEvent, FunctionComponent } from "react";
 import Input from "../Input";
 import styled from "styled-components";
+import { LoginFormState } from "./Login";
 
 interface LoginFormProps {
-  email: string;
-  password: string;
-  onEmailChange: (value: string) => void;
-  onPasswordChange: (value: string) => void;
+  form: LoginFormState;
+  onFormChange: (event: ChangeEvent<HTMLInputElement>) => void;
 }
 
 export const PaddingRow = styled.div`
@@ -14,24 +13,25 @@ export const PaddingRow = styled.div`
 `;
 
 const LoginForm: FunctionComponent<LoginFormProps> = props => {
+  const {email, password} = props.form;
   return (
     <form>
       <PaddingRow>
         <Input
           name="email"
-          value={props.email}
+          value={email}
           labelValue="Email"
           type="text"
-          onFormChange={props.onEmailChange}
+          onFormChange={props.onFormChange}
           width="300px"
         />
       </PaddingRow>
       <Input
         name="password"
-        value={props.password}
+        value={password}
         labelValue="Password"
         type="password"
-        onFormChange={props.onPasswordChange}
+        onFormChange={props.onFormChange}
         width="300px"
       />
     </form>

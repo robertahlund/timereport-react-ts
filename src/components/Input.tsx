@@ -1,4 +1,4 @@
-import React, { Fragment, FunctionComponent } from "react";
+import React, { ChangeEvent, Fragment, FunctionComponent } from "react";
 import styled from "styled-components";
 
 interface InputProps {
@@ -6,7 +6,7 @@ interface InputProps {
   labelValue: string;
   type: "number" | "text" | "password";
   name: string;
-  onFormChange: (value: string) => void;
+  onFormChange: (event: ChangeEvent<HTMLInputElement>) => void;
   width: string;
 }
 
@@ -36,7 +36,7 @@ const Input: FunctionComponent<InputProps> = props => {
         name={props.name}
         value={props.value}
         type={props.type}
-        onChange={(event: any) => props.onFormChange(event.target.value)}
+        onChange={(event: ChangeEvent<HTMLInputElement>) => props.onFormChange(event)}
         autoComplete="off"
       />
     </div>

@@ -1,47 +1,77 @@
-import React, {useState} from 'react';
+import React, { ChangeEvent, FunctionComponent, useState } from "react";
 import Button from "../Button";
-import {Section, Wrapper} from "./Login";
+import { Section, Wrapper } from "./Login";
 import RegisterForm from "./RegisterForm";
-import firebase from '../../firebaseConfig';
-import {AuthObject} from "../../App";
+import firebase from "../../firebaseConfig";
+import { AuthObject } from "../../App";
 
-const formSubmit = async (firstName: string, lastName: string, email: string, password: string): Promise<void> => {
+const formSubmit = async (
+  firstName: string,
+  lastName: string,
+  email: string,
+  password: string
+): Promise<void> => {
   try {
     await firebase.auth().createUserWithEmailAndPassword(email, password);
-    const {uid} = await firebase.auth().currentUser!;
+    const { uid } = await firebase.auth().currentUser!;
     const userDocument: AuthObject = {
       firstName,
       lastName,
       uid
     };
     const db = firebase.firestore();
-    await db.collection('users').doc().set(userDocument);
-    console.log('Account created');
+    await db
+      .collection("users")
+      .doc()
+      .set(userDocument);
+    console.log("Account created");
   } catch (error) {
-    console.log(error)
+    console.log(error);
   }
 
   console.log(firstName, lastName, email, password);
 };
 
-const Register = () => {
-  const [firstNameInput, setFirstNameInput] = useState("");
-  const [lastNameInput, setLastNameInput] = useState("");
-  const [emailInput, setEmailInput] = useState("");
-  const [passwordInput, setPasswordInput] = useState("");
+export interface RegisterFormState {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+}
+
+const Register: FunctionComponent = () => {
+  const [form, setForm] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: ""
+  });
+
+  const handleFormChange = (event: ChangeEvent<HTMLInputElement>): void => {
+    setForm({
+      ...form,
+      [event.target.name]: event.target.value
+    });
+  };
+
   return (
     <Wrapper>
       <Section>
         <h3>Create new account</h3>
-        <RegisterForm email={emailInput} password={passwordInput} firstName={firstNameInput}
-                      lastName={lastNameInput} onEmailChange={setEmailInput}
-                      onFirstNameChange={setFirstNameInput} onLastNameChange={setLastNameInput}
-                      onPasswordChange={setPasswordInput}/>
-        <Button type="button" text="Create"
-                onSubmit={() => formSubmit(firstNameInput, lastNameInput, emailInput, passwordInput)}/>
+        <RegisterForm
+          onFormChange={handleFormChange}
+          form={form}
+        />
+        <Button
+          type="button"
+          text="Create"
+          onSubmit={() =>
+            formSubmit(form.firstName, form.lastName, form.email, form.password)
+          }
+        />
       </Section>
     </Wrapper>
-  )
+  );
 };
 
 export default Register;
