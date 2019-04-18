@@ -1,4 +1,4 @@
-import React from "react";
+import React, {FunctionComponent} from "react";
 import styled from "styled-components";
 import {MenuItem} from "./MenuItem";
 import Logo from "./Logo";
@@ -46,7 +46,11 @@ const signOut = async (): Promise<void> => {
   await firebase.auth().signOut();
 };
 
-export const Menu = () => {
+interface MenuProps {
+  toggleModal: (event: React.MouseEvent) => void;
+}
+
+const Menu: FunctionComponent<MenuProps> = props => {
   return (
     <AuthContextConsumer>
       {authContext => (
@@ -66,7 +70,7 @@ export const Menu = () => {
                 <MenuItem text="Employees"/>
               </NavLink>
               <NavLink to="#" activeClassName="active">
-                <MenuItem text="My Account"/>
+                <MenuItem text="My Account" toggleModal={props.toggleModal}/>
               </NavLink>
               <NavLink to="#" activeClassName="active">
                 <MenuItem text="Log out" signOut={signOut}/>
@@ -78,3 +82,5 @@ export const Menu = () => {
     </AuthContextConsumer>
   );
 };
+
+export default Menu;
