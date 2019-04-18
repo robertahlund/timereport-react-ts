@@ -1,17 +1,12 @@
-import React, { FunctionComponent } from "react";
+import React, { ChangeEvent, FunctionComponent } from "react";
 import Input from "../Input";
 import styled from "styled-components";
 import { PaddingRow } from "./LoginForm";
+import { RegisterFormState } from "./Register";
 
 interface RegisterFormProps {
-  email: string;
-  password: string;
-  firstName: string;
-  lastName: string;
-  onEmailChange: (value: string) => void;
-  onPasswordChange: (value: string) => void;
-  onFirstNameChange: (value: string) => void;
-  onLastNameChange: (value: string) => void;
+  onFormChange: (event: ChangeEvent<HTMLInputElement>) => void;
+  form: RegisterFormState;
 }
 
 interface RowProps {
@@ -30,23 +25,24 @@ export const Row = styled.div`
 `;
 
 const RegisterForm: FunctionComponent<RegisterFormProps> = props => {
+  const { firstName, lastName, email, password } = props.form;
   return (
     <form autoComplete="off">
       <Row direction="row">
         <Input
-          value={props.firstName}
+          value={firstName}
           labelValue="First name"
           type="text"
-          name="first-name"
-          onFormChange={props.onFirstNameChange}
+          name="firstName"
+          onFormChange={props.onFormChange}
           width="171px"
         />
         <Input
-          value={props.lastName}
+          value={lastName}
           labelValue="Last name"
           type="text"
-          name="last-name"
-          onFormChange={props.onLastNameChange}
+          name="lastName"
+          onFormChange={props.onFormChange}
           width="171px"
         />
       </Row>
@@ -54,19 +50,19 @@ const RegisterForm: FunctionComponent<RegisterFormProps> = props => {
         <PaddingRow>
           <Input
             name="email"
-            value={props.email}
+            value={email}
             labelValue="Email"
             type="text"
-            onFormChange={props.onEmailChange}
+            onFormChange={props.onFormChange}
             width="378px"
           />
         </PaddingRow>
         <Input
           name="password"
-          value={props.password}
+          value={password}
           labelValue="Password"
           type="password"
-          onFormChange={props.onPasswordChange}
+          onFormChange={props.onFormChange}
           width="378px"
         />
       </Row>

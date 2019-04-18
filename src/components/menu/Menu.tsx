@@ -1,10 +1,10 @@
-import React from "react";
+import React, {FunctionComponent} from "react";
 import styled from "styled-components";
 import {MenuItem} from "./MenuItem";
-import Logo from "./Logo";
+import Logo from "../Logo";
 import {NavLink} from "react-router-dom";
-import firebase from '../firebaseConfig';
-import {AuthContextConsumer} from "../App";
+import firebase from '../../firebaseConfig';
+import {AuthContextConsumer} from "../../App";
 
 const List = styled.ul`
   list-style: none;
@@ -39,6 +39,7 @@ const Nav = styled.nav`
     padding-top: 7px;
     padding-bottom: 7px;
     border-radius: 3px;
+    transition: background-color .3s;
   }
 `;
 
@@ -46,7 +47,11 @@ const signOut = async (): Promise<void> => {
   await firebase.auth().signOut();
 };
 
-export const Menu = () => {
+interface MenuProps {
+  toggleModal: (event: React.MouseEvent) => void;
+}
+
+const Menu: FunctionComponent<MenuProps> = props => {
   return (
     <AuthContextConsumer>
       {authContext => (
@@ -66,7 +71,7 @@ export const Menu = () => {
                 <MenuItem text="Employees"/>
               </NavLink>
               <NavLink to="#" activeClassName="active">
-                <MenuItem text="My Account"/>
+                <MenuItem text="My Account" toggleModal={props.toggleModal}/>
               </NavLink>
               <NavLink to="#" activeClassName="active">
                 <MenuItem text="Log out" signOut={signOut}/>
@@ -78,3 +83,5 @@ export const Menu = () => {
     </AuthContextConsumer>
   );
 };
+
+export default Menu;

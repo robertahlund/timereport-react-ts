@@ -1,7 +1,7 @@
 import React, {FunctionComponent, ReactNode} from 'react';
 import {Route, Redirect, Switch} from 'react-router-dom';
 import Login from '../authentication/Login';
-import Time from "../Time";
+import Time from "../timereport/Time";
 import Companies from "../Companies";
 import Employees from "../Employees";
 import ForgotPassword from "../authentication/ForgotPassword";
