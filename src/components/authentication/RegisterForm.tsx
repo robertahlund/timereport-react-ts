@@ -1,5 +1,5 @@
 import React, { ChangeEvent, FunctionComponent } from "react";
-import Input from "../Input";
+import Input from "../general/Input";
 import styled from "styled-components";
 import { PaddingRow } from "./LoginForm";
 import { RegisterFormState } from "./Register";

@@ -3,7 +3,7 @@ import React, {
   Fragment,
   ChangeEvent
 } from "react";
-import Input from "../Input";
+import Input from "../general/Input";
 import { PaddingRow } from "../authentication/LoginForm";
 import { Row } from "../authentication/RegisterForm";
 import { RegisterFormState } from "../authentication/Register";

@@ -1,7 +1,7 @@
 import React, { ChangeEvent, useState } from "react";
 import { Section, Wrapper } from "./Login";
 import ForgotPasswordForm from "./ForgotPasswordForm";
-import Button from "../Button";
+import Button from "../general/Button";
 import styled from "styled-components";
 
 const Text = styled.p`

@@ -1,9 +1,9 @@
-import React, { ChangeEvent, FunctionComponent, useState } from "react";
-import { AuthContextConsumer, AuthObject } from "../../App";
+import React, {ChangeEvent, FunctionComponent, useState} from "react";
+import {AuthContextConsumer, AuthObject} from "../../App";
 import styled from "styled-components";
 import CloseIcon from "../../Icons/CloseIcon";
 import ModalForm from "./ModalForm";
-import Button from "../Button";
+import Button from "../general/Button";
 import firebase from "../../firebaseConfig";
 import {User} from "firebase";
 
@@ -17,6 +17,7 @@ const ModalBackground = styled.div`
   align-items: center;
   justify-content: center;
   background-color: rgba(0, 0, 0, 0.39);
+  z-index: 1;
 `;
 
 const ModalContent = styled.div`
@@ -63,6 +64,7 @@ const MyAccountModal: FunctionComponent<MyAccountModalProps> = props => {
     email: typeof props.context === "object" ? props.context.email : "",
     password: ""
   });
+  const [loading, setLoading] = useState(false);
 
   const handleFormChange = (event: ChangeEvent<HTMLInputElement>): void => {
     setForm({
@@ -100,9 +102,9 @@ const MyAccountModal: FunctionComponent<MyAccountModalProps> = props => {
     password?: string
   ): Promise<void> => {
     console.log(firstName, lastName, email, password);
-    console.log(props.context)
-    const db = firebase.firestore();
     try {
+      const db = firebase.firestore();
+      setLoading(true);
       const user = await firebase.auth().currentUser;
       console.log(user, `${firstName} ${lastName}`);
       if (user) {
@@ -121,7 +123,8 @@ const MyAccountModal: FunctionComponent<MyAccountModalProps> = props => {
             });
             await db.collection("users").doc(props.context.uid).update({
               firstName,
-              lastName
+              lastName,
+              email
             });
             console.log("Updated profile & collection with displayName.");
           }
@@ -132,21 +135,26 @@ const MyAccountModal: FunctionComponent<MyAccountModalProps> = props => {
           email != null &&
           email !== ""
         ) {
-          if (hasUserEmailChanged(user.email, email)) {
+          if (hasUserEmailChanged(user.email, email) && typeof props.context === "object") {
             await user.updateEmail(email);
-            console.log("Updated email.");
+            await db.collection('users').doc(props.context.uid).update({
+              email
+            });
+            console.log("Updated email, and email in collection");
           }
         }
         if (showPassword && password != null && password !== "") {
           await user.updatePassword(password);
           console.log("Updated password.");
         }
-        await props.setUserInfo(user)
+        await props.setUserInfo(user);
+        setLoading(false);
       } else {
         return;
       }
     } catch (error) {
       console.log(error);
+      setLoading(false);
     }
 
     //update user collection
@@ -154,7 +162,7 @@ const MyAccountModal: FunctionComponent<MyAccountModalProps> = props => {
     //update password if toggled
   };
 
-  const { firstName, lastName, email, password } = form;
+  const {firstName, lastName, email, password} = form;
 
   return (
     <AuthContextConsumer>
@@ -167,7 +175,7 @@ const MyAccountModal: FunctionComponent<MyAccountModalProps> = props => {
                   {authContext.firstName} {authContext.lastName}
                 </ModalTitle>
               ) : (
-                <ModalTitle>Katten Jansson</ModalTitle>
+                null
               )}
               <CloseIcon
                 color="#fff"
@@ -186,6 +194,7 @@ const MyAccountModal: FunctionComponent<MyAccountModalProps> = props => {
               <Button
                 type="button"
                 text="Update"
+                loading={loading}
                 onSubmit={() => onSubmit(firstName, lastName, email, password)}
               />
             </Section>

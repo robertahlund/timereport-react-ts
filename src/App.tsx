@@ -14,7 +14,10 @@ export interface AuthObject {
   lastName?: string;
   uid?: string;
   email?: string;
+  roles?: UserRoles[]
 }
+
+export type UserRoles = 'Administrator' | 'Employee';
 
 interface AppState {
   auth: AuthObject | boolean;

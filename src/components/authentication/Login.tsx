@@ -2,7 +2,7 @@ import React, { ChangeEvent, useState } from "react";
 import styled from "styled-components";
 import LoginForm from "./LoginForm";
 import LoginLinks from "./LoginLinks";
-import Button from "../Button";
+import Button from "../general/Button";
 import firebase from "../../firebaseConfig";
 
 export const Section = styled.div`
@@ -26,14 +26,6 @@ export const Wrapper = styled.section`
   height: 85vh;
 `;
 
-const formSubmit = async (email: string, password: string): Promise<void> => {
-  try {
-    await firebase.auth().signInWithEmailAndPassword(email, password);
-  } catch (error) {
-    console.log(error);
-  }
-};
-
 export interface LoginFormState {
   email: string;
   password: string;
@@ -44,6 +36,17 @@ const Login = () => {
     email: "",
     password: ""
   });
+  const [loading, setLoading] = useState(false);
+
+  const formSubmit = async (email: string, password: string): Promise<void> => {
+    try {
+      setLoading(true);
+      await firebase.auth().signInWithEmailAndPassword(email, password);
+    } catch (error) {
+      setLoading(false);
+      console.log(error);
+    }
+  };
 
   const onLoginFormChange = (event: ChangeEvent<HTMLInputElement>): void => {
     setLoginForm({
@@ -62,6 +65,7 @@ const Login = () => {
           type="button"
           text="Login"
           onSubmit={() => formSubmit(loginForm.email, loginForm.password)}
+          loading={loading}
         />
       </Section>
     </Wrapper>

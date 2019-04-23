@@ -1,5 +1,5 @@
 import React, {ChangeEvent, FunctionComponent} from 'react';
-import Input from "../Input";
+import Input from "../general/Input";
 
 interface ForgotPasswordFormProps {
     email: string;
