@@ -2,6 +2,7 @@ import React, {Fragment, useEffect, useState} from 'react';
 import styled from "styled-components";
 import LoadingIcon from "../../Icons/LoadingIcon";
 import firebase from "../../firebaseConfig";
+import {UserRoles} from "../../App";
 
 const EmployeeListHeader = styled.div`
   background-color: #fec861;
@@ -14,6 +15,10 @@ const EmployeeListHeader = styled.div`
   border-top-right-radius: 3px;
   span {
     cursor: pointer;
+    width: 33.3%;
+  }
+  span:last-child {
+    text-align: right;
   }
 `;
 
@@ -24,6 +29,13 @@ const EmployeeListRow = styled(EmployeeListHeader)`
   border-bottom: 1px solid #f1f1f1;
   transition: all .1s;
   position: relative;
+  span {
+    cursor: pointer;
+    width: 33.3%;
+  }
+  span:last-child {
+    text-align: right;
+  }
   &:hover {
     transform: scale(1.01);
   }
@@ -33,6 +45,7 @@ interface EmployeeRow {
   name: string;
   uid: string;
   email: string;
+  roles: UserRoles[]
 }
 
 const EmployeeList = () => {
@@ -52,7 +65,8 @@ const EmployeeList = () => {
               let employee: EmployeeRow = {
                 name: `${doc.data().firstName} ${doc.data().lastName}`,
                 uid: doc.data().uid,
-                email: doc.data().email
+                email: doc.data().email,
+                roles: doc.data().roles.join(', ')
               };
               employeeData.push(employee);
             })
@@ -76,6 +90,7 @@ const EmployeeList = () => {
       <EmployeeListHeader>
         <span>Name</span>
         <span>Email</span>
+        <span>Roles</span>
       </EmployeeListHeader>
       {employeeList.length > 0 && !loading ?
         employeeList.map(employee => {
@@ -83,6 +98,7 @@ const EmployeeList = () => {
             <EmployeeListRow key={employee.uid}>
               <span>{employee.name}</span>
               <span>{employee.email}</span>
+              <span>{employee.roles}</span>
             </EmployeeListRow>
           )
         }) : (
