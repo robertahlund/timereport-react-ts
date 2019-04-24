@@ -34,7 +34,7 @@ const EmployeeListRow = styled(EmployeeListHeader)`
   position: relative;
   &:hover {
     transform: scale(1.01);
-
+    //zoom: 1.15;
   }
 `;
 

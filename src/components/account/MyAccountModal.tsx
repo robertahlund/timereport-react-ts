@@ -1,5 +1,5 @@
-import React, {ChangeEvent, FunctionComponent, useState} from "react";
-import {AuthContextConsumer, AuthObject} from "../../App";
+import React, {ChangeEvent, FunctionComponent, useContext, useState} from "react";
+import {AuthContext, AuthContextConsumer, AuthObject} from "../../App";
 import styled from "styled-components";
 import CloseIcon from "../../Icons/CloseIcon";
 import ModalForm from "./ModalForm";
@@ -52,16 +52,16 @@ const Section = styled.div`
 
 interface MyAccountModalProps {
   toggleModal: (event: React.MouseEvent) => void;
-  context: AuthObject | boolean;
   setUserInfo: (user: User) => Promise<void>;
 }
 
 const MyAccountModal: FunctionComponent<MyAccountModalProps> = props => {
+  const authContext = useContext(AuthContext);
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({
-    firstName: typeof props.context === "object" ? props.context.firstName : "",
-    lastName: typeof props.context === "object" ? props.context.lastName : "",
-    email: typeof props.context === "object" ? props.context.email : "",
+    firstName: typeof authContext === "object" ? authContext.firstName : "",
+    lastName: typeof authContext === "object" ? authContext.lastName : "",
+    email: typeof authContext === "object" ? authContext.email : "",
     password: ""
   });
   const [loading, setLoading] = useState(false);
@@ -116,12 +116,12 @@ const MyAccountModal: FunctionComponent<MyAccountModalProps> = props => {
         ) {
           if (
             hasUserNameChanged(user.displayName, `${firstName} ${lastName}`) &&
-            typeof props.context === "object"
+            typeof authContext === "object"
           ) {
             await user.updateProfile({
               displayName: `${firstName} ${lastName}`
             });
-            await db.collection("users").doc(props.context.uid).update({
+            await db.collection("users").doc(authContext.uid).update({
               firstName,
               lastName,
               email
@@ -135,9 +135,9 @@ const MyAccountModal: FunctionComponent<MyAccountModalProps> = props => {
           email != null &&
           email !== ""
         ) {
-          if (hasUserEmailChanged(user.email, email) && typeof props.context === "object") {
+          if (hasUserEmailChanged(user.email, email) && typeof authContext === "object") {
             await user.updateEmail(email);
-            await db.collection('users').doc(props.context.uid).update({
+            await db.collection('users').doc(authContext.uid).update({
               email
             });
             console.log("Updated email, and email in collection");

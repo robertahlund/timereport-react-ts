@@ -1,37 +1,72 @@
-import React, {FunctionComponent, ReactNode} from 'react';
-import {Route, Redirect, Switch} from 'react-router-dom';
-import Login from '../authentication/Login';
+import React, { FunctionComponent, ReactNode, useContext } from "react";
+import { Route, Redirect, Switch } from "react-router-dom";
+import Login from "../authentication/Login";
 import Time from "../timereport/Time";
 import Companies from "../companies/Companies";
 import Employees from "../employees/Employees";
 import ForgotPassword from "../authentication/ForgotPassword";
 import Register from "../authentication/Register";
-import {AuthObject} from "../../App";
+import { AuthContext, AuthObject } from "../../App";
 
-interface RouterProps {
-  auth: boolean | AuthObject;
-}
-
-const Routes: FunctionComponent<RouterProps> = props => {
-  const {auth} = props;
+const Routes: FunctionComponent = () => {
+  const authContext = useContext(AuthContext);
   return (
     <Switch>
-      <Route exact path="/"
-             render={(): ReactNode => auth ? <Redirect to="/time"/> :
-               <Redirect to="/login"/>}/>{/*TODO: should point to /time*/}
-      <Route exact path="/time" render={(): ReactNode => auth ? <Time/> : <Redirect to="/"/>}/>
-      <Route exact path="/companies"
-             render={(): ReactNode => auth && typeof auth === 'object' && auth.isAdmin ? <Companies/> :
-               <Redirect to="/"/>}/>
-      <Route exact path="/employees"
-             render={(): ReactNode => auth && typeof auth === 'object' && auth.isAdmin ? <Employees/> :
-               <Redirect to="/"/>}/>
-      <Route exact path="/login" render={(): ReactNode => auth ? <Redirect to="/"/> : <Login/>}/>
-      <Route exact path="/forgot-password" render={(): ReactNode => auth ? <Redirect to="/"/> : <ForgotPassword/>}/>
-      <Route exact path="/create-account" render={(): ReactNode => auth ? <Redirect to="/"/> : <Register/>}/>
-      <Route render={() => <p>TODO: 404</p>}/>
+      <Route
+        exact
+        path="/"
+        render={(): ReactNode =>
+          authContext ? <Redirect to="/time" /> : <Redirect to="/login" />
+        }
+      />
+      {/*TODO: should point to /time*/}
+      <Route
+        exact
+        path="/time"
+        render={(): ReactNode => (authContext ? <Time /> : <Redirect to="/" />)}
+      />
+      <Route
+        exact
+        path="/companies"
+        render={(): ReactNode =>
+          authContext && typeof authContext === "object" && authContext.isAdmin ? (
+            <Companies />
+          ) : (
+            <Redirect to="/" />
+          )
+        }
+      />
+      <Route
+        exact
+        path="/employees"
+        render={(): ReactNode =>
+          authContext && typeof authContext === "object" && authContext.isAdmin ? (
+            <Employees />
+          ) : (
+            <Redirect to="/" />
+          )
+        }
+      />
+      <Route
+        exact
+        path="/login"
+        render={(): ReactNode => (authContext ? <Redirect to="/" /> : <Login />)}
+      />
+      <Route
+        exact
+        path="/forgot-password"
+        render={(): ReactNode =>
+          authContext ? <Redirect to="/" /> : <ForgotPassword />
+        }
+      />
+      <Route
+        exact
+        path="/create-account"
+        render={(): ReactNode => (authContext ? <Redirect to="/" /> : <Register />)}
+      />
+      <Route render={() => <p>TODO: 404</p>} />
     </Switch>
-  )
+  );
 };
 
 export default Routes;

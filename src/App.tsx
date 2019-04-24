@@ -1,11 +1,11 @@
-import React, {Component} from "react";
+import React, { Component } from "react";
 import "./App.css";
 import Menu from "./components/menu/Menu";
 import Routes from "./components/routes/Routes";
 import firebase from "./firebaseConfig";
 import MyAccountModal from "./components/account/MyAccountModal";
 import ReactCSSTransitionGroup from "react-addons-css-transition-group";
-import {User} from "firebase";
+import { User } from "firebase";
 
 const db = firebase.firestore();
 
@@ -19,14 +19,14 @@ export interface AuthObject {
   inactive?: boolean;
 }
 
-export type UserRoles = 'Administrator' | 'Employee';
+export type UserRoles = "Administrator" | "Employee";
 
 interface AppState {
   auth: AuthObject | boolean;
   showMyAccountModal?: boolean;
 }
 
-const AuthContext = React.createContext<AuthObject | boolean>(false);
+export const AuthContext = React.createContext<AuthObject | boolean>(false);
 
 export const AuthContextProvider = AuthContext.Provider;
 export const AuthContextConsumer = AuthContext.Consumer;
@@ -34,7 +34,7 @@ export const AuthContextConsumer = AuthContext.Consumer;
 class App extends Component<{}, AppState> {
   state: AppState = {
     auth: false,
-    showMyAccountModal: false,
+    showMyAccountModal: false
   };
 
   async componentDidMount(): Promise<void> {
@@ -68,16 +68,22 @@ class App extends Component<{}, AppState> {
         if (doc.exists) {
           userData = doc.data()!;
           const [firstName, lastName] = user.displayName!.split(" ");
-          if (firstName !== userData.firstName || lastName !== userData.lastName || user.email !== userData.email!.toLowerCase()) {
-            console.log("Data was changed, and need to be updated in the collection.");
-            console.log(userData, user.email, firstName, lastName)
+          if (
+            firstName !== userData.firstName ||
+            lastName !== userData.lastName ||
+            user.email !== userData.email!.toLowerCase()
+          ) {
+            console.log(
+              "Data was changed, and need to be updated in the collection."
+            );
+            console.log(userData, user.email, firstName, lastName);
             return true;
           } else return false;
         } else return false;
       });
     if (updateNeeded) {
       await user.updateProfile({
-        displayName: `${userData.firstName} ${userData.lastName}`,
+        displayName: `${userData.firstName} ${userData.lastName}`
       });
       await user.updateEmail(userData.email!);
     }
@@ -91,9 +97,9 @@ class App extends Component<{}, AppState> {
       .then(doc => {
         if (doc.exists) {
           return doc.data()!.inactive;
-        } else return true
+        } else return true;
       });
-    return new Promise<boolean>(resolve => resolve(inactive))
+    return new Promise<boolean>(resolve => resolve(inactive));
   };
 
   setUserInfo = async (user: User): Promise<void> => {
@@ -113,7 +119,9 @@ class App extends Component<{}, AppState> {
         if (doc.exists) {
           // @ts-ignore
           userData = doc.data();
-          userData.isAdmin = userData.roles ? userData.roles.includes('Administrator') : false;
+          userData.isAdmin = userData.roles
+            ? userData.roles.includes("Administrator")
+            : false;
         }
       });
     userData.email = user.email !== null ? user.email : "";
@@ -123,7 +131,7 @@ class App extends Component<{}, AppState> {
   };
 
   toggleMyAccountModal = (event: React.MouseEvent): void => {
-    const {target, currentTarget} = event;
+    const { target, currentTarget } = event;
     if (target === currentTarget) {
       this.setState(prevState => ({
         showMyAccountModal: !prevState.showMyAccountModal
@@ -132,30 +140,25 @@ class App extends Component<{}, AppState> {
   };
 
   render() {
-    const {auth, showMyAccountModal} = this.state;
+    const { auth, showMyAccountModal } = this.state;
     return (
       <div className="App">
         <AuthContextProvider value={auth}>
-          <Menu toggleModal={this.toggleMyAccountModal}/>
+          <Menu toggleModal={this.toggleMyAccountModal} />
           <ReactCSSTransitionGroup
             transitionName="modal-transition"
             transitionEnterTimeout={0}
             transitionLeaveTimeout={0}
           >
             {showMyAccountModal && (
-              <AuthContextConsumer>
-                {authContext => (
-                  <MyAccountModal
-                    toggleModal={this.toggleMyAccountModal}
-                    context={authContext}
-                    setUserInfo={this.setUserInfo}
-                    key="1"
-                  />
-                )}
-              </AuthContextConsumer>
+              <MyAccountModal
+                toggleModal={this.toggleMyAccountModal}
+                setUserInfo={this.setUserInfo}
+                key="1"
+              />
             )}
           </ReactCSSTransitionGroup>
-          <Routes auth={auth}/>
+          <Routes />
         </AuthContextProvider>
       </div>
     );

@@ -1,10 +1,10 @@
-import React, {FunctionComponent, Fragment} from "react";
+import React, {FunctionComponent, Fragment, useContext} from "react";
 import styled from "styled-components";
 import {MenuItem} from "./MenuItem";
 import Logo from "../Logo";
 import {NavLink} from "react-router-dom";
 import firebase from '../../firebaseConfig';
-import {AuthContextConsumer} from "../../App";
+import {AuthContext, AuthContextConsumer} from "../../App";
 
 const List = styled.ul`
   list-style: none;
