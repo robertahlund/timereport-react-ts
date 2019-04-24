@@ -3,10 +3,13 @@ import Input from "../general/Input";
 import styled from "styled-components";
 import { PaddingRow } from "./LoginForm";
 import { RegisterFormState } from "./Register";
+import Checkbox from "../general/Checkbox";
 
 interface RegisterFormProps {
   onFormChange: (event: ChangeEvent<HTMLInputElement>) => void;
   form: RegisterFormState;
+  onCheckboxChange: (event: ChangeEvent<HTMLInputElement>) => void;
+  checked: boolean;
 }
 
 interface RowProps {
@@ -26,6 +29,7 @@ export const Row = styled.div`
 
 const RegisterForm: FunctionComponent<RegisterFormProps> = props => {
   const { firstName, lastName, email, password } = props.form;
+  const {checked} = props;
   return (
     <form autoComplete="off">
       <Row direction="row">
@@ -65,6 +69,9 @@ const RegisterForm: FunctionComponent<RegisterFormProps> = props => {
           onFormChange={props.onFormChange}
           width="378px"
         />
+      </Row>
+      <Row direction="column">
+        <Checkbox onChange={props.onCheckboxChange} checked={checked} id="admin-checkbox" labelValue="Create admin account"/>
       </Row>
     </form>
   );

@@ -10,7 +10,7 @@ interface InputProps {
   width: string;
 }
 
-const Label = styled.label`
+export const Label = styled.label`
   display: block;
   font-size: 15px;
   font-weight: 500;

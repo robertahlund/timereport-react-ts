@@ -31,7 +31,7 @@ interface ButtonProps {
 const Button: FunctionComponent<ButtonProps> = (props) => {
   return <ButtonItem type={props.type} className={props.loading ? "active" : ""}
                      onClick={props.onSubmit} disabled={props.loading}>{props.loading &&
-  <LoadingIcon position="absolute" left="15px"/>}{props.text}</ButtonItem>
+  <LoadingIcon position="absolute" left="15px" height="16px" width="24px" color="#393e41"/>}{props.text}</ButtonItem>
 };
 
 export default Button;

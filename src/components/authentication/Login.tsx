@@ -42,6 +42,7 @@ const Login = () => {
     try {
       setLoading(true);
       await firebase.auth().signInWithEmailAndPassword(email, password);
+      setLoading(false);
     } catch (error) {
       setLoading(false);
       console.log(error);

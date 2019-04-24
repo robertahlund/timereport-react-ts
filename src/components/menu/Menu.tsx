@@ -1,4 +1,4 @@
-import React, {FunctionComponent} from "react";
+import React, {FunctionComponent, Fragment} from "react";
 import styled from "styled-components";
 import {MenuItem} from "./MenuItem";
 import Logo from "../Logo";
@@ -64,12 +64,15 @@ const Menu: FunctionComponent<MenuProps> = props => {
               <NavLink to="/time" activeClassName="active">
                 <MenuItem text="Time"/>
               </NavLink>
-              <NavLink to="/companies" activeClassName="active">
-                <MenuItem text="Companies"/>
-              </NavLink>
-              <NavLink to="/employees" activeClassName="active">
-                <MenuItem text="Employees"/>
-              </NavLink>
+              {typeof authContext === 'object' && authContext.isAdmin ? (
+                <Fragment>
+                  <NavLink to="/companies" activeClassName="active">
+                    <MenuItem text="Companies"/>
+                  </NavLink>
+                  <NavLink to="/employees" activeClassName="active">
+                    <MenuItem text="Employees"/>
+                  </NavLink>
+                </Fragment>) : null}
               <NavLink to="#" activeClassName="active">
                 <MenuItem text="My Account" toggleModal={props.toggleModal}/>
               </NavLink>

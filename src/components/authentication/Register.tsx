@@ -20,6 +20,7 @@ const Register: FunctionComponent = () => {
     password: ""
   });
   const [loading, setLoading] = useState(false);
+  const [checkbox, setCheckbox] = useState(false);
 
   const handleFormChange = (event: ChangeEvent<HTMLInputElement>): void => {
     setForm({
@@ -48,7 +49,8 @@ const Register: FunctionComponent = () => {
           firstName,
           lastName,
           uid,
-          email
+          email,
+          roles: checkbox ? ['Administrator', 'Employee'] : ['Employee']
         };
         const db = firebase.firestore();
         await db
@@ -68,7 +70,9 @@ const Register: FunctionComponent = () => {
     <Wrapper>
       <Section>
         <h3>Create new account</h3>
-        <RegisterForm onFormChange={handleFormChange} form={form}/>
+        <RegisterForm onFormChange={handleFormChange}
+                      onCheckboxChange={(event: ChangeEvent<HTMLInputElement>) => setCheckbox(event.target.checked)}
+                      form={form} checked={checkbox}/>
         <Button
           type="button"
           text="Create"
