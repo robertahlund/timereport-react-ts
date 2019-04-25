@@ -7,6 +7,7 @@ import Input from "../general/Input";
 import { PaddingRow } from "../authentication/LoginForm";
 import { Row } from "../authentication/RegisterForm";
 import Checkbox from "../general/Checkbox";
+import styled from "styled-components";
 
 export interface EmployeeForm {
   firstName?: string;
@@ -20,6 +21,10 @@ interface EmployeeModalFormProps {
   onInactiveChange: (event: ChangeEvent<HTMLInputElement>) => void;
   inactive: boolean;
 }
+
+const SmallerHeading = styled.h3`
+  padding-top: 15px;
+`;
 
 const EmployeeModalForm: FunctionComponent<EmployeeModalFormProps> = props => {
   const { firstName, lastName, email } = props.form;
@@ -57,6 +62,9 @@ const EmployeeModalForm: FunctionComponent<EmployeeModalFormProps> = props => {
             />
           </PaddingRow>
           <Checkbox onChange={props.onInactiveChange} checked={inactive} id="inactive-checkbox" labelValue="Inactivate user"/>
+        </Row>
+        <Row direction="column">
+          <SmallerHeading>Companies</SmallerHeading>
         </Row>
       </form>
     </Fragment>

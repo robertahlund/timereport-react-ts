@@ -5,6 +5,7 @@ import firebase from "../../firebaseConfig";
 import {UserRoles} from "../../App";
 import Input from "../general/Input";
 import {PaddingRow} from "../authentication/LoginForm";
+import {toast} from "react-toastify";
 
 export const ListHeader = styled.div`
   background-color: #fec861;
@@ -77,6 +78,8 @@ const EmployeeList: FunctionComponent<EmployeeListProps> = props => {
       const db = firebase.firestore();
       const employeeData: EmployeeRow[] = [];
       await db.collection('users')
+        .orderBy("firstName", "asc")
+        .orderBy("lastName", "asc")
         .get()
         .then(documents => {
           documents.forEach(doc => {

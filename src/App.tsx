@@ -20,7 +20,7 @@ export interface AuthObject {
   roles?: UserRoles[];
   isAdmin?: boolean;
   inactive?: boolean;
-  company?: string;
+  companies?: string[];
 }
 
 export type UserRoles = "Administrator" | "Employee";
