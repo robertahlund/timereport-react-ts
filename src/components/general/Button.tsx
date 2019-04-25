@@ -14,7 +14,7 @@ const ButtonItem = styled.button`
     color: #393E41;
     cursor: pointer;
     display: flex;
-    transition: background-color: .2s;
+    transition: background-color .2s;
     position: relative;
     &.active {
       cursor: not-allowed;
@@ -24,7 +24,7 @@ const ButtonItem = styled.button`
 interface ButtonProps {
   type: 'button' | 'submit';
   text: string;
-  onSubmit: () => Promise<void>;
+  onSubmit: (() => Promise<void>) | (() => void);
   loading?: boolean;
 }
 

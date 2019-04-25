@@ -4,7 +4,7 @@ import EmployeeList from "./EmployeeList";
 import EmployeeModal from "./EmployeeModal";
 import ReactCSSTransitionGroup from "react-addons-css-transition-group";
 
-const ContentSection = styled.section`
+export const ContentSection = styled.section`
   display: flex;
   flex-direction: column;
   margin: 100px auto 0 auto;

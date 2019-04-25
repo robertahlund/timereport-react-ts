@@ -40,3 +40,8 @@ html, body {
   opacity: 0.01;
   transition: opacity 300ms ease-in;
 }
+
+.toast-global {
+  font-family: inherit!important;
+  padding-left: 20px!important;
+}

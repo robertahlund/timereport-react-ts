@@ -1,10 +1,12 @@
-import React, {Fragment, FunctionComponent, useEffect, useState} from 'react';
+import React, {ChangeEvent, Fragment, FunctionComponent, useEffect, useState} from 'react';
 import styled from "styled-components";
 import LoadingIcon from "../../Icons/LoadingIcon";
 import firebase from "../../firebaseConfig";
 import {UserRoles} from "../../App";
+import Input from "../general/Input";
+import {PaddingRow} from "../authentication/LoginForm";
 
-const EmployeeListHeader = styled.div`
+export const ListHeader = styled.div`
   background-color: #fec861;
   display: flex;
   width: calc(100% - 40px);
@@ -20,13 +22,13 @@ const EmployeeListHeader = styled.div`
   span:first-child {
     width: 40%;
   }
-  span:last-child {
+  span:last-child:not(:first-child) {
     text-align: right;
   }
 `;
 
-const EmployeeListRow = styled(EmployeeListHeader)`
-  border-radius: 0px;
+export const ListRow = styled(ListHeader)`
+  border-radius: 0;
   background: #fff;
   cursor: pointer;
   border-bottom: 1px solid #f1f1f1;
@@ -34,7 +36,7 @@ const EmployeeListRow = styled(EmployeeListHeader)`
   position: relative;
   &:hover {
     transform: scale(1.01);
-    //zoom: 1.15;
+    font-size: 16px;
   }
 `;
 
@@ -49,17 +51,33 @@ interface EmployeeListProps {
   selectUser: (uid: string) => void;
 }
 
+interface Sort {
+  column: Column;
+  order: Order;
+}
+
+type Column = 'name' | 'email';
+type Order = 'asc' | 'desc';
+
 const EmployeeList: FunctionComponent<EmployeeListProps> = props => {
   const initialEmployeeState: EmployeeRow[] = [];
+  const initialSortState: Sort = {
+    column: "name",
+    order: 'asc'
+  };
   const [employeeList, setEmployeeList] = useState(initialEmployeeState);
+  const [clonedEmployeeList, setClonedEmployeeList] = useState(initialEmployeeState);
   const [loading, setLoading] = useState(false);
+  const [sortMethod, setSortMethod] = useState(initialSortState);
+  const [searchValue, setSearchValue] = useState("");
 
   const getEmployees = async (): Promise<void> => {
     setLoading(true);
     try {
       const db = firebase.firestore();
-      const employeeData : EmployeeRow[] = [];
-      await db.collection('users').get()
+      const employeeData: EmployeeRow[] = [];
+      await db.collection('users')
+        .get()
         .then(documents => {
           documents.forEach(doc => {
             let employee: EmployeeRow = {
@@ -72,6 +90,7 @@ const EmployeeList: FunctionComponent<EmployeeListProps> = props => {
           })
         });
       setEmployeeList(employeeData);
+      setClonedEmployeeList(employeeData);
       setLoading(false);
     } catch (error) {
       setLoading(false);
@@ -83,37 +102,102 @@ const EmployeeList: FunctionComponent<EmployeeListProps> = props => {
     getEmployees();
   }, []);
 
-  const sortData = (column: string, order: 'asc' | 'desc'): void => {
-    //TODO implement sort
+  const sortData = (sortMethod: Sort): void => {
+    setSortMethod(sortMethod);
+    if (sortMethod.column === "name") {
+      if (sortMethod.order === "asc") {
+        sortAsc(sortMethod.column);
+      } else {
+        sortDesc(sortMethod.column)
+      }
+    } else if (sortMethod.column === "email") {
+      if (sortMethod.order === "asc") {
+        sortAsc(sortMethod.column);
+      } else {
+        sortDesc(sortMethod.column)
+      }
+    }
+  };
+
+  const sortAsc = (column: Column): void => {
+    const listToSort: EmployeeRow[] = JSON.parse(JSON.stringify(employeeList));
+    listToSort.sort((a: EmployeeRow, b: EmployeeRow): number => {
+      const propA = a[column].toLowerCase();
+      const propB = b[column].toLowerCase();
+      if (propA < propB) {
+        return -1;
+      }
+      if (propA > propB) {
+        return 1;
+      }
+      return 0;
+    });
+    setEmployeeList(listToSort);
+    setClonedEmployeeList(listToSort);
+  };
+
+  const sortDesc = (column: Column): void => {
+    const listToSort: EmployeeRow[] = JSON.parse(JSON.stringify(employeeList));
+    listToSort.sort((a: EmployeeRow, b: EmployeeRow): number => {
+      const propA = a[column].toLowerCase();
+      const propB = b[column].toLowerCase();
+      if (propB < propA) {
+        return -1;
+      }
+      if (propB > propA) {
+        return 1;
+      }
+      return 0;
+    });
+    setEmployeeList(listToSort);
+    setClonedEmployeeList(listToSort);
+  };
+
+  const handleSearchChange = (event: ChangeEvent<HTMLInputElement>): void => {
+    const {target} = event;
+    setSearchValue(target.value);
+    if (target.value === "") {
+      setEmployeeList(clonedEmployeeList);
+      return;
+    }
+    let searchList: EmployeeRow[];
+    searchList = clonedEmployeeList.filter(employee => employee.name.toLowerCase().indexOf(target.value.toLowerCase()) > -1 ||
+      employee.email.toLowerCase().indexOf(target.value.toLowerCase()) > -1);
+    console.log(searchList)
+    setEmployeeList(searchList);
   };
 
   return (
     <Fragment>
-      <EmployeeListHeader>
-        <span>Name</span>
-        <span>Email</span>
+      <PaddingRow>
+        <Input labelValue="Search" type="text" name="search" onFormChange={handleSearchChange} width="300px"
+               value={searchValue}/>
+      </PaddingRow>
+      <ListHeader>
+        <span onClick={() => sortData({column: "name", order: sortMethod.order === "asc" ? "desc" : "asc"})}>Name</span>
+        <span
+          onClick={() => sortData({column: "email", order: sortMethod.order === "asc" ? "desc" : "asc"})}>Email</span>
         <span>Roles</span>
-      </EmployeeListHeader>
+      </ListHeader>
       {employeeList.length > 0 && !loading ?
         employeeList.map(employee => {
           return (
-            <EmployeeListRow key={employee.uid} onClick={() => props.selectUser(employee.uid)}>
+            <ListRow key={employee.uid} onClick={() => props.selectUser(employee.uid)}>
               <span>{employee.name}</span>
               <span>{employee.email}</span>
               <span>{employee.roles}</span>
-            </EmployeeListRow>
+            </ListRow>
           )
         }) : (
           loading ? (
-            <EmployeeListRow>
+            <ListRow>
               <LoadingIcon position="relative" left="0" height="30px" width="30px" color="#393e41"/>
-            </EmployeeListRow>
+            </ListRow>
           ) : (
-            <EmployeeListRow>
+            <ListRow>
               <span>No employees.</span>
-            </EmployeeListRow>
+            </ListRow>
           )
-
         )
       }
     </Fragment>);
