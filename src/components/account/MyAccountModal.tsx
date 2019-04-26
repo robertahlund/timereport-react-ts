@@ -52,7 +52,7 @@ const Section = styled.div`
 
 interface MyAccountModalProps {
   toggleModal: (event: React.MouseEvent) => void;
-  setUserInfo: (user: User) => Promise<void>;
+  setUserInfo: (user: User, displayToast: boolean) => Promise<void>;
 }
 
 const MyAccountModal: FunctionComponent<MyAccountModalProps> = props => {
@@ -147,7 +147,7 @@ const MyAccountModal: FunctionComponent<MyAccountModalProps> = props => {
           await user.updatePassword(password);
           console.log("Updated password.");
         }
-        await props.setUserInfo(user);
+        await props.setUserInfo(user, false);
         setLoading(false);
       } else {
         return;
@@ -156,10 +156,6 @@ const MyAccountModal: FunctionComponent<MyAccountModalProps> = props => {
       console.log(error);
       setLoading(false);
     }
-
-    //update user collection
-    //update user credentials
-    //update password if toggled
   };
 
   const {firstName, lastName, email, password} = form;
@@ -181,7 +177,10 @@ const MyAccountModal: FunctionComponent<MyAccountModalProps> = props => {
                 color="#fff"
                 background={true}
                 backgroundColor="#fec861"
-                toggleModal={props.toggleModal}
+                onClick={props.toggleModal}
+                margin="20px 20px 0 0"
+                height="24px"
+                width="24px"
               />
             </ModalHeader>
             <Section>

@@ -43,20 +43,24 @@ const CheckboxLabel = styled(Label)`
 `;
 
 const CheckboxContainer = styled.div`
-  padding-top: 15px;
+  padding-top: ${(props: CheckboxContainerProps) => props.paddingTop}
 `;
 
+interface CheckboxContainerProps {
+  paddingTop: string;
+}
 
 interface CheckboxProps {
   onChange: (event: ChangeEvent<HTMLInputElement>) => void;
   checked: boolean;
   id: string;
   labelValue: string;
+  paddingTop: string;
 }
 
 const Checkbox: FunctionComponent<CheckboxProps> = props => {
   return (
-    <CheckboxContainer>
+    <CheckboxContainer paddingTop={props.paddingTop}>
       <CheckboxLabel htmlFor={props.id}>
         <HiddenCheckbox type="checkbox" {...props}/>
         <StyledCheckbox checked={props.checked}><CheckIcon width="16px" height="16px"/></StyledCheckbox>

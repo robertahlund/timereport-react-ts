@@ -20,7 +20,12 @@ export interface AuthObject {
   roles?: UserRoles[];
   isAdmin?: boolean;
   inactive?: boolean;
-  companies?: string[];
+  companies?: UserCompanies[];
+}
+
+interface UserCompanies {
+  value: string;
+  label: string;
 }
 
 export type UserRoles = "Administrator" | "Employee";
@@ -49,7 +54,7 @@ class App extends Component<{}, AppState> {
     try {
       firebase.auth().onAuthStateChanged(async user => {
         if (user) {
-          await this.setUserInfo(user);
+          await this.setUserInfo(user, true);
         } else {
           console.log("Logged out");
           this.setState({
@@ -109,7 +114,7 @@ class App extends Component<{}, AppState> {
     return new Promise<boolean>(resolve => resolve(inactive));
   };
 
-  setUserInfo = async (user: User): Promise<void> => {
+  setUserInfo = async (user: User, displayToast: boolean): Promise<void> => {
     console.log("Logged in");
     if (await this.checkIfUserIsInactive(user)) {
       console.log("User is inactive, logging out.");
@@ -136,7 +141,7 @@ class App extends Component<{}, AppState> {
     this.setState({
       auth: userData
     });
-    toast.success(`Welcome back ${userData.firstName}.`)
+    displayToast ? toast.success(`Welcome back ${userData.firstName}.`) : null;
   };
 
   toggleMyAccountModal = (event: React.MouseEvent): void => {

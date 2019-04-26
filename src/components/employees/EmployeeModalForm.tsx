@@ -4,10 +4,13 @@ import React, {
   ChangeEvent
 } from "react";
 import Input from "../general/Input";
-import { PaddingRow } from "../authentication/LoginForm";
-import { Row } from "../authentication/RegisterForm";
+import {PaddingRow} from "../authentication/LoginForm";
+import {Row} from "../authentication/RegisterForm";
 import Checkbox from "../general/Checkbox";
 import styled from "styled-components";
+import Select from "react-select";
+import {ValueType} from "react-select/lib/types";
+import {CompanySelectOptions} from "./EmployeeModal";
 
 export interface EmployeeForm {
   firstName?: string;
@@ -20,6 +23,8 @@ interface EmployeeModalFormProps {
   onFormChange: (event: ChangeEvent<HTMLInputElement>) => void;
   onInactiveChange: (event: ChangeEvent<HTMLInputElement>) => void;
   inactive: boolean;
+  selectOptions: CompanySelectOptions[];
+  handleSelectChange: (value: ValueType<object>) => void;
 }
 
 const SmallerHeading = styled.h3`
@@ -27,8 +32,8 @@ const SmallerHeading = styled.h3`
 `;
 
 const EmployeeModalForm: FunctionComponent<EmployeeModalFormProps> = props => {
-  const { firstName, lastName, email } = props.form;
-  const {inactive} = props;
+  const {firstName, lastName, email} = props.form;
+  const {inactive, selectOptions} = props;
   return (
     <Fragment>
       <form autoComplete="off">
@@ -61,10 +66,13 @@ const EmployeeModalForm: FunctionComponent<EmployeeModalFormProps> = props => {
               width="378px"
             />
           </PaddingRow>
-          <Checkbox onChange={props.onInactiveChange} checked={inactive} id="inactive-checkbox" labelValue="Inactivate user"/>
+          <Checkbox onChange={props.onInactiveChange} checked={inactive} id="inactive-checkbox"
+                    labelValue="Inactivate user" paddingTop="0"/>
         </Row>
         <Row direction="column">
           <SmallerHeading>Companies</SmallerHeading>
+          <Select onChange={props.handleSelectChange} options={selectOptions} placeholder="Select Companies"
+                  value={null} classNamePrefix="react-select" className="react-select"/>
         </Row>
       </form>
     </Fragment>

@@ -71,7 +71,7 @@ const RegisterForm: FunctionComponent<RegisterFormProps> = props => {
         />
       </Row>
       <Row direction="column">
-        <Checkbox onChange={props.onCheckboxChange} checked={checked} id="admin-checkbox" labelValue="Create admin account"/>
+        <Checkbox onChange={props.onCheckboxChange} checked={checked} id="admin-checkbox" labelValue="Create admin account" paddingTop="15px"/>
       </Row>
     </form>
   );

@@ -6,7 +6,9 @@ import Button from "../general/Button";
 import firebase from "../../firebaseConfig";
 import EmployeeModalForm from "./EmployeeModalForm";
 import LoadingIcon from "../../Icons/LoadingIcon";
-import ReactCSSTransitionGroup from "react-addons-css-transition-group";
+import {ValueType} from "react-select/lib/types";
+import EmployeeModalCompanyList from "./EmployeeModalCompanyList";
+import {all, reject} from "q";
 
 const ModalBackground = styled.div`
   height: 100vh;
@@ -56,6 +58,13 @@ interface EmployeeModalProps {
   uid: string;
 }
 
+export interface CompanySelectOptions {
+  value: string;
+  label: string;
+}
+
+export type EmployeeCompanyList = CompanySelectOptions[];
+
 const EmployeeModal: FunctionComponent<EmployeeModalProps> = props => {
   const [userInactive, setUserInactive] = useState(false);
   const [form, setForm] = useState({
@@ -66,30 +75,79 @@ const EmployeeModal: FunctionComponent<EmployeeModalProps> = props => {
   const [loading, setLoading] = useState(false);
   const [modalLoading, setModalLoading] = useState(true);
   const [selectedUser, setSelectedUser] = useState();
+  const initialCompanyListState: CompanySelectOptions[] = [];
+  const [companyList, setCompanyList] = useState(initialCompanyListState);
+  const initialEmployeeCompanyList: EmployeeCompanyList = [];
+  const [employeeCompanyList, setEmployeeCompanyList] = useState(initialEmployeeCompanyList);
+  const [originalEmployeeCompanyList, setOriginalEmployeeCompanyList] = useState(initialEmployeeCompanyList);
 
-  const getUserInformation = async (): Promise<void> => {
-    const db = firebase.firestore();
-    await db.collection('users')
-      .doc(props.uid)
-      .get()
-      .then(doc => {
-        if (doc.exists) {
-          setSelectedUser(doc.data());
-          setForm({
-            firstName: doc.data()!.firstName ? doc.data()!.firstName : "",
-            lastName: doc.data()!.lastName,
-            email: doc.data()!.email
-          });
-          setUserInactive(doc.data()!.inactive);
-          setModalLoading(false);
-          return doc.data();
-        } else return null;
-      });
+  const getUserInformation = async (): Promise<CompanySelectOptions[] | string> => {
+    try {
+      const db = firebase.firestore();
+      const user = await db.collection('users')
+        .doc(props.uid)
+        .get()
+        .then(doc => {
+          if (doc.exists) {
+            setSelectedUser(doc.data());
+            setForm({
+              firstName: doc.data()!.firstName ? doc.data()!.firstName : "",
+              lastName: doc.data()!.lastName,
+              email: doc.data()!.email
+            });
+            setEmployeeCompanyList(doc.data()!.companies);
+            setOriginalEmployeeCompanyList(doc.data()!.companies);
+            setUserInactive(doc.data()!.inactive);
+            setModalLoading(false);
+            return doc.data();
+          } else return new Promise(reject => reject("Error"));
+        });
+      return new Promise<CompanySelectOptions[] | string>(resolve => resolve(user!.companies))
+    } catch (error) {
+      console.log(error);
+      return new Promise(reject => reject("Error"));
+    }
+  };
+
+  const getCompanies = async (): Promise<CompanySelectOptions[] | string> => {
+    try {
+      const db = firebase.firestore();
+      const companyData: CompanySelectOptions[] = [];
+      await db.collection('companies').get()
+        .then(documents => {
+          documents.forEach(doc => {
+            const company: CompanySelectOptions = {
+              value: doc.id,
+              label: doc.data().name
+            };
+            companyData.push(company);
+          })
+        });
+      setCompanyList(companyData);
+      return new Promise<CompanySelectOptions[]|string>(resolve => resolve(companyData));
+    } catch (error) {
+      console.log(error);
+      return new Promise<CompanySelectOptions[]|string>(reject => reject("Error"))
+    }
+  };
+
+  const removeAddedCompaniesFromList = async (): Promise<void> => {
+    let allCompanies = await getCompanies();
+    const assignedCompanies: CompanySelectOptions[] | string | undefined = await getUserInformation();
+    if (typeof assignedCompanies !== "string") {
+      assignedCompanies.forEach(assignedCompany => {
+        if (typeof allCompanies !== "string") {
+          allCompanies = [...allCompanies.filter(company => company.value !== assignedCompany.value)];
+          setCompanyList(allCompanies);
+        }
+      })
+    }
   };
 
   useEffect(() => {
     console.log('effect');
-    getUserInformation();
+    // noinspection JSIgnoredPromiseFromCall
+    removeAddedCompaniesFromList()
   }, []);
 
   const handleFormChange = (event: ChangeEvent<HTMLInputElement>): void => {
@@ -97,6 +155,12 @@ const EmployeeModal: FunctionComponent<EmployeeModalProps> = props => {
       ...form,
       [event.target.name]: event.target.value
     });
+  };
+
+  const hasUserCompaniesChanged = (originalCompaniesList: EmployeeCompanyList, newCompaniesList: EmployeeCompanyList): boolean => {
+    const originalCompaniesListString: string = JSON.stringify(originalCompaniesList);
+    const newCompaniesListString: string = JSON.stringify(newCompaniesList);
+    return originalCompaniesListString !== newCompaniesListString;
   };
 
   const hasUserEmailChanged = (
@@ -125,9 +189,10 @@ const EmployeeModal: FunctionComponent<EmployeeModalProps> = props => {
     firstName?: string,
     lastName?: string,
     email?: string,
-    inactive?: boolean
+    inactive?: boolean,
+    companies?: EmployeeCompanyList
   ): Promise<void> => {
-    console.log(firstName, lastName, email, inactive);
+    console.log(firstName, lastName, email, inactive, companies);
     try {
       const db = firebase.firestore();
       setLoading(true);
@@ -148,15 +213,16 @@ const EmployeeModal: FunctionComponent<EmployeeModalProps> = props => {
         ) {
           if (
             hasUserNameChanged(`${user.firstName} ${user.lastName}`, `${firstName} ${lastName}`) ||
-            user.inactive !== inactive
+            user.inactive !== inactive || hasUserCompaniesChanged(originalEmployeeCompanyList, employeeCompanyList)
           ) {
             await db.collection("users").doc(props.uid).update({
               firstName,
               lastName,
               email,
-              inactive
+              inactive,
+              companies
             });
-            console.log("Updated collection with name & inactive status.");
+            console.log("Updated collection with name, inactive status & companies.");
           }
         }
         if (
@@ -172,6 +238,7 @@ const EmployeeModal: FunctionComponent<EmployeeModalProps> = props => {
             console.log("Updated email in collection");
           }
         }
+        // noinspection JSIgnoredPromiseFromCall
         getUserInformation();
         setLoading(false);
       } else {
@@ -181,6 +248,35 @@ const EmployeeModal: FunctionComponent<EmployeeModalProps> = props => {
       console.log(error);
       setLoading(false);
     }
+  };
+
+  const handleSelectChange = (value: ValueType<any>): void => {
+    console.log(value);
+    setEmployeeCompanyList([
+      ...employeeCompanyList,
+      {
+        label: value.label,
+        value: value.value
+      }
+    ]);
+    removeCompanyFromComboboxList(value.value)
+  };
+
+  const handleRemoveFromEmployeeCompanyList = (company: ValueType<any>): void => {
+    removeCompanyFromEmployeeCompanyList(company.value);
+    addCompanyToComboboxList(company);
+  };
+
+  const removeCompanyFromEmployeeCompanyList = (id: string): void => {
+    setEmployeeCompanyList([...employeeCompanyList.filter(company => company.value !== id)])
+  };
+
+  const removeCompanyFromComboboxList = (id: string): void => {
+    setCompanyList([...companyList.filter(company => company.value !== id)])
+  };
+
+  const addCompanyToComboboxList = (company: ValueType<any>): void => {
+    setCompanyList([...companyList, {value: company.value, label: company.label}]);
   };
 
   const {firstName, lastName, email} = form;
@@ -200,7 +296,10 @@ const EmployeeModal: FunctionComponent<EmployeeModalProps> = props => {
               color="#fff"
               background={true}
               backgroundColor="#fec861"
-              toggleModal={props.toggleModal}
+              onClick={props.toggleModal}
+              margin="20px 20px 0 0"
+              height="24px"
+              width="24px"
             />
           </ModalHeader>
           <Section>
@@ -209,12 +308,16 @@ const EmployeeModal: FunctionComponent<EmployeeModalProps> = props => {
               onFormChange={handleFormChange}
               onInactiveChange={(event: ChangeEvent<HTMLInputElement>) => setUserInactive(event.target.checked)}
               inactive={userInactive}
+              selectOptions={companyList}
+              handleSelectChange={handleSelectChange}
             />
+            <EmployeeModalCompanyList companySelectOptions={employeeCompanyList}
+                                      handleRemoveFromEmployeeCompanyList={handleRemoveFromEmployeeCompanyList}/>
             <Button
               type="button"
               text="Update"
               loading={loading}
-              onSubmit={() => onSubmit(firstName, lastName, email, userInactive)}
+              onSubmit={() => onSubmit(firstName, lastName, email, userInactive, employeeCompanyList)}
             />
           </Section>
         </ModalContent>

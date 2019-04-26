@@ -20,7 +20,7 @@ interface CompanySort {
 type Column = "name" | "orgNumber";
 type Order = "asc" | "desc";
 
-interface Company {
+export interface Company {
   id: string;
   name: string;
   orgNumber: string;
@@ -56,20 +56,20 @@ const CompanyList = () => {
     try {
       const db = firebase.firestore();
       const companyData: Company[] = [];
-      await db.collection('companies').get()
-        .then(documents => {
-          documents.forEach(doc => {
-            const company: Company = {
-              id: doc.id,
-              name: doc.data().name,
-              orgNumber: doc.data().orgNumber
-            };
-            companyData.push(company);
-          })
+      await db.collection('companies').onSnapshot(querySnapShot => {
+        querySnapShot.forEach(doc => {
+          const company: Company = {
+            id: doc.id,
+            name: doc.data().name,
+            orgNumber: doc.data().orgNumber
+          };
+          companyData.push(company);
         });
-      setCompanyList(companyData);
-      setClonedCompanyList(companyData);
-      setLoading(false);
+        setCompanyList(companyData);
+        setClonedCompanyList(companyData);
+        setLoading(false);
+      })
+
     } catch (error) {
       setLoading(false);
       console.log(error);
@@ -77,7 +77,13 @@ const CompanyList = () => {
   };
 
   useEffect(() => {
+    // noinspection JSIgnoredPromiseFromCall
     getCompanies();
+    return () => {
+      const db = firebase.firestore();
+      const unsubscribe = db.collection('companies').onSnapshot(() => {});
+      unsubscribe();
+    }
   }, []);
 
   const sortData = (sortMethod: CompanySort) => {

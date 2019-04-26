@@ -5,7 +5,7 @@ import firebase from "../../firebaseConfig";
 import {UserRoles} from "../../App";
 import Input from "../general/Input";
 import {PaddingRow} from "../authentication/LoginForm";
-import {toast} from "react-toastify";
+import {EmployeeCompanyList} from "./EmployeeModal";
 
 export const ListHeader = styled.div`
   background-color: #fec861;
@@ -18,10 +18,10 @@ export const ListHeader = styled.div`
   border-top-right-radius: 3px;
   span {
     cursor: pointer;
-    width: 30%;
+    width: 25%;
   }
   span:first-child {
-    width: 40%;
+    width: 25%;
   }
   span:last-child:not(:first-child) {
     text-align: right;
@@ -45,7 +45,8 @@ interface EmployeeRow {
   name: string;
   uid: string;
   email: string;
-  roles: UserRoles[]
+  roles: UserRoles[],
+  companies: EmployeeCompanyList
 }
 
 interface EmployeeListProps {
@@ -76,25 +77,25 @@ const EmployeeList: FunctionComponent<EmployeeListProps> = props => {
     setLoading(true);
     try {
       const db = firebase.firestore();
-      const employeeData: EmployeeRow[] = [];
       await db.collection('users')
         .orderBy("firstName", "asc")
         .orderBy("lastName", "asc")
-        .get()
-        .then(documents => {
-          documents.forEach(doc => {
+        .onSnapshot(querySnapshot => {
+          const employeeData: EmployeeRow[] = [];
+          querySnapshot.forEach(doc => {
             let employee: EmployeeRow = {
               name: `${doc.data().firstName} ${doc.data().lastName}`,
               uid: doc.data().uid,
               email: doc.data().email,
-              roles: doc.data().roles.join(', ')
+              roles: doc.data().roles.join(', '),
+              companies: doc.data().companies
             };
             employeeData.push(employee);
-          })
+          });
+          setEmployeeList(employeeData);
+          setClonedEmployeeList(employeeData);
+          setLoading(false);
         });
-      setEmployeeList(employeeData);
-      setClonedEmployeeList(employeeData);
-      setLoading(false);
     } catch (error) {
       setLoading(false);
       console.log(error);
@@ -102,7 +103,13 @@ const EmployeeList: FunctionComponent<EmployeeListProps> = props => {
   };
 
   useEffect(() => {
+    // noinspection JSIgnoredPromiseFromCall
     getEmployees();
+    return () => {
+      const db = firebase.firestore();
+      const unsubscribe = db.collection('users').onSnapshot(() => {});
+      unsubscribe();
+    }
   }, []);
 
   const sortData = (sortMethod: Sort): void => {
@@ -180,6 +187,7 @@ const EmployeeList: FunctionComponent<EmployeeListProps> = props => {
         <span onClick={() => sortData({column: "name", order: sortMethod.order === "asc" ? "desc" : "asc"})}>Name</span>
         <span
           onClick={() => sortData({column: "email", order: sortMethod.order === "asc" ? "desc" : "asc"})}>Email</span>
+        <span>Companies</span>
         <span>Roles</span>
       </ListHeader>
       {employeeList.length > 0 && !loading ?
@@ -188,6 +196,22 @@ const EmployeeList: FunctionComponent<EmployeeListProps> = props => {
             <ListRow key={employee.uid} onClick={() => props.selectUser(employee.uid)}>
               <span>{employee.name}</span>
               <span>{employee.email}</span>
+              <span>
+              {employee.companies.map((company, index) => {
+                if (index !== employee.companies.length - 1) {
+                  return (
+                    <Fragment key={company.value}>
+                      {company.label}, </Fragment>
+                  )
+                } else {
+                  return (
+                    <Fragment key={company.value}>
+                      {company.label}
+                    </Fragment>
+                  )
+                }
+              })}
+              </span>
               <span>{employee.roles}</span>
             </ListRow>
           )
