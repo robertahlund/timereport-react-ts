@@ -7,7 +7,7 @@ import Button from "../general/Button";
 import firebase from "../../firebaseConfig";
 import {User} from "firebase";
 
-const ModalBackground = styled.div`
+export const ModalBackground = styled.div`
   height: 100vh;
   width: 100vw;
   position: absolute;
@@ -20,23 +20,23 @@ const ModalBackground = styled.div`
   z-index: 1;
 `;
 
-const ModalContent = styled.div`
+export const ModalContent = styled.div`
   border-radius: 3px;
   background-color: #fff;
 `;
 
-const ModalHeader = styled.div`
+export const ModalHeader = styled.div`
   display: flex;
   justify-content: space-between;
 `;
 
-const ModalTitle = styled.h3`
+export const ModalTitle = styled.h3`
   font-weight: 500;
   margin: 0;
   padding: 25px;
 `;
 
-const Section = styled.div`
+export const Section = styled.div`
   display: flex;
   justify-content: center;
   border-radius: 3px;

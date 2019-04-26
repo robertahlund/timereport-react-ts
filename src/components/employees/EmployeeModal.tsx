@@ -8,7 +8,6 @@ import EmployeeModalForm from "./EmployeeModalForm";
 import LoadingIcon from "../../Icons/LoadingIcon";
 import {ValueType} from "react-select/lib/types";
 import EmployeeModalCompanyList from "./EmployeeModalCompanyList";
-import {all, reject} from "q";
 
 const ModalBackground = styled.div`
   height: 100vh;

@@ -1,4 +1,4 @@
-import React, {ChangeEvent, Fragment, useEffect, useState} from 'react';
+import React, {ChangeEvent, Fragment, FunctionComponent, useEffect, useState} from 'react';
 import {PaddingRow} from "../authentication/LoginForm";
 import Input from "../general/Input";
 import LoadingIcon from "../../Icons/LoadingIcon";
@@ -26,7 +26,11 @@ export interface Company {
   orgNumber: string;
 }
 
-const CompanyList = () => {
+interface CompanyListProps {
+  selectCompany: (companyId: string) => void;
+}
+
+const CompanyList: FunctionComponent<CompanyListProps> = props => {
   const [searchValue, setSearchValue] = useState("");
   const initialSortState: CompanySort = {
     column: "name",
@@ -137,17 +141,13 @@ const CompanyList = () => {
     setClonedCompanyList(listToSort);
   };
 
-  const addCompany = () => {
-
-  };
-
   return (
     <Fragment>
       <PaddingRow>
         <FlexContainer>
           <Input labelValue="Search" type="text" name="search" onFormChange={handleSearchChange} width="300px"
                  value={searchValue}/>
-          <Button type="button" text="Add company" onSubmit={addCompany}/>
+          <Button type="button" text="Add company" onSubmit={() => props.selectCompany("")}/>
         </FlexContainer>
       </PaddingRow>
       <ListHeader>
@@ -160,7 +160,7 @@ const CompanyList = () => {
       {companyList.length > 0 && !loading ?
         companyList.map((company: Company) => {
           return (
-            <ListRow key={company.id}>
+            <ListRow key={company.id} onClick={() => props.selectCompany(company.id)}>
               <span>{company.name}</span>
               <span>{company.orgNumber}</span>
             </ListRow>

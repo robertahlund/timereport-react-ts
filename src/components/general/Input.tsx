@@ -15,6 +15,7 @@ export const Label = styled.label`
   font-size: 15px;
   font-weight: 500;
   padding: 0 0 3px 0;
+  cursor: pointer;
 `;
 
 const InputField = styled.input`
