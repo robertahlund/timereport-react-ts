@@ -1,14 +1,16 @@
-import React, {Component} from "react";
+import React, { Component } from "react";
 import "./App.css";
 import Menu from "./components/menu/Menu";
 import Routes from "./components/routes/Routes";
 import firebase from "./firebaseConfig";
 import MyAccountModal from "./components/account/MyAccountModal";
 import ReactCSSTransitionGroup from "react-addons-css-transition-group";
-import {User} from "firebase";
-import {ToastContainer, toast} from "react-toastify";
-import 'react-toastify/dist/ReactToastify.min.css';
+import { User } from "firebase";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.min.css";
 import ToastCloseIcon from "./Icons/ToastCloseIcon";
+import LoadingIcon from "./Icons/LoadingIcon";
+import AuthLoading from "./components/authentication/AuthLoading";
 
 const db = firebase.firestore();
 
@@ -33,6 +35,7 @@ export type UserRoles = "Administrator" | "Employee";
 interface AppState {
   auth: AuthObject | boolean;
   showMyAccountModal?: boolean;
+  authHasLoaded: boolean;
 }
 
 export const AuthContext = React.createContext<AuthObject | boolean>(false);
@@ -43,7 +46,8 @@ export const AuthContextConsumer = AuthContext.Consumer;
 class App extends Component<{}, AppState> {
   state: AppState = {
     auth: false,
-    showMyAccountModal: false
+    showMyAccountModal: false,
+    authHasLoaded: false
   };
 
   async componentDidMount(): Promise<void> {
@@ -85,7 +89,9 @@ class App extends Component<{}, AppState> {
             console.log(
               "Data was changed, and need to be updated in the collection."
             );
-            toast.info("Your information was changed by an administrator and is being updated.");
+            toast.info(
+              "Your information was changed by an administrator and is being updated."
+            );
             console.log(userData, user.email, firstName, lastName);
             return true;
           } else return false;
@@ -96,8 +102,11 @@ class App extends Component<{}, AppState> {
         displayName: `${userData.firstName} ${userData.lastName}`
       });
       await user.updateEmail(userData.email!);
-      toast.success("Your information was successfully updated. This might mean that your email has changed, and the new email should " +
-        "be used to log in the next time.", {autoClose: false})
+      toast.success(
+        "Your information was successfully updated. This might mean that your email has changed, and the new email should " +
+          "be used to log in the next time.",
+        { autoClose: false }
+      );
     }
   };
 
@@ -118,7 +127,7 @@ class App extends Component<{}, AppState> {
     console.log("Logged in");
     if (await this.checkIfUserIsInactive(user)) {
       console.log("User is inactive, logging out.");
-      toast.error("This account is inactive.", {autoClose: false});
+      toast.error("This account is inactive.", { autoClose: false });
       await firebase.auth().signOut();
       return;
     }
@@ -139,13 +148,14 @@ class App extends Component<{}, AppState> {
       });
     userData.email = user.email !== null ? user.email : "";
     this.setState({
-      auth: userData
+      auth: userData,
+      authHasLoaded: true
     });
     displayToast ? toast.success(`Welcome back ${userData.firstName}.`) : null;
   };
 
   toggleMyAccountModal = (event: React.MouseEvent): void => {
-    const {target, currentTarget} = event;
+    const { target, currentTarget } = event;
     if (target === currentTarget) {
       this.setState(prevState => ({
         showMyAccountModal: !prevState.showMyAccountModal
@@ -154,11 +164,11 @@ class App extends Component<{}, AppState> {
   };
 
   render() {
-    const {auth, showMyAccountModal} = this.state;
+    const { auth, showMyAccountModal, authHasLoaded } = this.state;
     return (
       <div className="App">
         <AuthContextProvider value={auth}>
-          <Menu toggleModal={this.toggleMyAccountModal}/>
+          <Menu toggleModal={this.toggleMyAccountModal} />
           <ReactCSSTransitionGroup
             transitionName="modal-transition"
             transitionEnterTimeout={0}
@@ -172,7 +182,11 @@ class App extends Component<{}, AppState> {
               />
             )}
           </ReactCSSTransitionGroup>
-          <Routes/>
+          {authHasLoaded ? (
+            <Routes />
+          ) : (
+              <AuthLoading/>
+          )}
         </AuthContextProvider>
         <ToastContainer
           position="top-right"
@@ -180,7 +194,9 @@ class App extends Component<{}, AppState> {
           hideProgressBar={false}
           closeOnClick
           toastClassName="toast-global"
-          closeButton={<ToastCloseIcon color="#fff" height="16px" width="16px"/>}
+          closeButton={
+            <ToastCloseIcon color="#fff" height="16px" width="16px" />
+          }
         />
       </div>
     );

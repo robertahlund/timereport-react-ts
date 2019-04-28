@@ -5,38 +5,27 @@ import React, {
   useEffect,
   useState
 } from "react";
+import firebase from "../../firebaseConfig";
 import { PaddingRow } from "../authentication/LoginForm";
 import Input from "../general/Input";
-import LoadingIcon from "../../Icons/LoadingIcon";
-import { ListHeader, ListRow } from "../employees/EmployeeList";
 import Button from "../general/Button";
-import styled from "styled-components";
-import firebase from "../../firebaseConfig";
+import { ListHeader, ListRow } from "../employees/EmployeeList";
+import LoadingIcon from "../../Icons/LoadingIcon";
+import { FlexContainer, Order } from "../companies/CompanyList";
+import { Activity } from "./Activities";
 
-export const FlexContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-`;
+type Column = "name";
 
-type Column = "name" | "orgNumber";
-export type Order = "asc" | "desc";
-
-export interface Sort {
+interface Sort {
   column: Column;
   order: Order;
 }
 
-export interface Company {
-  id: string;
-  name: string;
-  orgNumber: string;
+interface ActivitiesListProps {
+  selectActivity: (activityId: string) => void;
 }
 
-interface CompanyListProps {
-  selectCompany: (companyId: string) => void;
-}
-
-const CompanyList: FunctionComponent<CompanyListProps> = props => {
+const ActivitiesList: FunctionComponent<ActivitiesListProps> = props => {
   const [searchValue, setSearchValue] = useState("");
   const initialSortState: Sort = {
     column: "name",
@@ -44,44 +33,43 @@ const CompanyList: FunctionComponent<CompanyListProps> = props => {
   };
   const [sortMethod, setSortMethod] = useState(initialSortState);
   const [loading, setLoading] = useState(false);
-  const initialCompanyListState: Company[] = [];
-  const [companyList, setCompanyList] = useState(initialCompanyListState);
-  const [clonedCompanyList, setClonedCompanyList] = useState(
-    initialCompanyListState
+  const initialActivityListState: Activity[] = [];
+  const [activityList, setActivityList] = useState(initialActivityListState);
+  const [clonedActivityList, setClonedActivityList] = useState(
+    initialActivityListState
   );
 
   const handleSearchChange = (event: ChangeEvent<HTMLInputElement>): void => {
     const { target } = event;
     setSearchValue(target.value);
     if (target.value === "") {
-      setCompanyList(clonedCompanyList);
+      setActivityList(clonedActivityList);
       return;
     }
-    let searchList: Company[];
-    searchList = clonedCompanyList.filter(
-      company =>
-        company.name.toLowerCase().indexOf(target.value.toLowerCase()) > -1 ||
-        company.orgNumber.toLowerCase().indexOf(target.value.toLowerCase()) > -1
+    let searchList: Activity[];
+    searchList = clonedActivityList.filter(
+      activity =>
+        activity.name.toLowerCase().indexOf(target.value.toLowerCase()) > -1
     );
-    setCompanyList(searchList);
+    setActivityList(searchList);
   };
 
-  const getCompanies = async (): Promise<void> => {
+  const getActivities = async (): Promise<void> => {
     setLoading(true);
     try {
       const db = firebase.firestore();
-      await db.collection("companies").onSnapshot(querySnapShot => {
-        const companyData: Company[] = [];
+      await db.collection("activities").onSnapshot(querySnapShot => {
+        const activityData: Activity[] = [];
         querySnapShot.forEach(doc => {
-          const company: Company = {
+          const activity: Activity = {
             id: doc.id,
-            name: doc.data().name,
-            orgNumber: doc.data().orgNumber
+            name: doc.data().name
           };
-          companyData.push(company);
+          activityData.push(activity);
         });
-        setCompanyList(companyData);
-        setClonedCompanyList(companyData);
+        console.log(activityData, "data");
+        setActivityList(activityData);
+        setClonedActivityList(activityData);
         setLoading(false);
       });
     } catch (error) {
@@ -92,10 +80,10 @@ const CompanyList: FunctionComponent<CompanyListProps> = props => {
 
   useEffect(() => {
     // noinspection JSIgnoredPromiseFromCall
-    getCompanies();
+    getActivities();
     return () => {
       const db = firebase.firestore();
-      const unsubscribe = db.collection("companies").onSnapshot(() => {});
+      const unsubscribe = db.collection("activities").onSnapshot(() => {});
       unsubscribe();
     };
   }, []);
@@ -108,18 +96,12 @@ const CompanyList: FunctionComponent<CompanyListProps> = props => {
       } else {
         sortDesc(sortMethod.column);
       }
-    } else if (sortMethod.column === "orgNumber") {
-      if (sortMethod.order === "asc") {
-        sortAsc(sortMethod.column);
-      } else {
-        sortDesc(sortMethod.column);
-      }
     }
   };
 
   const sortAsc = (column: Column): void => {
-    const listToSort: Company[] = JSON.parse(JSON.stringify(companyList));
-    listToSort.sort((a: Company, b: Company): number => {
+    const listToSort: Activity[] = JSON.parse(JSON.stringify(activityList));
+    listToSort.sort((a: Activity, b: Activity): number => {
       const propA = a[column].toLowerCase();
       const propB = b[column].toLowerCase();
       if (propA < propB) {
@@ -130,13 +112,13 @@ const CompanyList: FunctionComponent<CompanyListProps> = props => {
       }
       return 0;
     });
-    setCompanyList(listToSort);
-    setClonedCompanyList(listToSort);
+    setActivityList(listToSort);
+    setClonedActivityList(listToSort);
   };
 
   const sortDesc = (column: Column): void => {
-    const listToSort: Company[] = JSON.parse(JSON.stringify(companyList));
-    listToSort.sort((a: Company, b: Company): number => {
+    const listToSort: Activity[] = JSON.parse(JSON.stringify(activityList));
+    listToSort.sort((a: Activity, b: Activity): number => {
       const propA = a[column].toLowerCase();
       const propB = b[column].toLowerCase();
       if (propB < propA) {
@@ -147,8 +129,8 @@ const CompanyList: FunctionComponent<CompanyListProps> = props => {
       }
       return 0;
     });
-    setCompanyList(listToSort);
-    setClonedCompanyList(listToSort);
+    setActivityList(listToSort);
+    setClonedActivityList(listToSort);
   };
 
   return (
@@ -165,8 +147,8 @@ const CompanyList: FunctionComponent<CompanyListProps> = props => {
           />
           <Button
             type="button"
-            text="Add company"
-            onSubmit={() => props.selectCompany("")}
+            text="Add activity"
+            onSubmit={() => props.selectActivity("")}
           />
         </FlexContainer>
       </PaddingRow>
@@ -181,26 +163,15 @@ const CompanyList: FunctionComponent<CompanyListProps> = props => {
         >
           Name
         </span>
-        <span
-          onClick={() =>
-            sortData({
-              column: "name",
-              order: sortMethod.order === "asc" ? "desc" : "asc"
-            })
-          }
-        >
-          Org. number
-        </span>
       </ListHeader>
-      {companyList.length > 0 && !loading ? (
-        companyList.map((company: Company) => {
+      {activityList.length > 0 && !loading ? (
+        activityList.map((activity: Activity) => {
           return (
             <ListRow
-              key={company.id}
-              onClick={() => props.selectCompany(company.id)}
+              key={activity.id}
+              onClick={() => props.selectActivity(activity.id)}
             >
-              <span>{company.name}</span>
-              <span>{company.orgNumber}</span>
+              <span>{activity.name}</span>
             </ListRow>
           );
         })
@@ -216,11 +187,11 @@ const CompanyList: FunctionComponent<CompanyListProps> = props => {
         </ListRow>
       ) : (
         <ListRow>
-          <span>No companies.</span>
+          <span>No activites.</span>
         </ListRow>
       )}
     </Fragment>
   );
 };
 
-export default CompanyList;
+export default ActivitiesList;

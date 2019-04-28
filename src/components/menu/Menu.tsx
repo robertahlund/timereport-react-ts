@@ -66,6 +66,9 @@ const Menu: FunctionComponent<MenuProps> = props => {
               </NavLink>
               {typeof authContext === 'object' && authContext.isAdmin ? (
                 <Fragment>
+                  <NavLink to="/activities" activeClassName="active">
+                    <MenuItem text="Activities"/>
+                  </NavLink>
                   <NavLink to="/companies" activeClassName="active">
                     <MenuItem text="Companies"/>
                   </NavLink>
