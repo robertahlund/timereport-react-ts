@@ -8,7 +8,7 @@ const ButtonItem = styled.button`
     padding: 10px 50px;
     border: none;
     border-radius: 3px;
-    background-color: #FEC861;
+    background-color: ${(props: ButtonStyleProps) => props.buttonType === "Delete" ? '#FE9161' : '#FEC861'};
     margin-top: 25px;
     font-size: 14px;
     color: #393E41;
@@ -26,11 +26,18 @@ interface ButtonProps {
   text: string;
   onSubmit: (() => Promise<void>) | (() => void);
   loading?: boolean;
+  buttonType?: ButtonType;
 }
+
+interface ButtonStyleProps {
+  buttonType?: ButtonType;
+}
+
+type ButtonType = "Create" | "Delete";
 
 const Button: FunctionComponent<ButtonProps> = (props) => {
   return <ButtonItem type={props.type} className={props.loading ? "active" : ""}
-                     onClick={props.onSubmit} disabled={props.loading}>{props.loading &&
+                     onClick={props.onSubmit} disabled={props.loading} buttonType={props.buttonType}>{props.loading &&
   <LoadingIcon position="absolute" left="15px" height="16px" width="24px" color="#393e41"/>}{props.text}</ButtonItem>
 };
 

@@ -3,18 +3,19 @@ import {CompanySelectOptions} from "./EmployeeModal";
 import styled from "styled-components";
 import CloseIcon from "../../Icons/CloseIcon";
 import {ValueType} from "react-select/lib/types";
+import ReactCSSTransitionGroup from "react-addons-css-transition-group";
 
 interface EmployeeModalCompanyListProps {
   companySelectOptions: CompanySelectOptions[];
   handleRemoveFromEmployeeCompanyList: (company: ValueType<any>) => void;
 }
 
-const ListContainer = styled.div`
+export const ListContainer = styled.div`
   padding-top: 15px;
   width: 100%;
 `;
 
-const Row = styled.div`
+export const Row = styled.div`
   padding: 5px 5px 5px 10px;
   background: #F7F7F7;
   border-radius: 3px;
@@ -33,16 +34,22 @@ const EmployeeModalCompanyList: FunctionComponent<EmployeeModalCompanyListProps>
   const {companySelectOptions} = props;
   return (
     <ListContainer>
-      {companySelectOptions.map((company: CompanySelectOptions) => {
-        return (
-          <Row key={company.value}>
-            <span>{company.label}</span>
-            <CloseIcon color="#fff" backgroundColor="#FE9161" background={true} margin="0"
-                       onClick={() => props.handleRemoveFromEmployeeCompanyList(company)}
-                       height="16px"
-                       width="16px"/>
-          </Row>)
-      })}
+      <ReactCSSTransitionGroup
+        transitionName="modal-transition"
+        transitionEnterTimeout={0}
+        transitionLeaveTimeout={0}
+      >
+        {companySelectOptions.map((company: CompanySelectOptions) => {
+          return (
+            <Row key={company.value}>
+              <span>{company.label}</span>
+              <CloseIcon color="#fff" backgroundColor="#FE9161" background={true} margin="0"
+                         onClick={() => props.handleRemoveFromEmployeeCompanyList(company)}
+                         height="16px"
+                         width="16px"/>
+            </Row>)
+        })}
+      </ReactCSSTransitionGroup>
     </ListContainer>
   )
 };

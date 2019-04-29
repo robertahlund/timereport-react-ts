@@ -67,7 +67,6 @@ const ActivitiesList: FunctionComponent<ActivitiesListProps> = props => {
           };
           activityData.push(activity);
         });
-        console.log(activityData, "data");
         setActivityList(activityData);
         setClonedActivityList(activityData);
         setLoading(false);

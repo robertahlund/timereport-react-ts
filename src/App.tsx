@@ -11,6 +11,7 @@ import "react-toastify/dist/ReactToastify.min.css";
 import ToastCloseIcon from "./Icons/ToastCloseIcon";
 import LoadingIcon from "./Icons/LoadingIcon";
 import AuthLoading from "./components/authentication/AuthLoading";
+import {getEmployeesByCompanyId} from "./api/employeeApi";
 
 const db = firebase.firestore();
 
@@ -25,7 +26,7 @@ export interface AuthObject {
   companies?: UserCompanies[];
 }
 
-interface UserCompanies {
+export interface UserCompanies {
   value: string;
   label: string;
 }

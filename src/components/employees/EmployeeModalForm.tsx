@@ -27,7 +27,7 @@ interface EmployeeModalFormProps {
   handleSelectChange: (value: ValueType<object>) => void;
 }
 
-const SmallerHeading = styled.h3`
+export const SmallerHeading = styled.h3`
   padding-top: 15px;
 `;
 

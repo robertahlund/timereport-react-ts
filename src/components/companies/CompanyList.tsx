@@ -12,6 +12,7 @@ import { ListHeader, ListRow } from "../employees/EmployeeList";
 import Button from "../general/Button";
 import styled from "styled-components";
 import firebase from "../../firebaseConfig";
+import {ActivitySelectOptions} from "./CompanyModal";
 
 export const FlexContainer = styled.div`
   display: flex;
@@ -30,6 +31,7 @@ export interface Company {
   id: string;
   name: string;
   orgNumber: string;
+  activities?: ActivitySelectOptions[];
 }
 
 interface CompanyListProps {

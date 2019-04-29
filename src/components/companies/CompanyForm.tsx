@@ -7,15 +7,23 @@ import Input from "../general/Input";
 import {Row} from "../authentication/RegisterForm";
 import {Company} from "./CompanyList";
 import {PaddingRow} from "../authentication/LoginForm";
+import {Activity} from "../activities/Activities";
+import {ValueType} from "react-select/lib/types";
+import Select from "react-select";
+import {SmallerHeading} from "../employees/EmployeeModalForm";
+import {ActivitySelectOptions} from "./CompanyModal";
 
 
 interface CompanyFormProps {
   form: Company;
   onFormChange: (event: ChangeEvent<HTMLInputElement>) => void;
+  selectOptions: ActivitySelectOptions[];
+  handleSelectChange: (value: ValueType<object>) => void;
 }
 
 const CompanyForm: FunctionComponent<CompanyFormProps> = props => {
   const {name, orgNumber} = props.form;
+  const {selectOptions} = props;
   return (
     <Fragment>
       <form autoComplete="off">
@@ -38,6 +46,11 @@ const CompanyForm: FunctionComponent<CompanyFormProps> = props => {
             onFormChange={props.onFormChange}
             width="378px"
           />
+        </Row>
+        <Row direction="column">
+          <SmallerHeading>Activities</SmallerHeading>
+          <Select onChange={props.handleSelectChange} options={selectOptions} placeholder="Select Activities"
+                  value={null} classNamePrefix="react-select" className="react-select"/>
         </Row>
       </form>
     </Fragment>
