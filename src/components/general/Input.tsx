@@ -3,11 +3,23 @@ import styled from "styled-components";
 
 interface InputProps {
   value?: string;
-  labelValue: string;
+  labelValue?: string;
   type: "number" | "text" | "password";
-  name: string;
-  onFormChange: (event: ChangeEvent<HTMLInputElement>) => void;
+  name?: string;
+  onFormChange: (
+    event: ChangeEvent<HTMLInputElement>,
+    timeReportIndex?: number,
+    timeReportRowIndex?: number
+  ) => void;
   width: string;
+  textAlign?: "left" | "right";
+  timeReportIndex?: number;
+  timeReportRowIndex?: number;
+}
+
+interface InputFieldProps {
+  width: string;
+  textAlign?: string;
 }
 
 export const Label = styled.label`
@@ -24,21 +36,28 @@ const InputField = styled.input`
   border: 1px solid #f1f1f1;
   padding: 10px;
   font-size: 15px;
-  width: ${props => props.width};
+  width: ${(props: InputFieldProps) => props.width};
+  text-align: ${(props: InputFieldProps) =>
+    props.textAlign ? props.textAlign : "left"};
 `;
 
 const Input: FunctionComponent<InputProps> = props => {
   return (
     <div>
-      <Label htmlFor={props.name}>{props.labelValue}</Label>
+      {props.labelValue && (
+        <Label htmlFor={props.name}>{props.labelValue}</Label>
+      )}
       <InputField
         width={props.width}
         id={props.name}
         name={props.name}
         value={props.value}
         type={props.type}
-        onChange={(event: ChangeEvent<HTMLInputElement>) => props.onFormChange(event)}
+        onChange={(event: ChangeEvent<HTMLInputElement>) =>
+          props.onFormChange(event, props.timeReportIndex, props.timeReportRowIndex)
+        }
         autoComplete="off"
+        textAlign={props.textAlign}
       />
     </div>
   );

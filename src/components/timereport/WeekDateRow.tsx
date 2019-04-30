@@ -41,7 +41,6 @@ const WeekDateRow: FunctionComponent<WeekDateRowProps> = props => {
           <Day>{format(addDays(initialDate, i), "ddd")}</Day>
           <Date>{format(addDays(initialDate, i), "MMM[ ]D")}</Date>
         </DateContainer>;
-
       dateList.push(dateItem)
     }
     return dateList;
