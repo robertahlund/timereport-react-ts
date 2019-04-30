@@ -1,10 +1,10 @@
-import React, {Fragment, useState} from 'react';
+import React, {Fragment, FunctionComponent, useState} from 'react';
 import {ContentSection} from "../employees/Employees";
 import CompanyList from "./CompanyList";
 import ReactCSSTransitionGroup from "react-addons-css-transition-group";
 import CompanyModal from "./CompanyModal";
 
-const Companies = () => {
+const Companies: FunctionComponent = () => {
   const [showCompanyModal, setShowCompanyModal] = useState(false);
   const [companyId, setCompanyId] = useState("");
 

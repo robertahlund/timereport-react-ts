@@ -1,4 +1,4 @@
-import React, {useState, Fragment} from 'react';
+import React, {useState, Fragment, FunctionComponent} from 'react';
 import styled from "styled-components";
 import EmployeeList from "./EmployeeList";
 import EmployeeModal from "./EmployeeModal";
@@ -12,7 +12,7 @@ export const ContentSection = styled.section`
   max-width: 1440px;
 `;
 
-const Employees = () => {
+const Employees: FunctionComponent = () => {
   const [showEmployeeModal, setShowEmployeeModal] = useState(false);
   const [userUid, setUserUid] = useState("");
 

@@ -1,4 +1,4 @@
-import React, { Fragment, useState } from "react";
+import React, {Fragment, FunctionComponent, useState} from "react";
 import ActivitiesList from "./ActivitiesList";
 import { ContentSection } from "../employees/Employees";
 import ActivityModal from "./ActivityModal";
@@ -9,7 +9,7 @@ export interface Activity {
   name: string;
 }
 
-const Activities = () => {
+const Activities: FunctionComponent = () => {
   const [showActivityModal, setShowActivityModal] = useState(false);
   const [activityId, setActivityId] = useState("");
 
