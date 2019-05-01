@@ -40,6 +40,7 @@ export const WeekDay: FunctionComponent<WeekDayProps> = props => {
         textAlign="right"
         timeReportRowIndex={timeReportRowIndex}
         timeReportIndex={timeReportIndex}
+        fontWeight="300"
       />
     </InputWrapper>
   );

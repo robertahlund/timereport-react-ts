@@ -22,6 +22,8 @@ export interface TimeReportRow {
 
 export interface TimeReport {
   userId: string;
+  date: Date;
+  prettyDate: string;
   activityId: string;
   activityName?: string;
   companyId: string;
@@ -43,6 +45,8 @@ const timeReportDateFormat: TimeReportDateFormat = "YYYY-MM-DD";
 const FAKE_TIME_REPORT_ROWS: TimeReport[] = [
   {
     userId: "",
+    date: new Date(),
+    prettyDate: "",
     activityId: "",
     activityName: "En aktivitet",
     companyId: "",
@@ -87,6 +91,8 @@ const FAKE_TIME_REPORT_ROWS: TimeReport[] = [
   },
   {
     userId: "",
+    date: new Date(),
+    prettyDate: "",
     activityId: "",
     activityName: "En aktivitet",
     companyId: "",

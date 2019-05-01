@@ -15,11 +15,13 @@ interface InputProps {
   textAlign?: "left" | "right";
   timeReportIndex?: number;
   timeReportRowIndex?: number;
+  fontWeight?: string;
 }
 
 interface InputFieldProps {
   width: string;
   textAlign?: string;
+  fontWeight?: string;
 }
 
 export const Label = styled.label`
@@ -39,6 +41,8 @@ const InputField = styled.input`
   width: ${(props: InputFieldProps) => props.width};
   text-align: ${(props: InputFieldProps) =>
     props.textAlign ? props.textAlign : "left"};
+  font-weight: ${(props: InputFieldProps) =>
+    props.fontWeight ? props.fontWeight : 400};
 `;
 
 const Input: FunctionComponent<InputProps> = props => {
@@ -54,10 +58,15 @@ const Input: FunctionComponent<InputProps> = props => {
         value={props.value}
         type={props.type}
         onChange={(event: ChangeEvent<HTMLInputElement>) =>
-          props.onFormChange(event, props.timeReportIndex, props.timeReportRowIndex)
+          props.onFormChange(
+            event,
+            props.timeReportIndex,
+            props.timeReportRowIndex
+          )
         }
         autoComplete="off"
         textAlign={props.textAlign}
+        fontWeight={props.fontWeight}
       />
     </div>
   );
