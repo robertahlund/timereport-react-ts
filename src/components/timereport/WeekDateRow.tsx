@@ -6,7 +6,7 @@ interface WeekDateRowProps {
   selectedDate: Date;
 }
 
-const Row = styled.div`
+export const Row = styled.div`
   background-color: #F7F7F7;
   border: 2px solid #fff;
   display: flex;

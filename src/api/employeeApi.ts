@@ -1,5 +1,8 @@
 import firebase from '../firebaseConfig';
 import {AuthObject} from "../App";
+import {ActivitySelectOptions} from "../components/companies/CompanyModal";
+import {CompanySelectOptions} from "../components/employees/EmployeeModal";
+import {ActivityCompanySelectOption, getCompanyActivitiesByCompanies} from "./companyApi";
 
 export const getEmployees = async (): Promise<AuthObject[] | string> => {
   const db = firebase.firestore();
@@ -51,6 +54,28 @@ export const updateEmployee = async (employee: AuthObject): Promise<void> => {
       .update(employee);
   } catch (error) {
     console.log(error);
+  }
+};
+
+export const getAllActivitiesAssignedToUser = async (uid: string): Promise<ActivityCompanySelectOption[] | string> => {
+  const db = firebase.firestore();
+  try {
+    const userCompanies: CompanySelectOptions[] = await db
+      .collection("users")
+      .doc(uid)
+      .get()
+      .then(doc => {
+        if (doc.exists) {
+          return doc.data()!.companies
+        }
+      });
+    const userActivities: ActivityCompanySelectOption[] | string = await getCompanyActivitiesByCompanies(userCompanies);
+    if (typeof userActivities === "string") {
+      return new Promise<ActivityCompanySelectOption[] | string>(reject => reject("Error"))
+    }
+    return new Promise<ActivityCompanySelectOption[] | string>(resolve => (resolve(userActivities)))
+  } catch (error) {
+    return new Promise<ActivityCompanySelectOption[] | string>(reject => reject("Error"))
   }
 };
 

@@ -2,7 +2,7 @@ import React, {FunctionComponent} from 'react';
 import styled from "styled-components";
 import LoadingIcon from "../../Icons/LoadingIcon";
 
-const ButtonItem = styled.button`
+export const ButtonItem = styled.button`
     align-self: flex-end;
     text-transform: uppercase;
     padding: 10px 50px;

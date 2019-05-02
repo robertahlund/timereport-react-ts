@@ -18,7 +18,7 @@ interface WeekRowProps {
   ) => void;
 }
 
-const Row = styled.div`
+export const Row = styled.div`
   background-color: #fff;
   padding: 10px 5px 10px 10px;
   display: flex;
@@ -34,13 +34,13 @@ const Company = styled.span`
   font-weight: 300;
 `;
 
-const TextWrapper = styled.div`
+export const TextWrapper = styled.div`
   display: flex;
   flex-direction: column;
   font-size: 15px;
 `;
 
-const FieldWrapper = styled.div`
+export const FieldWrapper = styled.div`
   display: flex;
 `;
 

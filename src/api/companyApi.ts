@@ -1,5 +1,7 @@
 import firebase from '../firebaseConfig';
 import {Company} from "../components/companies/CompanyList";
+import {ActivitySelectOptions} from "../components/companies/CompanyModal";
+import {CompanySelectOptions} from "../components/employees/EmployeeModal";
 
 export const getCompanies = async (): Promise<Company[] | string> => {
   const db = firebase.firestore();
@@ -16,6 +18,41 @@ export const getCompanies = async (): Promise<Company[] | string> => {
     return new Promise<Company[]>(resolve => resolve(companyList))
   } catch (error) {
     return new Promise<Company[] | string>(reject => reject("Error"))
+  }
+};
+
+export interface ActivityCompanySelectOption {
+  value: string;
+  label: string;
+  companyId: string;
+  companyName: string;
+}
+
+export const getCompanyActivitiesByCompanies = async (companies: CompanySelectOptions[]): Promise<ActivityCompanySelectOption[] | string> => {
+  const db = firebase.firestore();
+  const activities: ActivityCompanySelectOption[] = [];
+  for (const company of companies) {
+    await db
+      .collection("companies")
+      .doc(company.value)
+      .get()
+      .then(doc => {
+        if (doc.exists) {
+          doc.data()!.activities.forEach((activity: ActivityCompanySelectOption) => {
+            activities.push({
+              label: `${company.label} - ${activity.label}`,
+              value: activity.value,
+              companyId: company.value,
+              companyName: company.label
+            })
+          })
+        }
+      })
+  }
+  if (activities.length > 0) {
+    return new Promise<ActivityCompanySelectOption[] | string>(resolve => resolve(activities))
+  } else {
+    return new Promise<ActivityCompanySelectOption[] | string>(reject => reject("Activity list is empty"))
   }
 };
 
