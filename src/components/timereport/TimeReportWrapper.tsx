@@ -10,6 +10,9 @@ import Select from "react-select";
 import {ActivitySelectOptions} from "../companies/CompanyModal";
 import {ValueType} from "react-select/lib/types";
 import Button, {ButtonItem} from "../general/Button";
+import ReactCSSTransitionGroup from "react-addons-css-transition-group";
+import TimeReportLoading from "./TimeReportLoading";
+import LoadingIcon from "../../Icons/LoadingIcon";
 
 const TimeReportListHeader = styled(ListHeader)`
   justify-content: flex-end;
@@ -21,12 +24,16 @@ const SummaryRow = styled(SummaryRowWhite)`
   border-top: none;
 `;
 
+interface ActivityRowProps {
+  lastSaved: string;
+}
+
 const ActivityRow = styled(Row)`
   border: none;
   background-color: transparent;
   padding-right: 0;
   padding-left: 0;
-  justify-content: space-between;
+  justify-content: ${(props: ActivityRowProps) => props.lastSaved ? "space-between" : "flex-end"};
   button${ButtonItem} {
     margin: 0;
   }
@@ -45,6 +52,18 @@ const TextWrapperSummary = styled(SummaryWrapper)`
   font-weight: 400;
 `;
 
+const LastSaved = styled.span`
+  font-size: 15px;
+`;
+
+const LastSavedTimeStamp = styled.span`
+  font-weight: 500;
+`;
+
+const EmptyRow = styled(SummaryRowWhite)`
+  font-size: 15px;
+`;
+
 interface TimeReportWrapperProps {
   handleWeekChange: (direction: "prev" | "next") => void;
   dateSelectorValue: DateSelectorValue;
@@ -58,11 +77,14 @@ interface TimeReportWrapperProps {
   selectOptions: ActivitySelectOptions[];
   handleSelectChange: (option: ValueType<any>) => void;
   saveRows: () => Promise<void>;
-  total: TimeReportSummary
+  total: TimeReportSummary;
+  lastSaved: string;
+  timeReportLoading: boolean;
+  deleteRow: (timeReport: TimeReport) => Promise<void>;
 }
 
 const TimeReportWrapper: FunctionComponent<TimeReportWrapperProps> = props => {
-  const {timeReportRows, selectOptions, handleSelectChange, total} = props;
+  const {timeReportRows, selectOptions, handleSelectChange, total, lastSaved, timeReportLoading} = props;
   return (
     <Fragment>
       <TimeReportListHeader>
@@ -72,26 +94,56 @@ const TimeReportWrapper: FunctionComponent<TimeReportWrapperProps> = props => {
         />
       </TimeReportListHeader>
       <WeekDateRow selectedDate={props.selectedDate}/>
-      {timeReportRows.map((timeReport, index) => (
-        <WeekRow
-          timeReport={timeReport}
-          key={index}
-          timeReportIndex={index}
-          onTimeReportRowChange={props.onTimeReportRowChange}
-        />
-      ))}
+      <ReactCSSTransitionGroup
+        transitionName="modal-transition"
+        transitionEnterTimeout={0}
+        transitionLeaveTimeout={0}
+      >
+        {timeReportLoading ? (<TimeReportLoading/>) : (
+          <Fragment>
+            {timeReportRows.length > 0 ? (
+              <Fragment>
+              {timeReportRows.map((timeReport, index) => (
+                  <WeekRow
+                    timeReport={timeReport}
+                    key={index}
+                    timeReportIndex={index}
+                    onTimeReportRowChange={props.onTimeReportRowChange}
+                    deleteRow={props.deleteRow}
+                  />
+                ))}
+              </Fragment>
+            ) : (
+              <EmptyRow>No data for this week.</EmptyRow>
+            )}
+          </Fragment>
+        )}
+      </ReactCSSTransitionGroup>
       <SummaryRow>
-        <SummaryWrapper>Total: {total.total}h</SummaryWrapper>
-        <FieldWrapper>
-          {total.rowTotals.map((totalRow, index) => <TextWrapperSummary
-            key={index}>{totalRow.total}</TextWrapperSummary>)}
-        </FieldWrapper>
+        {timeReportLoading ? (
+          <LoadingIcon
+            position="relative"
+            left="0"
+            height="18px"
+            width="18px"
+            color="#393e41"
+          />
+        ) : (
+          <Fragment>
+            <SummaryWrapper>Total: {total.total}h</SummaryWrapper>
+            <FieldWrapper>
+              {total.rowTotals.map((totalRow, index) => <TextWrapperSummary
+                key={index}>{totalRow.total}</TextWrapperSummary>)}
+            </FieldWrapper>
+          </Fragment>
+        )}
       </SummaryRow>
-      <ActivityRow>
-        <Button type="button" text="Save" onSubmit={props.saveRows}/>
+      <ActivityRow lastSaved={lastSaved}>
+        {lastSaved && <LastSaved>Last saved <LastSavedTimeStamp>{lastSaved}</LastSavedTimeStamp></LastSaved>}
         <Select onChange={handleSelectChange} options={selectOptions} placeholder="Select Activity"
                 value={null} classNamePrefix="react-select-time" className="react-select-time"/>
       </ActivityRow>
+      <Button type="button" text="Test save" onSubmit={props.saveRows}/>
     </Fragment>
   );
 };

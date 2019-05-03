@@ -10,11 +10,7 @@ import {
   addDays,
   endOfWeek,
   format,
-  getMonth,
-  getYear,
   isEqual,
-  lastDayOfMonth,
-  parse,
   startOfWeek,
   subDays
 } from "date-fns";
@@ -24,6 +20,7 @@ import {ActivitySelectOptions} from "../companies/CompanyModal";
 import {getAllActivitiesAssignedToUser} from "../../api/employeeApi";
 import {ValueType} from "react-select/lib/types";
 import {ActivityCompanySelectOption} from "../../api/companyApi";
+import {createOrUpdateTimeReportRows, deleteTimeReport, getTimeReportsByDate} from "../../api/timeReportApi";
 
 export interface DateSelectorValue {
   from: string;
@@ -37,6 +34,7 @@ export interface TimeReportRow {
 }
 
 export interface TimeReport {
+  id: string;
   userId: string;
   date: Date;
   prettyDate: string;
@@ -58,112 +56,17 @@ export interface TimeReportRowSummary {
 
 type DateSelectorStartValueFormatType = "MMM[ ]D";
 type DateSelectorEndValueFormatType = "[ - ]MMM[ ]D[, ]YYYY";
+export type TimeStampFormat = "HH[:]mm[:]ss";
 export const dateSelectorStartValueFormat: DateSelectorStartValueFormatType =
   "MMM[ ]D";
 export const dateSelectorEndValueFormat: DateSelectorEndValueFormatType =
   "[ - ]MMM[ ]D[, ]YYYY";
+export const timeStampFormat: TimeStampFormat = "HH[:]mm[:]ss";
 
 type TimeReportDateFormat = "YYYY-MM-DD";
 const timeReportDateFormat: TimeReportDateFormat = "YYYY-MM-DD";
 
-//En tidrapport per aktivitet och företag och månad
-/*const FAKE_TIME_REPORT_ROWS: TimeReport[] = [
-  {
-    userId: "",
-    date: new Date(),
-    prettyDate: "",
-    activityId: "",
-    activityName: "En aktivitet",
-    companyId: "",
-    companyName: "Ett företag",
-    timeReportRows: [
-      {
-        date: new Date(),
-        prettyDate: format(new Date(), timeReportDateFormat),
-        hours: "5"
-      },
-      {
-        date: new Date(),
-        prettyDate: "",
-        hours: "3"
-      },
-      {
-        date: new Date(),
-        prettyDate: "",
-        hours: "3"
-      },
-      {
-        date: new Date(),
-        prettyDate: "",
-        hours: "1"
-      },
-      {
-        date: new Date(),
-        prettyDate: "",
-        hours: "0.3"
-      },
-      {
-        date: new Date(),
-        prettyDate: "",
-        hours: "1.3"
-      },
-      {
-        date: new Date(),
-        prettyDate: "",
-        hours: "1.9"
-      }
-    ]
-  },
-  {
-    userId: "",
-    date: new Date(),
-    prettyDate: "",
-    activityId: "",
-    activityName: "En aktivitet",
-    companyId: "",
-    companyName: "Ett företag",
-    timeReportRows: [
-      {
-        date: new Date(),
-        prettyDate: format(new Date(), timeReportDateFormat),
-        hours: "5"
-      },
-      {
-        date: new Date(),
-        prettyDate: "",
-        hours: "3"
-      },
-      {
-        date: new Date(),
-        prettyDate: "",
-        hours: "3"
-      },
-      {
-        date: new Date(),
-        prettyDate: "",
-        hours: "1"
-      },
-      {
-        date: new Date(),
-        prettyDate: "",
-        hours: "0.3"
-      },
-      {
-        date: new Date(),
-        prettyDate: "",
-        hours: "1.3"
-      },
-      {
-        date: new Date(),
-        prettyDate: "",
-        hours: "1.9"
-      }
-    ]
-  }
-];
- */
-
-const initialTimeReportRows: TimeReport[] = []
+const initialTimeReportRows: TimeReport[] = [];
 
 const Time: FunctionComponent = () => {
   const authContext = useContext(AuthContext);
@@ -178,9 +81,6 @@ const Time: FunctionComponent = () => {
     initialDateSelectorValue
   );
   const [timeReportRows, setTimeReportRows] = useState(initialTimeReportRows);
-  const [filteredTimeReportRows, setFilteredTimeReportRows] = useState(
-    initialTimeReportRows
-  );
   const initialActivitySelect: ActivitySelectOptions[] = [];
   const [activitySelectOptions, setActivitySelectOptions] = useState(initialActivitySelect);
   const initialTotal: TimeReportSummary = {
@@ -188,6 +88,8 @@ const Time: FunctionComponent = () => {
     rowTotals: [{total: 0}, {total: 0}, {total: 0}, {total: 0}, {total: 0}, {total: 0}, {total: 0}]
   };
   const [total, setTotal] = useState(initialTotal);
+  const [lastSaved, setLastSaved] = useState("");
+  const [timeReportLoading, setTimeReportLoading] = useState(false);
 
   const getFirstAndLastDayOfWeek = (date: Date) => {
     const dateSelectorValue: DateSelectorValue = {
@@ -205,26 +107,46 @@ const Time: FunctionComponent = () => {
 
   useEffect(() => {
     getFirstAndLastDayOfWeek(selectedDate);
-    calculateTotals(filteredTimeReportRows);
-    getAllAssignedActivities();
+    // noinspection JSIgnoredPromiseFromCall
+    getInitialData(selectedDate);
   }, []);
 
-  const handleWeekChange = (direction: "prev" | "next"): void => {
+  const getInitialData = async (date: Date): Promise<void> => {
+    if (typeof authContext === "boolean" || authContext.uid === undefined) {
+      return;
+    }
+    setTimeReportLoading(true);
+    const timeReports = await getTimeReportsByDate(format(date, timeReportDateFormat), authContext.uid);
+    if (typeof timeReports !== "string") {
+      setTimeReportRows(timeReports);
+      const userActivities: ActivityCompanySelectOption[] | string = await getAllAssignedActivities();
+      if (typeof userActivities !== "string") {
+        removeActivityFromCombobox(undefined, timeReports, userActivities);
+      }
+      calculateTotals(timeReports);
+    }
+    setTimeReportLoading(false);
+  };
+
+  const handleWeekChange = async (direction: "prev" | "next"): Promise<void> => {
+    if (typeof authContext === "boolean" || authContext.uid === undefined) {
+      return;
+    }
+    setTimeReportLoading(true);
     if (direction === "prev") {
       const newSelectedDate = subDays(selectedDate, 7);
       const newWeekStartDate = startOfWeek(newSelectedDate, {weekStartsOn: 1});
-      const newWeekEndDate = endOfWeek(newSelectedDate, {weekStartsOn: 1});
       setSelectedDate(newWeekStartDate);
       getFirstAndLastDayOfWeek(newSelectedDate);
-      getTimeReportRowsForCurrentWeek(newWeekStartDate, newWeekEndDate)
+      await getInitialData(newWeekStartDate);
     } else {
       const newSelectedDate = addDays(selectedDate, 7);
       const newWeekStartDate = startOfWeek(newSelectedDate, {weekStartsOn: 1});
-      const newWeekEndDate = endOfWeek(newSelectedDate, {weekStartsOn: 1});
-      setSelectedDate(startOfWeek(newSelectedDate, {weekStartsOn: 1}));
+      setSelectedDate(newWeekStartDate);
       getFirstAndLastDayOfWeek(newSelectedDate);
-      getTimeReportRowsForCurrentWeek(newWeekStartDate, newWeekEndDate)
+      await getInitialData(newWeekStartDate);
     }
+    setTimeReportLoading(false);
   };
 
   const onTimeReportRowChange = (
@@ -234,40 +156,44 @@ const Time: FunctionComponent = () => {
   ) => {
     if (timeReportIndex !== undefined && timeReportRowIndex !== undefined) {
       //https://github.com/immerjs/immer
-      setFilteredTimeReportRows(
-        produce(filteredTimeReportRows, draft => {
+      setTimeReportRows(
+        produce(timeReportRows, draft => {
           draft[timeReportIndex].timeReportRows[timeReportRowIndex].hours =
             event.target.value;
         })
       );
-      calculateTotals(produce(filteredTimeReportRows, draft => {
+      calculateTotals(produce(timeReportRows, draft => {
         draft[timeReportIndex].timeReportRows[timeReportRowIndex].hours =
           event.target.value;
       }))
     }
   };
 
-  const getAllAssignedActivities = async (): Promise<void> => {
+  const getAllAssignedActivities = async (): Promise<ActivityCompanySelectOption[] | string> => {
     if (typeof authContext === "boolean" || authContext.uid === undefined) {
-      return;
+      return new Promise<ActivityCompanySelectOption[] | string>(reject => reject("Error"));
     }
     const userActivities: ActivityCompanySelectOption[] | string = await getAllActivitiesAssignedToUser(authContext.uid);
     if (typeof userActivities !== "string") {
-      setActivitySelectOptions(userActivities)
+      setActivitySelectOptions(userActivities);
+      return new Promise<ActivityCompanySelectOption[] | string>(resolve => resolve(userActivities))
     }
+    return new Promise<ActivityCompanySelectOption[] | string>(reject => reject("Error"))
   };
 
   const handleSelectChange = (option: ValueType<any>): void => {
+    // noinspection JSIgnoredPromiseFromCall
     createTimeReportRow(option);
     removeActivityFromCombobox(option.value)
   };
 
-  const createTimeReportRow = (activity: ActivityCompanySelectOption): void => {
+  const createTimeReportRow = async (activity: ActivityCompanySelectOption): Promise<void> => {
     if (typeof authContext === "boolean" || authContext.uid === undefined) {
       return;
     }
     const firstDayOfWeekDate: Date = selectedDate;
     const newTimeReportRow: TimeReport = {
+      id: "",
       userId: authContext.uid,
       activityId: activity.value,
       activityName: activity.label.split("-")[1].trimStart(),
@@ -286,13 +212,22 @@ const Time: FunctionComponent = () => {
       };
       newTimeReportRow.timeReportRows.push(timeReportCell);
     }
-    setFilteredTimeReportRows([...filteredTimeReportRows, newTimeReportRow]);
-    setTimeReportRows([...timeReportRows, newTimeReportRow]);
-    console.log(newTimeReportRow)
+    const savedTimeReportRow = await createOrUpdateTimeReportRows([newTimeReportRow]);
+    setLastSaved(format(new Date(), timeStampFormat));
+    if (typeof savedTimeReportRow !== "string") {
+      setTimeReportRows([...timeReportRows, ...savedTimeReportRow]);
+    }
   };
 
-  const removeActivityFromCombobox = (activityId: string): void => {
-    setActivitySelectOptions([...activitySelectOptions.filter(activity => activity.value !== activityId)])
+  const removeActivityFromCombobox = (activityId?: string, timeReports?: TimeReport[], userActivities?: ActivityCompanySelectOption[]): void => {
+    if (userActivities && timeReports && !activityId) {
+      timeReports.forEach(timeReport => {
+        userActivities = [...userActivities!.filter(activity => activity.value !== timeReport.activityId)]
+      });
+      setActivitySelectOptions(userActivities)
+    } else {
+      setActivitySelectOptions([...activitySelectOptions.filter(activity => activity.value !== activityId)]);
+    }
   };
 
   const addActivityToCombobox = (activity: ActivityCompanySelectOption): void => {
@@ -310,14 +245,36 @@ const Time: FunctionComponent = () => {
     setTotal(total);
   };
 
-  const getTimeReportRowsForCurrentWeek = (startDate: Date, endDate: Date): void => {
-    setFilteredTimeReportRows(timeReportRows.filter(timeReportRow => {
-      console.log(timeReportRow.date, startDate)
-      return isEqual(timeReportRow.date, startDate)
-    }));
+  const deleteRow = async (timeReport: TimeReport): Promise<void> => {
+    try {
+      await deleteTimeReport(timeReport.id);
+      setTimeReportRows([...timeReportRows].filter(timeReportRow => timeReportRow.id !== timeReport.id));
+      calculateTotals([...timeReportRows].filter(timeReportRow => timeReportRow.id !== timeReport.id));
+      setLastSaved(format(new Date(), timeStampFormat));
+      if (timeReport.activityName && timeReport.companyName) {
+        addActivityToCombobox({
+          value: timeReport.activityId,
+          label: `${timeReport.companyName} - ${timeReport.activityName}`,
+          companyId: timeReport.companyId,
+          companyName: timeReport.companyName
+        })
+      }
+    } catch (error) {
+      console.log(error)
+    }
   };
 
   const saveRows = async (): Promise<void> => {
+    try {
+      const savedRows = await createOrUpdateTimeReportRows(timeReportRows);
+      if (typeof savedRows !== "string") {
+        setTimeReportRows(savedRows);
+        setLastSaved(format(new Date(), timeStampFormat))
+      }
+      console.log(savedRows)
+    } catch (error) {
+      console.log(error)
+    }
   };
 
   return (
@@ -326,12 +283,15 @@ const Time: FunctionComponent = () => {
         handleWeekChange={handleWeekChange}
         dateSelectorValue={dateSelectorValue}
         selectedDate={selectedDate}
-        timeReportRows={filteredTimeReportRows}
+        timeReportRows={timeReportRows}
         onTimeReportRowChange={onTimeReportRowChange}
         selectOptions={activitySelectOptions}
         handleSelectChange={handleSelectChange}
         saveRows={saveRows}
         total={total}
+        lastSaved={lastSaved}
+        timeReportLoading={timeReportLoading}
+        deleteRow={deleteRow}
       />
     </ContentSection>
   );
