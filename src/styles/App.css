@@ -1,0 +1,10 @@
+html, body {
+  background: #F7F7F7;
+  color: #393E41;
+  font-family: 'Roboto', sans-serif;
+}
+
+.toast-global {
+  font-family: inherit!important;
+  padding-left: 20px!important;
+}

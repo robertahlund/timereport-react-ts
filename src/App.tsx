@@ -1,5 +1,7 @@
 import React, { Component } from "react";
-import "./App.css";
+import "./styles/App.css";
+import "./styles/modal-transition.css";
+import "./styles/react-select.css";
 import Menu from "./components/menu/Menu";
 import Routes from "./components/routes/Routes";
 import firebase from "./firebaseConfig";
@@ -9,9 +11,7 @@ import { User } from "firebase";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.min.css";
 import ToastCloseIcon from "./Icons/ToastCloseIcon";
-import LoadingIcon from "./Icons/LoadingIcon";
 import AuthLoading from "./components/authentication/AuthLoading";
-import {getEmployeesByCompanyId} from "./api/employeeApi";
 
 const db = firebase.firestore();
 
@@ -63,7 +63,8 @@ class App extends Component<{}, AppState> {
         } else {
           console.log("Logged out");
           this.setState({
-            auth: false
+            auth: false,
+            authHasLoaded: true
           });
         }
       });

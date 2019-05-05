@@ -1,9 +1,9 @@
 import React, {FunctionComponent} from 'react';
-import {CompanySelectOptions} from "./EmployeeModal";
 import styled from "styled-components";
 import CloseIcon from "../../Icons/CloseIcon";
 import {ValueType} from "react-select/lib/types";
 import ReactCSSTransitionGroup from "react-addons-css-transition-group";
+import {CompanySelectOptions} from "../../types/companyTypes";
 
 interface EmployeeModalCompanyListProps {
   companySelectOptions: CompanySelectOptions[];

@@ -1,7 +1,7 @@
 import React, { FunctionComponent, Fragment, ChangeEvent } from "react";
 import Input from "../general/Input";
 import { Row } from "../authentication/RegisterForm";
-import {Activity} from "./Activities";
+import {Activity} from "../../types/activityTypes";
 
 interface ActivityFormProps {
   form: Activity;

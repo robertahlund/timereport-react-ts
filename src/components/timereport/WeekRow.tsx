@@ -2,13 +2,14 @@ import React, {
   ReactNode,
   FunctionComponent,
   Fragment,
-  ChangeEvent, useState
+  ChangeEvent,
+  useState
 } from "react";
-import {WeekDay} from "./WeekDay";
-import {TimeReport} from "./Time";
+import { WeekDay } from "./WeekDay";
 import styled from "styled-components";
 import CloseIcon from "../../Icons/CloseIcon";
 import ReactCSSTransitionGroup from "react-addons-css-transition-group";
+import {TimeReport} from "../../types/timeReportTypes";
 
 interface WeekRowProps {
   timeReport: TimeReport;
@@ -19,6 +20,10 @@ interface WeekRowProps {
     timeReportRowIndex?: number
   ) => void;
   deleteRow: (timeReport: TimeReport) => Promise<void>;
+  saveSingleRow: (
+    timeReportIndex?: number,
+    timeReportRowIndex?: number
+  ) => Promise<void>;
 }
 
 export const Row = styled.div`
@@ -67,7 +72,7 @@ export const WeekRow: FunctionComponent<WeekRowProps> = props => {
     setShowDeleteIcon(true);
   };
 
-  const {timeReport, timeReportIndex, onTimeReportRowChange} = props;
+  const { timeReport, timeReportIndex, onTimeReportRowChange } = props;
   return (
     <Row onMouseOver={onRowHover} onMouseLeave={() => setShowDeleteIcon(false)}>
       <TextWrapper>
@@ -82,25 +87,27 @@ export const WeekRow: FunctionComponent<WeekRowProps> = props => {
             onTimeReportRowChange={onTimeReportRowChange}
             timeReportIndex={timeReportIndex}
             timeReportRowIndex={index}
+            saveSingleRow={props.saveSingleRow}
           />
         ))}
         <ReactCSSTransitionGroup
-          transitionName="modal-transition"
+          transitionName="close-button"
           transitionEnterTimeout={0}
           transitionLeaveTimeout={0}
         >
-          {showDeleteIcon &&
-          <DeleteContainer>
+          {showDeleteIcon && (
+            <DeleteContainer>
               <CloseIcon
-                  color="#fff"
-                  backgroundColor="#FE9161"
-                  background={true}
-                  margin="7px"
-                  onClick={() => props.deleteRow(timeReport)}
-                  height="16px"
-                  width="16px"/>
-          </DeleteContainer>
-          }
+                color="#fff"
+                backgroundColor="#FE9161"
+                background={true}
+                margin="7px"
+                onClick={() => props.deleteRow(timeReport)}
+                height="16px"
+                width="16px"
+              />
+            </DeleteContainer>
+          )}
         </ReactCSSTransitionGroup>
       </FieldWrapper>
     </Row>

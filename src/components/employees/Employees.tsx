@@ -1,4 +1,4 @@
-import React, {useState, Fragment, FunctionComponent} from 'react';
+import React, { useState, Fragment, FunctionComponent, useEffect } from "react";
 import styled from "styled-components";
 import EmployeeList from "./EmployeeList";
 import EmployeeModal from "./EmployeeModal";
@@ -16,9 +16,13 @@ const Employees: FunctionComponent = () => {
   const [showEmployeeModal, setShowEmployeeModal] = useState(false);
   const [userUid, setUserUid] = useState("");
 
+  useEffect(() => {
+    document.title = "Employees";
+  }, []);
+
   const toggleEmployeeModal = (event?: React.MouseEvent): void => {
     if (event) {
-      const {target, currentTarget} = event;
+      const { target, currentTarget } = event;
       if (target === currentTarget) {
         setShowEmployeeModal(!showEmployeeModal);
       }
@@ -27,20 +31,22 @@ const Employees: FunctionComponent = () => {
 
   const selectUser = (uid: string): void => {
     setUserUid(uid);
-    toggleEmployeeModal()
+    toggleEmployeeModal();
   };
 
   return (
     <Fragment>
       <ContentSection>
-        <EmployeeList selectUser={selectUser}/>
+        <EmployeeList selectUser={selectUser} />
       </ContentSection>
       <ReactCSSTransitionGroup
         transitionName="modal-transition"
         transitionEnterTimeout={0}
         transitionLeaveTimeout={0}
       >
-        {showEmployeeModal && <EmployeeModal uid={userUid} toggleModal={toggleEmployeeModal}/>}
+        {showEmployeeModal && (
+          <EmployeeModal uid={userUid} toggleModal={toggleEmployeeModal} />
+        )}
       </ReactCSSTransitionGroup>
     </Fragment>
   );

@@ -1,4 +1,4 @@
-import React, {ChangeEvent, FunctionComponent, useState, Fragment, useEffect} from "react";
+import React, {ChangeEvent, Fragment, FunctionComponent, useEffect, useState} from "react";
 import {AuthObject} from "../../App";
 import styled from "styled-components";
 import CloseIcon from "../../Icons/CloseIcon";
@@ -8,61 +8,12 @@ import EmployeeModalForm from "./EmployeeModalForm";
 import LoadingIcon from "../../Icons/LoadingIcon";
 import {ValueType} from "react-select/lib/types";
 import EmployeeModalCompanyList from "./EmployeeModalCompanyList";
-
-const ModalBackground = styled.div`
-  height: 100vh;
-  width: 100vw;
-  position: absolute;
-  left: 0;
-  top: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: rgba(0, 0, 0, 0.39);
-  z-index: 1;
-`;
-
-const ModalContent = styled.div`
-  border-radius: 3px;
-  background-color: #fff;
-`;
-
-const ModalHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-`;
-
-const ModalTitle = styled.h3`
-  font-weight: 500;
-  margin: 0;
-  padding: 25px;
-`;
-
-const Section = styled.div`
-  display: flex;
-  justify-content: center;
-  border-radius: 3px;
-  background: #fff;
-  padding: 25px 50px 50px 50px;
-  flex-direction: column;
-  align-items: center;
-  h3 {
-    font-weight: 500;
-    margin-top: 0;
-  }
-`;
+import {CompanySelectOptions, EmployeeCompanyList} from "../../types/companyTypes";
 
 interface EmployeeModalProps {
   toggleModal: (event: React.MouseEvent) => void;
   uid: string;
 }
-
-export interface CompanySelectOptions {
-  value: string;
-  label: string;
-}
-
-export type EmployeeCompanyList = CompanySelectOptions[];
 
 const EmployeeModal: FunctionComponent<EmployeeModalProps> = props => {
   const [userInactive, setUserInactive] = useState(false);
@@ -144,7 +95,6 @@ const EmployeeModal: FunctionComponent<EmployeeModalProps> = props => {
   };
 
   useEffect(() => {
-    console.log('effect');
     // noinspection JSIgnoredPromiseFromCall
     removeAddedCompaniesFromList()
   }, []);
@@ -326,3 +276,46 @@ const EmployeeModal: FunctionComponent<EmployeeModalProps> = props => {
 };
 
 export default EmployeeModal;
+
+const ModalBackground = styled.div`
+  height: 100vh;
+  width: 100vw;
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.39);
+  z-index: 1;
+`;
+
+const ModalContent = styled.div`
+  border-radius: 3px;
+  background-color: #fff;
+`;
+
+const ModalHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;
+
+const ModalTitle = styled.h3`
+  font-weight: 500;
+  margin: 0;
+  padding: 25px;
+`;
+
+const Section = styled.div`
+  display: flex;
+  justify-content: center;
+  border-radius: 3px;
+  background: #fff;
+  padding: 25px 50px 50px 50px;
+  flex-direction: column;
+  align-items: center;
+  h3 {
+    font-weight: 500;
+    margin-top: 0;
+  }
+`;

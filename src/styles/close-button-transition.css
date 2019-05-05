@@ -1,0 +1,17 @@
+.close-button-enter {
+  opacity: 0.01;
+}
+
+.close-button-enter.close-button-enter-active {
+  opacity: 1;
+  transition: opacity 50ms ease-in;
+}
+
+.close-button-leave {
+  opacity: 1;
+}
+
+.close-button-leave.close-button-leave-active {
+  opacity: 0.01;
+  transition: opacity 50ms ease-in;
+}

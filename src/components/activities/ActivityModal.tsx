@@ -15,7 +15,6 @@ import {
 } from "../account/MyAccountModal";
 import firebase from "../../firebaseConfig";
 import LoadingIcon from "../../Icons/LoadingIcon";
-import {Activity} from "./Activities";
 import ActivityForm from "./ActivityForm";
 import {toast} from "react-toastify";
 import styled from "styled-components";
@@ -23,6 +22,7 @@ import {AuthObject} from "../../App";
 import {Company} from "../companies/CompanyList";
 import {deleteActivity, updateActivity} from "../../api/activityApi";
 import {getCompaniesByActivityId, updateCompanies} from "../../api/companyApi";
+import {Activity} from "../../types/activityTypes";
 
 export const ButtonRow = styled.div`
   display: flex;

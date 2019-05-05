@@ -1,7 +1,7 @@
 import firebase from '../firebaseConfig';
 import {Company} from "../components/companies/CompanyList";
-import {ActivitySelectOptions} from "../components/companies/CompanyModal";
-import {CompanySelectOptions} from "../components/employees/EmployeeModal";
+import {ActivityCompanySelectOption} from "../types/activityTypes";
+import {CompanySelectOptions} from "../types/companyTypes";
 
 export const getCompanies = async (): Promise<Company[] | string> => {
   const db = firebase.firestore();
@@ -20,13 +20,6 @@ export const getCompanies = async (): Promise<Company[] | string> => {
     return new Promise<Company[] | string>(reject => reject("Error"))
   }
 };
-
-export interface ActivityCompanySelectOption {
-  value: string;
-  label: string;
-  companyId: string;
-  companyName: string;
-}
 
 export const getCompanyActivitiesByCompanies = async (companies: CompanySelectOptions[]): Promise<ActivityCompanySelectOption[] | string> => {
   const db = firebase.firestore();

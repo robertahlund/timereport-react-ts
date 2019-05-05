@@ -1,0 +1,50 @@
+.react-select-time .react-select-time__control {
+  background-color: #fff;
+  border: 1px solid #f1f1f1;
+  cursor: pointer;
+  box-shadow: none;
+  min-width: 350px;
+}
+
+.react-select-time .react-select-time__control:hover {
+  border-color: #f1f1f1;
+}
+
+.react-select-time .react-select-time__placeholder {
+  color: #393E41;
+  font-size: 15px;
+}
+
+.react-select-time .react-select-time__dropdown-indicator, .react-select-time .react-select-time__dropdown-indicator:hover {
+  color: #393E41;
+}
+
+.react-select-time .react-select-time__indicator-separator {
+  background-color: #f1f1f1;
+}
+
+.react-select-time .react-select-time__menu-list {
+  margin: 0;
+  padding: 0;
+}
+.react-select-time .react-select-time__option:first-child {
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+
+.react-select-time .react-select-time__option:last-child {
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+}
+
+.react-select-time .react-select-time__option {
+  background-color: #fff;
+  cursor: pointer;
+  padding: 10px;
+  font-size: 15px;
+}
+
+.react-select-time .react-select-time__option:hover {
+  background-color: #fec861;
+  cursor: pointer;
+}

@@ -1,8 +1,9 @@
 import firebase from '../firebaseConfig';
 import {AuthObject} from "../App";
 import {ActivitySelectOptions} from "../components/companies/CompanyModal";
-import {CompanySelectOptions} from "../components/employees/EmployeeModal";
-import {ActivityCompanySelectOption, getCompanyActivitiesByCompanies} from "./companyApi";
+import {getCompanyActivitiesByCompanies} from "./companyApi";
+import {ActivityCompanySelectOption} from "../types/activityTypes";
+import {CompanySelectOptions} from "../types/companyTypes";
 
 export const getEmployees = async (): Promise<AuthObject[] | string> => {
   const db = firebase.firestore();

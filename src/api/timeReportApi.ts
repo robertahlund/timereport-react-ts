@@ -1,5 +1,5 @@
 import firebase from '../firebaseConfig';
-import {TimeReport} from "../components/timereport/Time";
+import {TimeReport} from "../types/timeReportTypes";
 
 const db = firebase.firestore();
 
@@ -95,7 +95,7 @@ export const getTimeReportsByDate = async (startDate: string, userId: string): P
             userId: doc.data().userId,
             activityId: doc.data().activityId,
             activityName: doc.data().activityName,
-            companyId: doc.data().activityId,
+            companyId: doc.data().companyId,
             companyName: doc.data().companyName,
             date: doc.data().date,
             prettyDate: doc.data().prettyDate,

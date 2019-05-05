@@ -7,11 +7,11 @@ import Input from "../general/Input";
 import {Row} from "../authentication/RegisterForm";
 import {Company} from "./CompanyList";
 import {PaddingRow} from "../authentication/LoginForm";
-import {Activity} from "../activities/Activities";
 import {ValueType} from "react-select/lib/types";
 import Select from "react-select";
 import {SmallerHeading} from "../employees/EmployeeModalForm";
 import {ActivitySelectOptions} from "./CompanyModal";
+import {Activity} from "../../types/activityTypes";
 
 
 interface CompanyFormProps {

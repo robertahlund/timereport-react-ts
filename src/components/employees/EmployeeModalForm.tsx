@@ -10,7 +10,7 @@ import Checkbox from "../general/Checkbox";
 import styled from "styled-components";
 import Select from "react-select";
 import {ValueType} from "react-select/lib/types";
-import {CompanySelectOptions} from "./EmployeeModal";
+import {CompanySelectOptions} from "../../types/companyTypes";
 
 export interface EmployeeForm {
   firstName?: string;

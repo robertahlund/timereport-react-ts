@@ -1,4 +1,4 @@
-import React, {ChangeEvent, FunctionComponent, useState} from "react";
+import React, {ChangeEvent, FunctionComponent, useEffect, useState} from "react";
 import Button from "../general/Button";
 import {Section, Wrapper} from "./Login";
 import RegisterForm from "./RegisterForm";
@@ -21,6 +21,10 @@ const Register: FunctionComponent = () => {
   });
   const [loading, setLoading] = useState(false);
   const [checkbox, setCheckbox] = useState(false);
+
+  useEffect(() => {
+    document.title = "Register"
+  }, []);
 
   const handleFormChange = (event: ChangeEvent<HTMLInputElement>): void => {
     setForm({

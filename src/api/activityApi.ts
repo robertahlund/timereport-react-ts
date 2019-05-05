@@ -1,10 +1,10 @@
 import firebase from '../firebaseConfig';
-import {Activity} from "../components/activities/Activities";
+import {Activity} from "../types/activityTypes";
 
 export const getActivities = async (): Promise<Activity[] | string> => {
   const db = firebase.firestore();
   try {
-    let activityList: Activity[] = [];
+    const activityList: Activity[] = [];
     await db
       .collection("activities")
       .get()

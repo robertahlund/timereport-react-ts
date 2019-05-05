@@ -4,9 +4,9 @@ import React, {
   Fragment,
   ChangeEvent
 } from "react";
-import { TimeReportRow } from "./Time";
 import Input from "../general/Input";
 import styled from "styled-components";
+import {TimeReport, TimeReportRow} from "../../types/timeReportTypes";
 
 interface WeekDayProps {
   timeReportRow: TimeReportRow;
@@ -17,6 +17,10 @@ interface WeekDayProps {
     timeReportIndex?: number,
     timeReportRowIndex?: number
   ) => void;
+  saveSingleRow: (
+    timeReportIndex?: number,
+    timeReportRowIndex?: number
+  ) => Promise<void>;
 }
 
 const InputWrapper = styled.div`
@@ -41,6 +45,7 @@ export const WeekDay: FunctionComponent<WeekDayProps> = props => {
         timeReportRowIndex={timeReportRowIndex}
         timeReportIndex={timeReportIndex}
         fontWeight="300"
+        saveSingleRow={props.saveSingleRow}
       />
     </InputWrapper>
   );

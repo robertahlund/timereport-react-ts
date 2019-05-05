@@ -1,0 +1,49 @@
+.react-select .react-select__control {
+  background-color: #F7F7F7;
+  border: 1px solid #f1f1f1;
+  cursor: pointer;
+  box-shadow: none;
+}
+
+.react-select .react-select__control:hover {
+  border-color: #f1f1f1;
+}
+
+.react-select .react-select__placeholder {
+  color: #393E41;
+  font-size: 15px;
+}
+
+.react-select .react-select__dropdown-indicator, .react-select .react-select__dropdown-indicator:hover {
+  color: #393E41;
+}
+
+.react-select .react-select__indicator-separator {
+  background-color: #f1f1f1;
+}
+
+.react-select .react-select__menu-list {
+  margin: 0;
+  padding: 0;
+}
+.react-select .react-select__option:first-child {
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+
+.react-select .react-select__option:last-child {
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+}
+
+.react-select .react-select__option {
+  background-color: #fff;
+  cursor: pointer;
+  padding: 10px;
+  font-size: 15px;
+}
+
+.react-select .react-select__option:hover {
+  background-color: #fec861;
+  cursor: pointer;
+}

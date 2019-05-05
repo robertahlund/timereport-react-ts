@@ -1,5 +1,6 @@
 import React, { ChangeEvent, Fragment, FunctionComponent } from "react";
 import styled from "styled-components";
+import {TimeReport} from "../../types/timeReportTypes";
 
 interface InputProps {
   value?: string;
@@ -16,6 +17,10 @@ interface InputProps {
   timeReportIndex?: number;
   timeReportRowIndex?: number;
   fontWeight?: string;
+  saveSingleRow?: (
+    timeReportIndex?: number,
+    timeReportRowIndex?: number
+  ) => Promise<void>;
 }
 
 interface InputFieldProps {
@@ -67,6 +72,14 @@ const Input: FunctionComponent<InputProps> = props => {
         autoComplete="off"
         textAlign={props.textAlign}
         fontWeight={props.fontWeight}
+        onBlur={() =>
+          props.saveSingleRow
+            ? props.saveSingleRow(
+                props.timeReportIndex,
+                props.timeReportRowIndex
+              )
+            : null
+        }
       />
     </div>
   );

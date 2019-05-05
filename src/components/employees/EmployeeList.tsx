@@ -11,7 +11,7 @@ import firebase from "../../firebaseConfig";
 import { UserRoles } from "../../App";
 import Input from "../general/Input";
 import { PaddingRow } from "../authentication/LoginForm";
-import { EmployeeCompanyList } from "./EmployeeModal";
+import {EmployeeCompanyList} from "../../types/companyTypes";
 
 export const ListHeader = styled.div`
   background-color: #fec861;

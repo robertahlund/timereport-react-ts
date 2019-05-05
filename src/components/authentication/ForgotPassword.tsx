@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useState } from "react";
+import React, {ChangeEvent, useEffect, useState} from "react";
 import { Section, Wrapper } from "./Login";
 import ForgotPasswordForm from "./ForgotPasswordForm";
 import Button from "../general/Button";
@@ -18,6 +18,10 @@ const formSubmit = async (email: string): Promise<void> => {
 
 const ForgotPassword = () => {
   const [emailInput, setEmailInput] = useState("");
+
+  useEffect(() => {
+    document.title = "Forgot Password?"
+  }, []);
 
   const onFormChange = (event: ChangeEvent<HTMLInputElement>): void => {
     setEmailInput(event.target.value);

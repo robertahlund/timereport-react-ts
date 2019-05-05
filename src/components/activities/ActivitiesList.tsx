@@ -12,7 +12,7 @@ import Button from "../general/Button";
 import { ListHeader, ListRow } from "../employees/EmployeeList";
 import LoadingIcon from "../../Icons/LoadingIcon";
 import { FlexContainer, Order } from "../companies/CompanyList";
-import { Activity } from "./Activities";
+import {Activity} from "../../types/activityTypes";
 
 type Column = "name";
 

@@ -1,17 +1,16 @@
-import React, {Fragment, FunctionComponent, useState} from "react";
+import React, {Fragment, FunctionComponent, useEffect, useState} from "react";
 import ActivitiesList from "./ActivitiesList";
-import { ContentSection } from "../employees/Employees";
+import {ContentSection} from "../employees/Employees";
 import ActivityModal from "./ActivityModal";
 import ReactCSSTransitionGroup from "react-addons-css-transition-group";
-
-export interface Activity {
-  id: string;
-  name: string;
-}
 
 const Activities: FunctionComponent = () => {
   const [showActivityModal, setShowActivityModal] = useState(false);
   const [activityId, setActivityId] = useState("");
+
+  useEffect(() => {
+    document.title = "Activities";
+  }, []);
 
   const toggleActivityModal = (event?: React.MouseEvent): void => {
     if (event) {
@@ -39,8 +38,8 @@ const Activities: FunctionComponent = () => {
       >
         {showActivityModal && (
           <ActivityModal
-          activityId={activityId}
-          toggleModal={toggleActivityModal}
+            activityId={activityId}
+            toggleModal={toggleActivityModal}
           />
         )}
       </ReactCSSTransitionGroup>

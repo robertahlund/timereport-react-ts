@@ -2,7 +2,7 @@ import React, {FunctionComponent} from 'react';
 import styled from "styled-components";
 import ArrowLeft from "../../Icons/ArrowLeft";
 import ArrowRight from "../../Icons/ArrowRight";
-import {DateSelectorValue} from "./Time";
+import {DateSelectorValue} from "../../types/timeReportTypes";
 
 const DateSelectorWrapper = styled.div`
   display: flex;

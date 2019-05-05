@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useState } from "react";
+import React, {ChangeEvent, useEffect, useState} from "react";
 import styled from "styled-components";
 import LoginForm from "./LoginForm";
 import LoginLinks from "./LoginLinks";
@@ -37,6 +37,10 @@ const Login = () => {
     password: ""
   });
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    document.title = "Login"
+  }, []);
 
   const formSubmit = async (email: string, password: string): Promise<void> => {
     try {
