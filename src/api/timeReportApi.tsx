@@ -1,5 +1,5 @@
-import firebase from '../firebaseConfig';
-import {TimeReport} from "../types/timeReportTypes";
+import firebase from '../config/firebaseConfig';
+import {Company, TimeReport} from "../types/types";
 
 const db = firebase.firestore();
 
@@ -106,5 +106,49 @@ export const getTimeReportsByDate = async (startDate: string, userId: string): P
     return new Promise<TimeReport[]|string>(resolve => resolve(timeReports))
   } catch (error) {
     return new Promise<TimeReport[]|string>(reject => reject("Error"))
+  }
+};
+
+export const updateTimeReportByActivityId = async (activityId: string, newActivityName: string): Promise<void> => {
+  try {
+    const db = firebase.firestore();
+    await db
+      .collection("timeReports")
+      .where("activityId", "==", activityId)
+      .get()
+      .then(documents => {
+        documents.forEach(async doc => {
+          await db
+            .collection("timeReports")
+            .doc(doc.id)
+            .update({
+              activityName: newActivityName
+            })
+        })
+      })
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const updateTimeReportByCompanyId = async (companyId: string, newCompanyName: string): Promise<void> => {
+  try {
+    const db = firebase.firestore();
+    await db
+      .collection("timeReports")
+      .where("companyId", "==", companyId)
+      .get()
+      .then(documents => {
+        documents.forEach(async doc => {
+          await db
+            .collection("timeReports")
+            .doc(doc.id)
+            .update({
+              companyName: newCompanyName
+            })
+        })
+      })
+  } catch (error) {
+    console.log(error);
   }
 };

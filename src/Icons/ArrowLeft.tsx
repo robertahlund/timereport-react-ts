@@ -7,11 +7,6 @@ interface ArrowLeftProps {
   color?: string;
 }
 
-const Svg = styled.svg`
-  height: ${(props: ArrowLeftProps) => props.height};
-  width: ${(props: ArrowLeftProps) => props.width};
-`;
-
 const ArrowLeft: FunctionComponent<ArrowLeftProps> = props => {
   return (
     <Svg xmlns="http://www.w3.org/2000/svg" width={props.width} height={props.height} viewBox="0 0 24 24" fill={props.color}>
@@ -22,3 +17,8 @@ const ArrowLeft: FunctionComponent<ArrowLeftProps> = props => {
 };
 
 export default ArrowLeft;
+
+const Svg = styled.svg`
+  height: ${(props: ArrowLeftProps) => props.height};
+  width: ${(props: ArrowLeftProps) => props.width};
+`;

@@ -3,32 +3,12 @@ import styled from "styled-components";
 import CloseIcon from "../../Icons/CloseIcon";
 import {ValueType} from "react-select/lib/types";
 import ReactCSSTransitionGroup from "react-addons-css-transition-group";
-import {CompanySelectOptions} from "../../types/companyTypes";
+import {CompanySelectOptions} from "../../types/types";
 
 interface EmployeeModalCompanyListProps {
   companySelectOptions: CompanySelectOptions[];
   handleRemoveFromEmployeeCompanyList: (company: ValueType<any>) => void;
 }
-
-export const ListContainer = styled.div`
-  padding-top: 15px;
-  width: 100%;
-`;
-
-export const Row = styled.div`
-  padding: 5px 5px 5px 10px;
-  background: #F7F7F7;
-  border-radius: 3px;
-  font-size: 15px;
-  margin-bottom: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border: 1px solid #f1f1f1;
-  &:last-child {
-    margin-bottom: 0;
-  }
-`;
 
 const EmployeeModalCompanyList: FunctionComponent<EmployeeModalCompanyListProps> = props => {
   const {companySelectOptions} = props;
@@ -55,3 +35,23 @@ const EmployeeModalCompanyList: FunctionComponent<EmployeeModalCompanyListProps>
 };
 
 export default EmployeeModalCompanyList;
+
+export const ListContainer = styled.div`
+  padding-top: 15px;
+  width: 100%;
+`;
+
+export const Row = styled.div`
+  padding: 5px 5px 5px 10px;
+  background: #F7F7F7;
+  border-radius: 3px;
+  font-size: 15px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid #f1f1f1;
+  &:last-child {
+    margin-bottom: 0;
+  }
+`;

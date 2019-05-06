@@ -2,7 +2,28 @@ import React, {FunctionComponent} from 'react';
 import styled from "styled-components";
 import ArrowLeft from "../../Icons/ArrowLeft";
 import ArrowRight from "../../Icons/ArrowRight";
-import {DateSelectorValue} from "../../types/timeReportTypes";
+import {DateSelectorValue} from "../../types/types";
+
+interface DateSelectorProps {
+  handleWeekChange: (direction: "prev" | "next") => void;
+  dateSelectorValue: DateSelectorValue;
+}
+
+const DateSelector: FunctionComponent<DateSelectorProps> = props => {
+  return (
+    <DateSelectorWrapper>
+      <DateSelectorButton onClick={() => props.handleWeekChange("prev")} type="button">
+        <ArrowLeft width="24px" height="24px" color="#393e41"/>
+      </DateSelectorButton>
+      <DateSelectorValueContainer>{props.dateSelectorValue.from}{props.dateSelectorValue.to}</DateSelectorValueContainer>
+      <DateSelectorButton onClick={() => props.handleWeekChange("next")} type="button">
+        <ArrowRight width="24px" height="24px" color="#393e41"/>
+      </DateSelectorButton>
+    </DateSelectorWrapper>
+  );
+};
+
+export default DateSelector;
 
 const DateSelectorWrapper = styled.div`
   display: flex;
@@ -33,24 +54,3 @@ const DateSelectorValueContainer = styled.div`
   justify-content: center;
   margin: 0 5px;
 `;
-
-interface DateSelectorProps {
-  handleWeekChange: (direction: "prev" | "next") => void;
-  dateSelectorValue: DateSelectorValue;
-}
-
-const DateSelector: FunctionComponent<DateSelectorProps> = props => {
-  return (
-    <DateSelectorWrapper>
-      <DateSelectorButton onClick={() => props.handleWeekChange("prev")} type="button">
-        <ArrowLeft width="24px" height="24px" color="#393e41"/>
-      </DateSelectorButton>
-      <DateSelectorValueContainer>{props.dateSelectorValue.from}{props.dateSelectorValue.to}</DateSelectorValueContainer>
-      <DateSelectorButton onClick={() => props.handleWeekChange("next")} type="button">
-        <ArrowRight width="24px" height="24px" color="#393e41"/>
-      </DateSelectorButton>
-    </DateSelectorWrapper>
-  );
-};
-
-export default DateSelector;

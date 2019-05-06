@@ -4,67 +4,18 @@ import DateSelector from "./DateSelector";
 import styled from "styled-components";
 import WeekDateRow, { Row } from "./WeekDateRow";
 import { FieldWrapper, Row as SummaryRowWhite } from "./WeekRow";
-import { TextWrapper, WeekRow } from "./WeekRow";
+import WeekRow, { TextWrapper } from "./WeekRow";
 import Select from "react-select";
-import { ActivitySelectOptions } from "../companies/CompanyModal";
 import { ValueType } from "react-select/lib/types";
 import Button, { ButtonItem } from "../general/Button";
 import ReactCSSTransitionGroup from "react-addons-css-transition-group";
 import TimeReportLoading from "./TimeReportLoading";
 import LoadingIcon from "../../Icons/LoadingIcon";
-import {DateSelectorValue, TimeReport, TimeReportRow, TimeReportSummary} from "../../types/timeReportTypes";
-import {ActivityCompanySelectOption} from "../../types/activityTypes";
-
-const TimeReportListHeader = styled(ListHeader)`
-  justify-content: flex-end;
-`;
-
-const SummaryRow = styled(SummaryRowWhite)`
-  background-color: #f7f7f7;
-  border: 2px solid #fff;
-  border-top: none;
-`;
+import {ActivityCompanySelectOption, DateSelectorValue, TimeReport, TimeReportSummary} from "../../types/types";
 
 interface ActivityRowProps {
   lastSaved: string;
 }
-
-const ActivityRow = styled(Row)`
-  border: none;
-  background-color: transparent;
-  padding-right: 0;
-  padding-left: 0;
-  justify-content: ${(props: ActivityRowProps) =>
-    props.lastSaved ? "space-between" : "flex-end"};
-  button${ButtonItem} {
-    margin: 0;
-  }
-`;
-
-const SummaryWrapper = styled(TextWrapper)`
-  align-items: flex-start;
-  width: 150px;
-  font-weight: 500;
-`;
-
-const TextWrapperSummary = styled(SummaryWrapper)`
-  align-items: flex-end;
-  padding: 0 12.5px;
-  width: 75px;
-  font-weight: 400;
-`;
-
-const LastSaved = styled.span`
-  font-size: 15px;
-`;
-
-const LastSavedTimeStamp = styled.span`
-  font-weight: 500;
-`;
-
-const EmptyRow = styled(SummaryRowWhite)`
-  font-size: 15px;
-`;
 
 interface TimeReportWrapperProps {
   handleWeekChange: (direction: "prev" | "next") => void;
@@ -172,9 +123,55 @@ const TimeReportWrapper: FunctionComponent<TimeReportWrapperProps> = props => {
           className="react-select-time"
         />
       </ActivityRow>
-      <Button type="button" text="Test save" onSubmit={props.saveRows} />
     </Fragment>
   );
 };
 
 export default TimeReportWrapper;
+
+const TimeReportListHeader = styled(ListHeader)`
+  justify-content: flex-end;
+`;
+
+const SummaryRow = styled(SummaryRowWhite)`
+  background-color: #f7f7f7;
+  border: 2px solid #fff;
+  border-top: none;
+`;
+
+const ActivityRow = styled(Row)`
+  border: none;
+  background-color: transparent;
+  padding-right: 0;
+  padding-left: 0;
+  justify-content: ${(props: ActivityRowProps) =>
+  props.lastSaved ? "space-between" : "flex-end"};
+  button${ButtonItem} {
+    margin: 0;
+  }
+`;
+
+const SummaryWrapper = styled(TextWrapper)`
+  align-items: flex-start;
+  width: 150px;
+  font-weight: 500;
+`;
+
+const TextWrapperSummary = styled(SummaryWrapper)`
+  align-items: flex-end;
+  padding: 0 12.5px;
+  width: 75px;
+  font-weight: 400;
+`;
+
+const LastSaved = styled.span`
+  font-size: 15px;
+`;
+
+const LastSavedTimeStamp = styled.span`
+  font-weight: 500;
+`;
+
+const EmptyRow = styled(SummaryRowWhite)`
+  font-size: 15px;
+`;

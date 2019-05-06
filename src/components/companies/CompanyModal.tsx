@@ -2,8 +2,7 @@ import React, {ChangeEvent, FunctionComponent, useEffect, useState} from 'react'
 import CloseIcon from "../../Icons/CloseIcon";
 import Button from "../general/Button";
 import {ModalBackground, ModalContent, ModalHeader, ModalTitle, Section} from "../account/MyAccountModal";
-import firebase from "../../firebaseConfig";
-import {Company} from "./CompanyList";
+import firebase from "../../config/firebaseConfig";
 import LoadingIcon from "../../Icons/LoadingIcon";
 import CompanyForm from "./CompanyForm";
 import CompanyModalActivityList from "./CompanyModalActivityList";
@@ -11,17 +10,15 @@ import {ValueType} from "react-select/lib/types";
 import {toast} from "react-toastify";
 import {ButtonRow} from "../activities/ActivityModal";
 import {getEmployeesByCompanyId, updateEmployees} from "../../api/employeeApi";
-import {AuthObject} from "../../App";
 import {createCompany, deleteCompany, updateCompany} from "../../api/companyApi";
+import {ActivitySelectOptions, AuthObject, Company} from "../../types/types";
+import {updateTimeReportByCompanyId} from "../../api/timeReportApi";
+import {stringCompare} from "../../utilities/stringCompare";
 
 interface CompanyModalProps {
   toggleModal: (event?: React.MouseEvent) => void;
   companyId: string;
-}
-
-export interface ActivitySelectOptions {
-  value: string;
-  label: string;
+  getAllCompanies: () => Promise<void>;
 }
 
 const CompanyModal: FunctionComponent<CompanyModalProps> = props => {
@@ -41,6 +38,16 @@ const CompanyModal: FunctionComponent<CompanyModalProps> = props => {
   const [company, setCompany] = useState(initialCompanyState);
   const [originalCompany, setOriginalCompany] = useState(initialCompanyState);
   const [isNew, setIsNew] = useState(props.companyId === "");
+
+  useEffect(() => {
+    if (!isNew) {
+      // noinspection JSIgnoredPromiseFromCall
+      removeAddedActivitiesFromList();
+    } else {
+      // noinspection JSIgnoredPromiseFromCall
+      getActivities()
+    }
+  }, []);
 
   const getCompanyById = async (): Promise<ActivitySelectOptions[] | string> => {
     const {companyId} = props;
@@ -104,33 +111,6 @@ const CompanyModal: FunctionComponent<CompanyModalProps> = props => {
         }
       })
     }
-  };
-
-  useEffect(() => {
-    if (!isNew) {
-      // noinspection JSIgnoredPromiseFromCall
-      removeAddedActivitiesFromList();
-    } else {
-      // noinspection JSIgnoredPromiseFromCall
-      getActivities()
-    }
-  }, []);
-
-  const hasCompanyActivitiesChanged = (originalActivityList: ActivitySelectOptions[], newActivityList: ActivitySelectOptions[]): boolean => {
-    const originalActivityListString: string = JSON.stringify(originalActivityList);
-    const newActivityListString: string = JSON.stringify(newActivityList);
-    return originalActivityListString !== newActivityListString;
-  };
-
-  const hasDataChanged = (
-    originalString: string,
-    newString: string
-  ): boolean => {
-    return !!(
-      originalString !== newString &&
-      newString != null &&
-      originalString != null
-    );
   };
 
   const onFormChange = (event: ChangeEvent<HTMLInputElement>): void => {
@@ -202,6 +182,9 @@ const CompanyModal: FunctionComponent<CompanyModalProps> = props => {
         const updatedEmployeeList = updateCompanyNameOnEmployees(employees, company.id, company.name);
         await updateEmployees(updatedEmployeeList);
         await updateCompany({...company, activities: [...companyActivityList]});
+        if (stringCompare(company.name, originalCompany.name)) {
+          await updateTimeReportByCompanyId(company.id, company.name);
+        }
         setOriginalCompany({...company, activities: [...companyActivityList]});
       }
     } catch (error) {
@@ -219,6 +202,8 @@ const CompanyModal: FunctionComponent<CompanyModalProps> = props => {
         await onUpdateCompany();
         setLoading(false);
       }
+      // noinspection JSIgnoredPromiseFromCall
+      props.getAllCompanies()
     } catch (error) {
       console.log(error);
       setLoading(false);

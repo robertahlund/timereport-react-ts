@@ -17,14 +17,6 @@ interface SvgProps {
   width: string;
 }
 
-const Svg = styled.svg`
-  background: ${(props: SvgProps) => props.backgroundColor};
-  padding: 5px;
-  margin: ${(props: SvgProps) => props.margin};
-  border-radius: 3px;
-  cursor: pointer;
-`;
-
 const CloseIcon: FunctionComponent<SvgProps & IconProps> = props => {
   return (
     <Svg margin={props.margin} onClick={props.onClick} backgroundColor={props.backgroundColor}
@@ -38,3 +30,11 @@ const CloseIcon: FunctionComponent<SvgProps & IconProps> = props => {
 };
 
 export default CloseIcon;
+
+const Svg = styled.svg`
+  background: ${(props: SvgProps) => props.backgroundColor};
+  padding: 5px;
+  margin: ${(props: SvgProps) => props.margin};
+  border-radius: 3px;
+  cursor: pointer;
+`;

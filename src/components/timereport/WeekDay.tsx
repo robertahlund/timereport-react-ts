@@ -6,7 +6,7 @@ import React, {
 } from "react";
 import Input from "../general/Input";
 import styled from "styled-components";
-import {TimeReport, TimeReportRow} from "../../types/timeReportTypes";
+import {TimeReport, TimeReportRow} from "../../types/types";
 
 interface WeekDayProps {
   timeReportRow: TimeReportRow;
@@ -23,11 +23,7 @@ interface WeekDayProps {
   ) => Promise<void>;
 }
 
-const InputWrapper = styled.div`
-  padding: 0 5px;
-`;
-
-export const WeekDay: FunctionComponent<WeekDayProps> = props => {
+const WeekDay: FunctionComponent<WeekDayProps> = props => {
   const {
     timeReportRow,
     timeReportIndex,
@@ -50,3 +46,9 @@ export const WeekDay: FunctionComponent<WeekDayProps> = props => {
     </InputWrapper>
   );
 };
+
+export default WeekDay;
+
+const InputWrapper = styled.div`
+  padding: 0 5px;
+`;

@@ -9,13 +9,6 @@ interface LoadingIconProps {
   color?: string;
 }
 
-const Svg = styled.svg`
-  padding: 0 5px 0 0;
-  cursor: pointer;
-  position: ${(props: LoadingIconProps) => props.position};
-  left: ${(props: LoadingIconProps) => props.left};
-`;
-
 const LoadingIcon: FunctionComponent<LoadingIconProps> = props => {
   return (
     <Svg
@@ -53,3 +46,10 @@ const LoadingIcon: FunctionComponent<LoadingIconProps> = props => {
 };
 
 export default LoadingIcon;
+
+const Svg = styled.svg`
+  padding: 0 5px 0 0;
+  cursor: pointer;
+  position: ${(props: LoadingIconProps) => props.position};
+  left: ${(props: LoadingIconProps) => props.left};
+`;

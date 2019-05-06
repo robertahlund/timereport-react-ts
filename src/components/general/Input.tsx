@@ -1,6 +1,6 @@
 import React, { ChangeEvent, Fragment, FunctionComponent } from "react";
 import styled from "styled-components";
-import {TimeReport} from "../../types/timeReportTypes";
+import {TimeReport} from "../../types/types";
 
 interface InputProps {
   value?: string;
@@ -28,27 +28,6 @@ interface InputFieldProps {
   textAlign?: string;
   fontWeight?: string;
 }
-
-export const Label = styled.label`
-  display: block;
-  font-size: 15px;
-  font-weight: 500;
-  padding: 0 0 3px 0;
-  cursor: pointer;
-`;
-
-const InputField = styled.input`
-  background-color: #fbfbfb;
-  border-radius: 3px;
-  border: 1px solid #f1f1f1;
-  padding: 10px;
-  font-size: 15px;
-  width: ${(props: InputFieldProps) => props.width};
-  text-align: ${(props: InputFieldProps) =>
-    props.textAlign ? props.textAlign : "left"};
-  font-weight: ${(props: InputFieldProps) =>
-    props.fontWeight ? props.fontWeight : 400};
-`;
 
 const Input: FunctionComponent<InputProps> = props => {
   return (
@@ -86,3 +65,24 @@ const Input: FunctionComponent<InputProps> = props => {
 };
 
 export default Input;
+
+export const Label = styled.label`
+  display: block;
+  font-size: 15px;
+  font-weight: 500;
+  padding: 0 0 3px 0;
+  cursor: pointer;
+`;
+
+const InputField = styled.input`
+  background-color: #fbfbfb;
+  border-radius: 3px;
+  border: 1px solid #f1f1f1;
+  padding: 10px;
+  font-size: 15px;
+  width: ${(props: InputFieldProps) => props.width};
+  text-align: ${(props: InputFieldProps) =>
+  props.textAlign ? props.textAlign : "left"};
+  font-weight: ${(props: InputFieldProps) =>
+  props.fontWeight ? props.fontWeight : 400};
+`;

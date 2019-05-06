@@ -1,6 +1,17 @@
-import React from 'react';
+import React, {FunctionComponent} from 'react';
 import {NavLink} from "react-router-dom";
 import styled from "styled-components";
+
+const LoginLinks: FunctionComponent = () => {
+    return (
+        <LinkWrapper>
+            <NavLink to="/forgot-password">Forgot your password?</NavLink>
+            <NavLink to="/create-account">Create new account</NavLink>
+        </LinkWrapper>
+    )
+};
+
+export default LoginLinks;
 
 export const LinkWrapper = styled.div`
     display: flex;
@@ -15,14 +26,3 @@ export const LinkWrapper = styled.div`
         display: block;
     }
 `;
-
-const LoginLinks = () => {
-    return (
-        <LinkWrapper>
-            <NavLink to="/forgot-password">Forgot your password?</NavLink>
-            <NavLink to="/create-account">Create new account</NavLink>
-        </LinkWrapper>
-    )
-};
-
-export default LoginLinks;

@@ -1,78 +1,17 @@
-import React, {
-  ChangeEvent,
-  Fragment,
-  FunctionComponent,
-  useEffect,
-  useState
-} from "react";
+import React, {ChangeEvent, Fragment, FunctionComponent, useEffect, useState} from "react";
+import ReactDOM from "react-dom";
 import styled from "styled-components";
 import LoadingIcon from "../../Icons/LoadingIcon";
-import firebase from "../../firebaseConfig";
-import { UserRoles } from "../../App";
+import firebase from "../../config/firebaseConfig";
 import Input from "../general/Input";
-import { PaddingRow } from "../authentication/LoginForm";
-import {EmployeeCompanyList} from "../../types/companyTypes";
+import {PaddingRow} from "../authentication/LoginForm";
+import {initialEmployeeState, initialSortState} from "../../constants/employeeConstants";
+import {EmployeeColumn, EmployeeRow, EmployeeSort} from "../../types/types";
+import EmployeeModal from "./EmployeeModal";
+import {modalPortal} from "../../constants/generalConstants";
+import {getEmployeesForList} from "../../api/employeeApi";
 
-export const ListHeader = styled.div`
-  background-color: #fec861;
-  display: flex;
-  width: calc(100% - 40px);
-  justify-content: space-between;
-  font-weight: 300;
-  padding: 20px;
-  border-top-left-radius: 3px;
-  border-top-right-radius: 3px;
-  span {
-    cursor: pointer;
-    width: 25%;
-  }
-  span:first-child {
-    width: 25%;
-  }
-  span:last-child:not(:first-child) {
-    text-align: right;
-  }
-`;
-
-export const ListRow = styled(ListHeader)`
-  border-radius: 0;
-  background: #fff;
-  cursor: pointer;
-  border-bottom: 1px solid #f1f1f1;
-  transition: all 0.07s;
-  position: relative;
-  &:hover {
-    transform: scale(1.01);
-    font-size: 16px;
-  }
-`;
-
-interface EmployeeRow {
-  name: string;
-  uid: string;
-  email: string;
-  roles: UserRoles[];
-  companies: EmployeeCompanyList;
-}
-
-interface EmployeeListProps {
-  selectUser: (uid: string) => void;
-}
-
-interface Sort {
-  column: Column;
-  order: Order;
-}
-
-type Column = "name" | "email";
-type Order = "asc" | "desc";
-
-const EmployeeList: FunctionComponent<EmployeeListProps> = props => {
-  const initialEmployeeState: EmployeeRow[] = [];
-  const initialSortState: Sort = {
-    column: "name",
-    order: "asc"
-  };
+const EmployeeList: FunctionComponent = () => {
   const [employeeList, setEmployeeList] = useState(initialEmployeeState);
   const [clonedEmployeeList, setClonedEmployeeList] = useState(
     initialEmployeeState
@@ -80,48 +19,30 @@ const EmployeeList: FunctionComponent<EmployeeListProps> = props => {
   const [loading, setLoading] = useState(false);
   const [sortMethod, setSortMethod] = useState(initialSortState);
   const [searchValue, setSearchValue] = useState("");
+  const [showEmployeeModal, setShowEmployeeModal] = useState(false);
+  const [userUid, setUserUid] = useState("");
 
-  const getEmployees = async (): Promise<void> => {
+  useEffect(() => {
+    // noinspection JSIgnoredPromiseFromCall
+    getAllEmployees();
+  }, []);
+
+  const getAllEmployees = async (): Promise<void> => {
     setLoading(true);
     try {
-      const db = firebase.firestore();
-      await db
-        .collection("users")
-        .orderBy("firstName", "asc")
-        .orderBy("lastName", "asc")
-        .onSnapshot(querySnapshot => {
-          const employeeData: EmployeeRow[] = [];
-          querySnapshot.forEach(doc => {
-            let employee: EmployeeRow = {
-              name: `${doc.data().firstName} ${doc.data().lastName}`,
-              uid: doc.data().uid,
-              email: doc.data().email,
-              roles: doc.data().roles.join(", "),
-              companies: doc.data().companies
-            };
-            employeeData.push(employee);
-          });
-          setEmployeeList(employeeData);
-          setClonedEmployeeList(employeeData);
-          setLoading(false);
-        });
+      const employeeData: EmployeeRow[] | string = await getEmployeesForList();
+      if (typeof employeeData !== "string") {
+        setEmployeeList(employeeData);
+        setClonedEmployeeList(employeeData);
+        setLoading(false);
+      }
     } catch (error) {
       setLoading(false);
       console.log(error);
     }
   };
 
-  useEffect(() => {
-    // noinspection JSIgnoredPromiseFromCall
-    getEmployees();
-    return () => {
-      const db = firebase.firestore();
-      const unsubscribe = db.collection("users").onSnapshot(() => {});
-      unsubscribe();
-    };
-  }, []);
-
-  const sortData = (sortMethod: Sort): void => {
+  const sortData = (sortMethod: EmployeeSort): void => {
     setSortMethod(sortMethod);
     if (sortMethod.column === "name") {
       if (sortMethod.order === "asc") {
@@ -138,7 +59,7 @@ const EmployeeList: FunctionComponent<EmployeeListProps> = props => {
     }
   };
 
-  const sortAsc = (column: Column): void => {
+  const sortAsc = (column: EmployeeColumn): void => {
     const listToSort: EmployeeRow[] = JSON.parse(JSON.stringify(employeeList));
     listToSort.sort((a: EmployeeRow, b: EmployeeRow): number => {
       const propA = a[column].toLowerCase();
@@ -155,7 +76,7 @@ const EmployeeList: FunctionComponent<EmployeeListProps> = props => {
     setClonedEmployeeList(listToSort);
   };
 
-  const sortDesc = (column: Column): void => {
+  const sortDesc = (column: EmployeeColumn): void => {
     const listToSort: EmployeeRow[] = JSON.parse(JSON.stringify(employeeList));
     listToSort.sort((a: EmployeeRow, b: EmployeeRow): number => {
       const propA = a[column].toLowerCase();
@@ -173,7 +94,7 @@ const EmployeeList: FunctionComponent<EmployeeListProps> = props => {
   };
 
   const handleSearchChange = (event: ChangeEvent<HTMLInputElement>): void => {
-    const { target } = event;
+    const {target} = event;
     setSearchValue(target.value);
     if (target.value === "") {
       setEmployeeList(clonedEmployeeList);
@@ -187,6 +108,20 @@ const EmployeeList: FunctionComponent<EmployeeListProps> = props => {
     );
     console.log(searchList);
     setEmployeeList(searchList);
+  };
+
+  const toggleEmployeeModal = (event?: React.MouseEvent): void => {
+    if (event) {
+      const {target, currentTarget} = event;
+      if (target === currentTarget) {
+        setShowEmployeeModal(!showEmployeeModal);
+      }
+    } else setShowEmployeeModal(!showEmployeeModal);
+  };
+
+  const selectUser = (uid: string): void => {
+    setUserUid(uid);
+    toggleEmployeeModal();
   };
 
   return (
@@ -230,7 +165,7 @@ const EmployeeList: FunctionComponent<EmployeeListProps> = props => {
           return (
             <ListRow
               key={employee.uid}
-              onClick={() => props.selectUser(employee.uid)}
+              onClick={() => selectUser(employee.uid)}
             >
               <span>{employee.name}</span>
               <span>{employee.email}</span>
@@ -266,8 +201,45 @@ const EmployeeList: FunctionComponent<EmployeeListProps> = props => {
           <span>No employees.</span>
         </ListRow>
       )}
+      {showEmployeeModal && modalPortal && (
+        ReactDOM.createPortal(<EmployeeModal uid={userUid} toggleModal={toggleEmployeeModal} getAllEmployees={getAllEmployees}/>, modalPortal)
+      )}
     </Fragment>
   );
 };
 
 export default EmployeeList;
+
+export const ListHeader = styled.div`
+  background-color: #fec861;
+  display: flex;
+  width: calc(100% - 40px);
+  justify-content: space-between;
+  font-weight: 300;
+  padding: 20px;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  span {
+    cursor: pointer;
+    width: 25%;
+  }
+  span:first-child {
+    width: 25%;
+  }
+  span:last-child:not(:first-child) {
+    text-align: right;
+  }
+`;
+
+export const ListRow = styled(ListHeader)`
+  border-radius: 0;
+  background: #fff;
+  cursor: pointer;
+  border-bottom: 1px solid #f1f1f1;
+  transition: all 0.07s;
+  position: relative;
+  &:hover {
+    transform: scale(1.01);
+    font-size: 16px;
+  }
+`;

@@ -3,55 +3,19 @@ import styled from "styled-components";
 import {MenuItem} from "./MenuItem";
 import Logo from "../Logo";
 import {NavLink} from "react-router-dom";
-import firebase from '../../firebaseConfig';
-import {AuthContext, AuthContextConsumer} from "../../App";
-
-const List = styled.ul`
-  list-style: none;
-  display: flex;
-  align-items: center;
-  padding: 0;
-  margin: 0;
-`;
-
-const Nav = styled.nav`
-  background-color: #fec861;
-  display: flex;
-  justify-content: space-between;
-  padding: 30px 75px;
-  color: #393e41;
-  a {
-    text-decoration: none;
-    color: #393e41;
-    padding: 0 30px;
-    text-transform: uppercase;
-    font-weight: 300;
-    letter-spacing: 0.5px;
-  }
-  a.logo {
-    padding-left: 0;
-  }
-  a:last-child {
-    padding-right: 0;
-  }
-  a.active {
-    background: #fff;
-    padding-top: 7px;
-    padding-bottom: 7px;
-    border-radius: 3px;
-    transition: background-color .3s;
-  }
-`;
-
-const signOut = async (): Promise<void> => {
-  await firebase.auth().signOut();
-};
+import firebase from '../../config/firebaseConfig';
+import {AuthContext, AuthContextConsumer} from "../../context/authentication/authenticationContext";
 
 interface MenuProps {
   toggleModal: (event: React.MouseEvent) => void;
 }
 
 const Menu: FunctionComponent<MenuProps> = props => {
+
+  const signOut = async (): Promise<void> => {
+    await firebase.auth().signOut();
+  };
+
   return (
     <AuthContextConsumer>
       {authContext => (
@@ -91,3 +55,40 @@ const Menu: FunctionComponent<MenuProps> = props => {
 };
 
 export default Menu;
+
+const List = styled.ul`
+  list-style: none;
+  display: flex;
+  align-items: center;
+  padding: 0;
+  margin: 0;
+`;
+
+const Nav = styled.nav`
+  background-color: #fec861;
+  display: flex;
+  justify-content: space-between;
+  padding: 30px 75px;
+  color: #393e41;
+  a {
+    text-decoration: none;
+    color: #393e41;
+    padding: 0 30px;
+    text-transform: uppercase;
+    font-weight: 300;
+    letter-spacing: 0.5px;
+  }
+  a.logo {
+    padding-left: 0;
+  }
+  a:last-child {
+    padding-right: 0;
+  }
+  a.active {
+    background: #fff;
+    padding-top: 7px;
+    padding-bottom: 7px;
+    border-radius: 3px;
+    transition: background-color .3s;
+  }
+`;

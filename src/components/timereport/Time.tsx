@@ -9,7 +9,6 @@ import { ContentSection } from "../employees/Employees";
 import TimeReportWrapper from "./TimeReportWrapper";
 import { addDays, endOfWeek, format, startOfWeek, subDays } from "date-fns";
 import produce from "immer";
-import { AuthContext } from "../../App";
 import { getAllActivitiesAssignedToUser } from "../../api/employeeApi";
 import { ValueType } from "react-select/lib/types";
 import {
@@ -21,12 +20,6 @@ import "../../styles/time-react-select.css";
 import "../../styles/close-button-transition.css";
 import { validateNumberInput } from "../../utilities/validateNumberInput";
 import {
-  DateSelectorValue,
-  TimeReport,
-  TimeReportRow,
-  TimeReportSummary
-} from "../../types/timeReportTypes";
-import {
   dateSelectorEndValueFormat,
   dateSelectorStartValueFormat,
   initialActivitySelect,
@@ -36,7 +29,14 @@ import {
   timeReportDateFormat,
   timeStampFormat
 } from "../../constants/timeReportConstants";
-import { ActivityCompanySelectOption } from "../../types/activityTypes";
+import {AuthContext} from "../../context/authentication/authenticationContext";
+import {
+  ActivityCompanySelectOption,
+  DateSelectorValue,
+  TimeReport,
+  TimeReportRow,
+  TimeReportSummary
+} from "../../types/types";
 
 const Time: FunctionComponent = () => {
   const authContext = useContext(AuthContext);
@@ -86,7 +86,6 @@ const Time: FunctionComponent = () => {
       authContext.uid
     );
     if (typeof timeReports !== "string") {
-      console.log(timeReports);
       setTimeReportRows(timeReports);
       const userActivities:
         | ActivityCompanySelectOption[]

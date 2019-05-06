@@ -1,18 +1,20 @@
 import React, {ChangeEvent, Fragment, FunctionComponent, useEffect, useState} from "react";
-import {AuthObject} from "../../App";
 import styled from "styled-components";
 import CloseIcon from "../../Icons/CloseIcon";
 import Button from "../general/Button";
-import firebase from "../../firebaseConfig";
+import firebase from "../../config/firebaseConfig";
 import EmployeeModalForm from "./EmployeeModalForm";
 import LoadingIcon from "../../Icons/LoadingIcon";
 import {ValueType} from "react-select/lib/types";
 import EmployeeModalCompanyList from "./EmployeeModalCompanyList";
-import {CompanySelectOptions, EmployeeCompanyList} from "../../types/companyTypes";
+import {AuthObject, CompanySelectOptions, EmployeeCompanyList} from "../../types/types";
+import {getEmployeeById, updateEmployee} from "../../api/employeeApi";
+import {stringCompare} from "../../utilities/stringCompare";
 
 interface EmployeeModalProps {
   toggleModal: (event: React.MouseEvent) => void;
   uid: string;
+  getAllEmployees: () => Promise<void>;
 }
 
 const EmployeeModal: FunctionComponent<EmployeeModalProps> = props => {
@@ -30,6 +32,11 @@ const EmployeeModal: FunctionComponent<EmployeeModalProps> = props => {
   const initialEmployeeCompanyList: EmployeeCompanyList = [];
   const [employeeCompanyList, setEmployeeCompanyList] = useState(initialEmployeeCompanyList);
   const [originalEmployeeCompanyList, setOriginalEmployeeCompanyList] = useState(initialEmployeeCompanyList);
+
+  useEffect(() => {
+    // noinspection JSIgnoredPromiseFromCall
+    removeAddedCompaniesFromList()
+  }, []);
 
   const getUserInformation = async (): Promise<CompanySelectOptions[] | string> => {
     try {
@@ -74,10 +81,10 @@ const EmployeeModal: FunctionComponent<EmployeeModalProps> = props => {
           })
         });
       setCompanyList(companyData);
-      return new Promise<CompanySelectOptions[]|string>(resolve => resolve(companyData));
+      return new Promise<CompanySelectOptions[] | string>(resolve => resolve(companyData));
     } catch (error) {
       console.log(error);
-      return new Promise<CompanySelectOptions[]|string>(reject => reject("Error"))
+      return new Promise<CompanySelectOptions[] | string>(reject => reject("Error"))
     }
   };
 
@@ -93,11 +100,6 @@ const EmployeeModal: FunctionComponent<EmployeeModalProps> = props => {
       })
     }
   };
-
-  useEffect(() => {
-    // noinspection JSIgnoredPromiseFromCall
-    removeAddedCompaniesFromList()
-  }, []);
 
   const handleFormChange = (event: ChangeEvent<HTMLInputElement>): void => {
     setForm({
@@ -141,54 +143,32 @@ const EmployeeModal: FunctionComponent<EmployeeModalProps> = props => {
     inactive?: boolean,
     companies?: EmployeeCompanyList
   ): Promise<void> => {
-    console.log(firstName, lastName, email, inactive, companies);
     try {
-      const db = firebase.firestore();
       setLoading(true);
-      const user: AuthObject | null | undefined = await db.collection('users')
-        .doc(props.uid)
-        .get()
-        .then(doc => {
-          if (doc.exists) {
-            return doc.data();
-          } else return null;
-        });
-      if (user) {
-        if (
-          user.firstName != null && user.firstName !== "" &&
-          user.lastName !== "" && user.lastName !== "" &&
-          firstName !== "" &&
-          lastName !== ""
-        ) {
-          if (
-            hasUserNameChanged(`${user.firstName} ${user.lastName}`, `${firstName} ${lastName}`) ||
-            user.inactive !== inactive || hasUserCompaniesChanged(originalEmployeeCompanyList, employeeCompanyList)
-          ) {
-            await db.collection("users").doc(props.uid).update({
-              firstName,
-              lastName,
-              email,
-              inactive,
-              companies
-            });
-            console.log("Updated collection with name, inactive status & companies.");
-          }
+      const user: AuthObject | string = await getEmployeeById(props.uid);
+      if (user && typeof user !== "string" && user.firstName && user.lastName && firstName && lastName) {
+        if (stringCompare(user.firstName, firstName) || stringCompare(user.lastName, lastName) ||
+          user.inactive !== inactive || hasUserCompaniesChanged(originalEmployeeCompanyList, employeeCompanyList)) {
+          await updateEmployee({
+            uid: props.uid,
+            firstName,
+            lastName,
+            email,
+            inactive,
+            companies
+          });
+          console.log("Updated collection with name, inactive status & companies.");
         }
-        if (
-          user.email != null &&
-          email !== "" &&
-          email != null &&
-          email !== ""
-        ) {
-          if (hasUserEmailChanged(user.email, email)) {
-            await db.collection('users').doc(props.uid).update({
-              email
-            });
+        if (user.email && email) {
+          if (stringCompare(user.email, email)) {
+            await updateEmployee({uid: props.uid, email});
             console.log("Updated email in collection");
           }
         }
         // noinspection JSIgnoredPromiseFromCall
         getUserInformation();
+        // noinspection JSIgnoredPromiseFromCall
+        props.getAllEmployees();
         setLoading(false);
       } else {
         return;

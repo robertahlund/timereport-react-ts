@@ -15,13 +15,6 @@ interface SvgProps {
   closeToast?: (event: React.MouseEvent) => void;
 }
 
-const Svg = styled.svg`
-  background: ${(props: SvgProps) => props.backgroundColor};
-  padding: 5px;
-  border-radius: 3px;
-  cursor: pointer;
-`;
-
 const ToastCloseIcon: FunctionComponent<SvgProps & ToastCloseIconProps> = props => {
   return (
     <Svg onClick={props.closeToast} backgroundColor={props.backgroundColor} xmlns="http://www.w3.org/2000/svg"
@@ -34,3 +27,10 @@ const ToastCloseIcon: FunctionComponent<SvgProps & ToastCloseIconProps> = props 
 };
 
 export default ToastCloseIcon;
+
+const Svg = styled.svg`
+  background: ${(props: SvgProps) => props.backgroundColor};
+  padding: 5px;
+  border-radius: 3px;
+  cursor: pointer;
+`;

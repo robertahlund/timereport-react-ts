@@ -5,14 +5,18 @@ import React, {
   useEffect,
   useState
 } from "react";
-import firebase from "../../firebaseConfig";
-import { PaddingRow } from "../authentication/LoginForm";
+import ReactDOM from "react-dom";
+import {PaddingRow} from "../authentication/LoginForm";
 import Input from "../general/Input";
 import Button from "../general/Button";
-import { ListHeader, ListRow } from "../employees/EmployeeList";
+import {ListHeader, ListRow} from "../employees/EmployeeList";
 import LoadingIcon from "../../Icons/LoadingIcon";
-import { FlexContainer, Order } from "../companies/CompanyList";
-import {Activity} from "../../types/activityTypes";
+import {FlexContainer} from "../companies/CompanyList";
+import {Activity, Order} from "../../types/types";
+import ActivityModal from "./ActivityModal";
+import {getActivities} from "../../api/activityApi";
+import {modalPortal} from "../../constants/generalConstants";
+
 
 type Column = "name";
 
@@ -21,11 +25,7 @@ interface Sort {
   order: Order;
 }
 
-interface ActivitiesListProps {
-  selectActivity: (activityId: string) => void;
-}
-
-const ActivitiesList: FunctionComponent<ActivitiesListProps> = props => {
+const ActivitiesList: FunctionComponent = () => {
   const [searchValue, setSearchValue] = useState("");
   const initialSortState: Sort = {
     column: "name",
@@ -38,9 +38,11 @@ const ActivitiesList: FunctionComponent<ActivitiesListProps> = props => {
   const [clonedActivityList, setClonedActivityList] = useState(
     initialActivityListState
   );
+  const [showActivityModal, setShowActivityModal] = useState(false);
+  const [activityId, setActivityId] = useState("");
 
   const handleSearchChange = (event: ChangeEvent<HTMLInputElement>): void => {
-    const { target } = event;
+    const {target} = event;
     setSearchValue(target.value);
     if (target.value === "") {
       setActivityList(clonedActivityList);
@@ -54,23 +56,15 @@ const ActivitiesList: FunctionComponent<ActivitiesListProps> = props => {
     setActivityList(searchList);
   };
 
-  const getActivities = async (): Promise<void> => {
+  const getAllActivities = async (): Promise<void> => {
     setLoading(true);
     try {
-      const db = firebase.firestore();
-      await db.collection("activities").onSnapshot(querySnapShot => {
-        const activityData: Activity[] = [];
-        querySnapShot.forEach(doc => {
-          const activity: Activity = {
-            id: doc.id,
-            name: doc.data().name
-          };
-          activityData.push(activity);
-        });
+      const activityData = await getActivities();
+      if (typeof activityData !== "string") {
         setActivityList(activityData);
         setClonedActivityList(activityData);
         setLoading(false);
-      });
+      }
     } catch (error) {
       setLoading(false);
       console.log(error);
@@ -79,12 +73,7 @@ const ActivitiesList: FunctionComponent<ActivitiesListProps> = props => {
 
   useEffect(() => {
     // noinspection JSIgnoredPromiseFromCall
-    getActivities();
-    return () => {
-      const db = firebase.firestore();
-      const unsubscribe = db.collection("activities").onSnapshot(() => {});
-      unsubscribe();
-    };
+    getAllActivities();
   }, []);
 
   const sortData = (sortMethod: Sort) => {
@@ -132,6 +121,20 @@ const ActivitiesList: FunctionComponent<ActivitiesListProps> = props => {
     setClonedActivityList(listToSort);
   };
 
+  const toggleActivityModal = (event?: React.MouseEvent): void => {
+    if (event) {
+      const {target, currentTarget} = event;
+      if (target === currentTarget) {
+        setShowActivityModal(!showActivityModal);
+      }
+    } else setShowActivityModal(!showActivityModal);
+  };
+
+  const selectActivity = (companyId: string): void => {
+    setActivityId(companyId);
+    toggleActivityModal();
+  };
+
   return (
     <Fragment>
       <PaddingRow>
@@ -147,7 +150,7 @@ const ActivitiesList: FunctionComponent<ActivitiesListProps> = props => {
           <Button
             type="button"
             text="Add activity"
-            onSubmit={() => props.selectActivity("")}
+            onSubmit={() => selectActivity("")}
           />
         </FlexContainer>
       </PaddingRow>
@@ -168,7 +171,7 @@ const ActivitiesList: FunctionComponent<ActivitiesListProps> = props => {
           return (
             <ListRow
               key={activity.id}
-              onClick={() => props.selectActivity(activity.id)}
+              onClick={() => selectActivity(activity.id)}
             >
               <span>{activity.name}</span>
             </ListRow>
@@ -188,6 +191,15 @@ const ActivitiesList: FunctionComponent<ActivitiesListProps> = props => {
         <ListRow>
           <span>No activites.</span>
         </ListRow>
+      )}
+      {showActivityModal && modalPortal && (
+        ReactDOM.createPortal(
+            <ActivityModal
+              activityId={activityId}
+              toggleModal={toggleActivityModal}
+              getAllActivities={getAllActivities}
+            />, modalPortal
+        )
       )}
     </Fragment>
   );

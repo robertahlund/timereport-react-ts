@@ -6,30 +6,6 @@ interface WeekDateRowProps {
   selectedDate: Date;
 }
 
-export const Row = styled.div`
-  background-color: #F7F7F7;
-  border: 2px solid #fff;
-  display: flex;
-  justify-content: flex-end;
-  padding: 10px;
-`;
-
-const Day = styled.span`
-  font-weight: 500;
-`;
-
-const Date = styled.span`
-  font-weight: 300;
-`;
-
-const DateContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  width: 100px;
-  font-size: 15px;
-`;
-
 const WeekDateRow: FunctionComponent<WeekDateRowProps> = props => {
 
   const buildWeekDates = (): ReactNode[] => {
@@ -54,3 +30,27 @@ const WeekDateRow: FunctionComponent<WeekDateRowProps> = props => {
 };
 
 export default WeekDateRow;
+
+export const Row = styled.div`
+  background-color: #F7F7F7;
+  border: 2px solid #fff;
+  display: flex;
+  justify-content: flex-end;
+  padding: 10px;
+`;
+
+const Day = styled.span`
+  font-weight: 500;
+`;
+
+const Date = styled.span`
+  font-weight: 300;
+`;
+
+const DateContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  width: 100px;
+  font-size: 15px;
+`;

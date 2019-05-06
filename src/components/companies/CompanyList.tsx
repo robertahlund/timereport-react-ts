@@ -1,46 +1,20 @@
-import React, {
-  ChangeEvent,
-  Fragment,
-  FunctionComponent,
-  useEffect,
-  useState
-} from "react";
-import { PaddingRow } from "../authentication/LoginForm";
+import React, {ChangeEvent, Fragment, FunctionComponent, useEffect, useState} from "react";
+import ReactDOM from "react-dom";
+import {PaddingRow} from "../authentication/LoginForm";
 import Input from "../general/Input";
 import LoadingIcon from "../../Icons/LoadingIcon";
-import { ListHeader, ListRow } from "../employees/EmployeeList";
+import {ListHeader, ListRow} from "../employees/EmployeeList";
 import Button from "../general/Button";
 import styled from "styled-components";
-import firebase from "../../firebaseConfig";
-import {ActivitySelectOptions} from "./CompanyModal";
+import firebase from "../../config/firebaseConfig";
+import {CompanyColumn, Company, CompanySort} from "../../types/types";
+import CompanyModal from "./CompanyModal";
+import {modalPortal} from "../../constants/generalConstants";
+import {getCompanies} from "../../api/companyApi";
 
-export const FlexContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-`;
-
-type Column = "name" | "orgNumber";
-export type Order = "asc" | "desc";
-
-export interface Sort {
-  column: Column;
-  order: Order;
-}
-
-export interface Company {
-  id: string;
-  name: string;
-  orgNumber: string;
-  activities?: ActivitySelectOptions[];
-}
-
-interface CompanyListProps {
-  selectCompany: (companyId: string) => void;
-}
-
-const CompanyList: FunctionComponent<CompanyListProps> = props => {
+const CompanyList: FunctionComponent = () => {
   const [searchValue, setSearchValue] = useState("");
-  const initialSortState: Sort = {
+  const initialSortState: CompanySort = {
     column: "name",
     order: "asc"
   };
@@ -51,9 +25,12 @@ const CompanyList: FunctionComponent<CompanyListProps> = props => {
   const [clonedCompanyList, setClonedCompanyList] = useState(
     initialCompanyListState
   );
+  const [showCompanyModal, setShowCompanyModal] = useState(false);
+  const [companyId, setCompanyId] = useState("");
+
 
   const handleSearchChange = (event: ChangeEvent<HTMLInputElement>): void => {
-    const { target } = event;
+    const {target} = event;
     setSearchValue(target.value);
     if (target.value === "") {
       setCompanyList(clonedCompanyList);
@@ -68,24 +45,15 @@ const CompanyList: FunctionComponent<CompanyListProps> = props => {
     setCompanyList(searchList);
   };
 
-  const getCompanies = async (): Promise<void> => {
+  const getAllCompanies = async (): Promise<void> => {
     setLoading(true);
     try {
-      const db = firebase.firestore();
-      await db.collection("companies").onSnapshot(querySnapShot => {
-        const companyData: Company[] = [];
-        querySnapShot.forEach(doc => {
-          const company: Company = {
-            id: doc.id,
-            name: doc.data().name,
-            orgNumber: doc.data().orgNumber
-          };
-          companyData.push(company);
-        });
+      const companyData = await getCompanies();
+      if (typeof companyData !== "string") {
         setCompanyList(companyData);
         setClonedCompanyList(companyData);
         setLoading(false);
-      });
+      }
     } catch (error) {
       setLoading(false);
       console.log(error);
@@ -94,15 +62,16 @@ const CompanyList: FunctionComponent<CompanyListProps> = props => {
 
   useEffect(() => {
     // noinspection JSIgnoredPromiseFromCall
-    getCompanies();
+    getAllCompanies();
     return () => {
       const db = firebase.firestore();
-      const unsubscribe = db.collection("companies").onSnapshot(() => {});
+      const unsubscribe = db.collection("companies").onSnapshot(() => {
+      });
       unsubscribe();
     };
   }, []);
 
-  const sortData = (sortMethod: Sort) => {
+  const sortData = (sortMethod: CompanySort) => {
     setSortMethod(sortMethod);
     if (sortMethod.column === "name") {
       if (sortMethod.order === "asc") {
@@ -119,7 +88,7 @@ const CompanyList: FunctionComponent<CompanyListProps> = props => {
     }
   };
 
-  const sortAsc = (column: Column): void => {
+  const sortAsc = (column: CompanyColumn): void => {
     const listToSort: Company[] = JSON.parse(JSON.stringify(companyList));
     listToSort.sort((a: Company, b: Company): number => {
       const propA = a[column].toLowerCase();
@@ -136,7 +105,7 @@ const CompanyList: FunctionComponent<CompanyListProps> = props => {
     setClonedCompanyList(listToSort);
   };
 
-  const sortDesc = (column: Column): void => {
+  const sortDesc = (column: CompanyColumn): void => {
     const listToSort: Company[] = JSON.parse(JSON.stringify(companyList));
     listToSort.sort((a: Company, b: Company): number => {
       const propA = a[column].toLowerCase();
@@ -151,6 +120,20 @@ const CompanyList: FunctionComponent<CompanyListProps> = props => {
     });
     setCompanyList(listToSort);
     setClonedCompanyList(listToSort);
+  };
+
+  const toggleCompanyModal = (event?: React.MouseEvent): void => {
+    if (event) {
+      const {target, currentTarget} = event;
+      if (target === currentTarget) {
+        setShowCompanyModal(!showCompanyModal);
+      }
+    } else setShowCompanyModal(!showCompanyModal);
+  };
+
+  const selectCompany = (companyId: string): void => {
+    setCompanyId(companyId);
+    toggleCompanyModal();
   };
 
   return (
@@ -168,7 +151,7 @@ const CompanyList: FunctionComponent<CompanyListProps> = props => {
           <Button
             type="button"
             text="Add company"
-            onSubmit={() => props.selectCompany("")}
+            onSubmit={() => selectCompany("")}
           />
         </FlexContainer>
       </PaddingRow>
@@ -199,7 +182,7 @@ const CompanyList: FunctionComponent<CompanyListProps> = props => {
           return (
             <ListRow
               key={company.id}
-              onClick={() => props.selectCompany(company.id)}
+              onClick={() => selectCompany(company.id)}
             >
               <span>{company.name}</span>
               <span>{company.orgNumber}</span>
@@ -221,8 +204,22 @@ const CompanyList: FunctionComponent<CompanyListProps> = props => {
           <span>No companies.</span>
         </ListRow>
       )}
+      {showCompanyModal && modalPortal && (
+        ReactDOM.createPortal(
+          <CompanyModal
+            companyId={companyId}
+            toggleModal={toggleCompanyModal}
+            getAllCompanies={getAllCompanies}
+          />, modalPortal
+        )
+      )}
     </Fragment>
   );
 };
 
 export default CompanyList;
+
+export const FlexContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;

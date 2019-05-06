@@ -2,12 +2,12 @@ import React, { ChangeEvent, FunctionComponent } from "react";
 import Input from "../general/Input";
 import styled from "styled-components";
 import { PaddingRow } from "./LoginForm";
-import { RegisterFormState } from "./Register";
 import Checkbox from "../general/Checkbox";
+import {RegisterFormValue} from "../../types/types";
 
 interface RegisterFormProps {
   onFormChange: (event: ChangeEvent<HTMLInputElement>) => void;
-  form: RegisterFormState;
+  form: RegisterFormValue;
   onCheckboxChange: (event: ChangeEvent<HTMLInputElement>) => void;
   checked: boolean;
 }
@@ -15,17 +15,6 @@ interface RegisterFormProps {
 interface RowProps {
   direction: string;
 }
-
-export const Row = styled.div`
-  display: flex;
-  width: 400px;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  flex-direction: ${(props: RowProps) => props.direction};
-  &:first-child {
-    padding-bottom: 15px;
-  }
-`;
 
 const RegisterForm: FunctionComponent<RegisterFormProps> = props => {
   const { firstName, lastName, email, password } = props.form;
@@ -78,3 +67,14 @@ const RegisterForm: FunctionComponent<RegisterFormProps> = props => {
 };
 
 export default RegisterForm;
+
+export const Row = styled.div`
+  display: flex;
+  width: 400px;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  flex-direction: ${(props: RowProps) => props.direction};
+  &:first-child {
+    padding-bottom: 15px;
+  }
+`;

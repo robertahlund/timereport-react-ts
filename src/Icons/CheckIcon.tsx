@@ -6,11 +6,6 @@ interface CheckIconProps {
   height: string;
 }
 
-const Svg = styled.svg`
-  height: ${(props: CheckIconProps) => props.height};
-  width: ${(props: CheckIconProps) => props.width};
-`;
-
 const CheckIcon: FunctionComponent<CheckIconProps> = props => {
   return (
     <Svg xmlns="http://www.w3.org/2000/svg" width={props.width} height={props.height} viewBox="0 0 24 24">
@@ -21,3 +16,8 @@ const CheckIcon: FunctionComponent<CheckIconProps> = props => {
 };
 
 export default CheckIcon;
+
+const Svg = styled.svg`
+  height: ${(props: CheckIconProps) => props.height};
+  width: ${(props: CheckIconProps) => props.width};
+`;

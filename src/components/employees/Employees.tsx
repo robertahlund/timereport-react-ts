@@ -4,6 +4,22 @@ import EmployeeList from "./EmployeeList";
 import EmployeeModal from "./EmployeeModal";
 import ReactCSSTransitionGroup from "react-addons-css-transition-group";
 
+const Employees: FunctionComponent = () => {
+  useEffect(() => {
+    document.title = "Employees";
+  }, []);
+  return (
+    <Fragment>
+      <ContentSection>
+        <EmployeeList/>
+      </ContentSection>
+
+    </Fragment>
+  );
+};
+
+export default Employees;
+
 export const ContentSection = styled.section`
   display: flex;
   flex-direction: column;
@@ -12,44 +28,3 @@ export const ContentSection = styled.section`
   max-width: 1440px;
 `;
 
-const Employees: FunctionComponent = () => {
-  const [showEmployeeModal, setShowEmployeeModal] = useState(false);
-  const [userUid, setUserUid] = useState("");
-
-  useEffect(() => {
-    document.title = "Employees";
-  }, []);
-
-  const toggleEmployeeModal = (event?: React.MouseEvent): void => {
-    if (event) {
-      const { target, currentTarget } = event;
-      if (target === currentTarget) {
-        setShowEmployeeModal(!showEmployeeModal);
-      }
-    } else setShowEmployeeModal(!showEmployeeModal);
-  };
-
-  const selectUser = (uid: string): void => {
-    setUserUid(uid);
-    toggleEmployeeModal();
-  };
-
-  return (
-    <Fragment>
-      <ContentSection>
-        <EmployeeList selectUser={selectUser} />
-      </ContentSection>
-      <ReactCSSTransitionGroup
-        transitionName="modal-transition"
-        transitionEnterTimeout={0}
-        transitionLeaveTimeout={0}
-      >
-        {showEmployeeModal && (
-          <EmployeeModal uid={userUid} toggleModal={toggleEmployeeModal} />
-        )}
-      </ReactCSSTransitionGroup>
-    </Fragment>
-  );
-};
-
-export default Employees;

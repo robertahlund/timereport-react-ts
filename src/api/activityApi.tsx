@@ -1,5 +1,5 @@
-import firebase from '../firebaseConfig';
-import {Activity} from "../types/activityTypes";
+import firebase from '../config/firebaseConfig';
+import {Activity} from "../types/types";
 
 export const getActivities = async (): Promise<Activity[] | string> => {
   const db = firebase.firestore();

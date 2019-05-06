@@ -6,8 +6,8 @@ import Companies from "../companies/Companies";
 import Employees from "../employees/Employees";
 import ForgotPassword from "../authentication/ForgotPassword";
 import Register from "../authentication/Register";
-import { AuthContext } from "../../App";
 import Activities from "../activities/Activities";
+import {AuthContext} from "../../context/authentication/authenticationContext";
 
 const Routes: FunctionComponent = () => {
   const authContext = useContext(AuthContext);

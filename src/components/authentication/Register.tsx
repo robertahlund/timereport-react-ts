@@ -2,15 +2,8 @@ import React, {ChangeEvent, FunctionComponent, useEffect, useState} from "react"
 import Button from "../general/Button";
 import {Section, Wrapper} from "./Login";
 import RegisterForm from "./RegisterForm";
-import firebase from "../../firebaseConfig";
-import {AuthObject} from "../../App";
-
-export interface RegisterFormState {
-  firstName?: string;
-  lastName?: string;
-  email?: string;
-  password?: string;
-}
+import firebase from "../../config/firebaseConfig";
+import {AuthObject} from "../../types/types";
 
 const Register: FunctionComponent = () => {
   const [form, setForm] = useState({

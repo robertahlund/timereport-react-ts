@@ -1,16 +1,12 @@
 import React, { ChangeEvent, FunctionComponent } from "react";
 import Input from "../general/Input";
 import styled from "styled-components";
-import { LoginFormState } from "./Login";
+import {LoginFormValue} from "../../types/types";
 
 interface LoginFormProps {
-  form: LoginFormState;
+  form: LoginFormValue;
   onFormChange: (event: ChangeEvent<HTMLInputElement>) => void;
 }
-
-export const PaddingRow = styled.div`
-  padding-bottom: 15px;
-`;
 
 const LoginForm: FunctionComponent<LoginFormProps> = props => {
   const {email, password} = props.form;
@@ -39,3 +35,7 @@ const LoginForm: FunctionComponent<LoginFormProps> = props => {
 };
 
 export default LoginForm;
+
+export const PaddingRow = styled.div`
+  padding-bottom: 15px;
+`;

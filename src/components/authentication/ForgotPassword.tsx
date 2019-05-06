@@ -4,18 +4,6 @@ import ForgotPasswordForm from "./ForgotPasswordForm";
 import Button from "../general/Button";
 import styled from "styled-components";
 
-const Text = styled.p`
-  display: block;
-  max-width: 300px;
-  text-align: center;
-  margin-top: 0;
-  margin-bottom: 25px;
-`;
-
-const formSubmit = async (email: string): Promise<void> => {
-  console.log(email);
-};
-
 const ForgotPassword = () => {
   const [emailInput, setEmailInput] = useState("");
 
@@ -25,6 +13,10 @@ const ForgotPassword = () => {
 
   const onFormChange = (event: ChangeEvent<HTMLInputElement>): void => {
     setEmailInput(event.target.value);
+  };
+
+  const formSubmit = async (email: string): Promise<void> => {
+    console.log(email);
   };
 
   return (
@@ -46,3 +38,11 @@ const ForgotPassword = () => {
 };
 
 export default ForgotPassword;
+
+const Text = styled.p`
+  display: block;
+  max-width: 300px;
+  text-align: center;
+  margin-top: 0;
+  margin-bottom: 25px;
+`;

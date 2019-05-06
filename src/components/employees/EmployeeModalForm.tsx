@@ -1,8 +1,4 @@
-import React, {
-  FunctionComponent,
-  Fragment,
-  ChangeEvent
-} from "react";
+import React, {ChangeEvent, Fragment, FunctionComponent} from "react";
 import Input from "../general/Input";
 import {PaddingRow} from "../authentication/LoginForm";
 import {Row} from "../authentication/RegisterForm";
@@ -10,13 +6,7 @@ import Checkbox from "../general/Checkbox";
 import styled from "styled-components";
 import Select from "react-select";
 import {ValueType} from "react-select/lib/types";
-import {CompanySelectOptions} from "../../types/companyTypes";
-
-export interface EmployeeForm {
-  firstName?: string;
-  lastName?: string;
-  email?: string;
-}
+import {CompanySelectOptions, EmployeeForm} from "../../types/types";
 
 interface EmployeeModalFormProps {
   form: EmployeeForm;
@@ -26,10 +16,6 @@ interface EmployeeModalFormProps {
   selectOptions: CompanySelectOptions[];
   handleSelectChange: (value: ValueType<object>) => void;
 }
-
-export const SmallerHeading = styled.h3`
-  padding-top: 15px;
-`;
 
 const EmployeeModalForm: FunctionComponent<EmployeeModalFormProps> = props => {
   const {firstName, lastName, email} = props.form;
@@ -80,3 +66,7 @@ const EmployeeModalForm: FunctionComponent<EmployeeModalFormProps> = props => {
 };
 
 export default EmployeeModalForm;
+
+export const SmallerHeading = styled.h3`
+  padding-top: 15px;
+`;

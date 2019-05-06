@@ -1,48 +1,27 @@
-import React, { Component } from "react";
+import React, {Component} from "react";
 import "./styles/App.css";
 import "./styles/modal-transition.css";
 import "./styles/react-select.css";
 import Menu from "./components/menu/Menu";
 import Routes from "./components/routes/Routes";
-import firebase from "./firebaseConfig";
+import firebase from "./config/firebaseConfig";
 import MyAccountModal from "./components/account/MyAccountModal";
-import ReactCSSTransitionGroup from "react-addons-css-transition-group";
-import { User } from "firebase";
-import { ToastContainer, toast } from "react-toastify";
+import {User} from "firebase";
+import {toast, ToastContainer} from "react-toastify";
 import "react-toastify/dist/ReactToastify.min.css";
 import ToastCloseIcon from "./Icons/ToastCloseIcon";
 import AuthLoading from "./components/authentication/AuthLoading";
-
-const db = firebase.firestore();
-
-export interface AuthObject {
-  firstName?: string;
-  lastName?: string;
-  uid?: string;
-  email?: string;
-  roles?: UserRoles[];
-  isAdmin?: boolean;
-  inactive?: boolean;
-  companies?: UserCompanies[];
-}
-
-export interface UserCompanies {
-  value: string;
-  label: string;
-}
-
-export type UserRoles = "Administrator" | "Employee";
+import {AuthContextProvider} from "./context/authentication/authenticationContext";
+import {checkIfUserInformationHasChanged, checkIfUserIsInactive, getEmployeeById} from "./api/employeeApi";
+import {AuthObject} from "./types/types";
+import ReactDOM from "react-dom";
+import {modalPortal} from "./constants/generalConstants";
 
 interface AppState {
   auth: AuthObject | boolean;
   showMyAccountModal?: boolean;
   authHasLoaded: boolean;
 }
-
-export const AuthContext = React.createContext<AuthObject | boolean>(false);
-
-export const AuthContextProvider = AuthContext.Provider;
-export const AuthContextConsumer = AuthContext.Consumer;
 
 class App extends Component<{}, AppState> {
   state: AppState = {
@@ -51,8 +30,9 @@ class App extends Component<{}, AppState> {
     authHasLoaded: false
   };
 
-  async componentDidMount(): Promise<void> {
-    await this.authObserver();
+  componentDidMount(): void {
+    // noinspection JSIgnoredPromiseFromCall
+    this.authObserver();
   }
 
   authObserver = async (): Promise<void> => {
@@ -74,90 +54,37 @@ class App extends Component<{}, AppState> {
   };
 
   checkIfUserAccountNeedsToBeUpdated = async (user: User): Promise<void> => {
-    const usersCollection = db.collection("users");
-    let userData: AuthObject = {};
-    const updateNeeded: boolean = await usersCollection
-      .doc(user.uid)
-      .get()
-      .then(doc => {
-        if (doc.exists) {
-          userData = doc.data()!;
-          const [firstName, lastName] = user.displayName!.split(" ");
-          if (
-            firstName !== userData.firstName ||
-            lastName !== userData.lastName ||
-            user.email !== userData.email!.toLowerCase()
-          ) {
-            console.log(
-              "Data was changed, and need to be updated in the collection."
-            );
-            toast.info(
-              "Your information was changed by an administrator and is being updated."
-            );
-            console.log(userData, user.email, firstName, lastName);
-            return true;
-          } else return false;
-        } else return false;
-      });
-    if (updateNeeded) {
-      await user.updateProfile({
-        displayName: `${userData.firstName} ${userData.lastName}`
-      });
-      await user.updateEmail(userData.email!);
+    const updateNeeded: boolean | string = await checkIfUserInformationHasChanged(user);
+    if (updateNeeded && typeof updateNeeded === "boolean") {
+      console.log("Data was changed, and need to be updated in the collection.");
       toast.success(
-        "Your information was successfully updated. This might mean that your email has changed, and the new email should " +
-          "be used to log in the next time.",
-        { autoClose: false }
+        "An administrator has updated your information. This might mean that the email you log in with has changed. Verify under 'My account' that it has not changed.",
+        {autoClose: false}
       );
     }
   };
 
-  checkIfUserIsInactive = async (user: User): Promise<boolean> => {
-    const usersCollection = db.collection("users");
-    const inactive = await usersCollection
-      .doc(user.uid)
-      .get()
-      .then(doc => {
-        if (doc.exists) {
-          return doc.data()!.inactive;
-        } else return true;
-      });
-    return new Promise<boolean>(resolve => resolve(inactive));
-  };
-
   setUserInfo = async (user: User, displayToast: boolean): Promise<void> => {
     console.log("Logged in");
-    if (await this.checkIfUserIsInactive(user)) {
-      console.log("User is inactive, logging out.");
-      toast.error("This account is inactive.", { autoClose: false });
+    if (await checkIfUserIsInactive(user)) {
+      toast.error("This account is inactive.", {autoClose: false});
       await firebase.auth().signOut();
       return;
     }
     await this.checkIfUserAccountNeedsToBeUpdated(user);
-    const usersCollection = db.collection("users");
-    let userData: AuthObject = {};
-    await usersCollection
-      .doc(user.uid)
-      .get()
-      .then(doc => {
-        if (doc.exists) {
-          // @ts-ignore
-          userData = doc.data();
-          userData.isAdmin = userData.roles
-            ? userData.roles.includes("Administrator")
-            : false;
-        }
+    let userData: AuthObject | string = await getEmployeeById(user.uid);
+    if (typeof userData !== "string") {
+      userData.email = user.email !== null ? user.email : "";
+      this.setState({
+        auth: userData,
+        authHasLoaded: true
       });
-    userData.email = user.email !== null ? user.email : "";
-    this.setState({
-      auth: userData,
-      authHasLoaded: true
-    });
-    displayToast ? toast.success(`Welcome back ${userData.firstName}.`) : null;
+      displayToast ? toast.success(`Welcome back ${userData.firstName}.`) : null;
+    }
   };
 
   toggleMyAccountModal = (event: React.MouseEvent): void => {
-    const { target, currentTarget } = event;
+    const {target, currentTarget} = event;
     if (target === currentTarget) {
       this.setState(prevState => ({
         showMyAccountModal: !prevState.showMyAccountModal
@@ -166,28 +93,23 @@ class App extends Component<{}, AppState> {
   };
 
   render() {
-    const { auth, showMyAccountModal, authHasLoaded } = this.state;
+    const {auth, showMyAccountModal, authHasLoaded} = this.state;
     return (
       <div className="App">
         <AuthContextProvider value={auth}>
-          <Menu toggleModal={this.toggleMyAccountModal} />
-          <ReactCSSTransitionGroup
-            transitionName="modal-transition"
-            transitionEnterTimeout={0}
-            transitionLeaveTimeout={0}
-          >
-            {showMyAccountModal && (
+          <Menu toggleModal={this.toggleMyAccountModal}/>
+          {showMyAccountModal && modalPortal && (
+            ReactDOM.createPortal(
               <MyAccountModal
                 toggleModal={this.toggleMyAccountModal}
                 setUserInfo={this.setUserInfo}
                 key="1"
-              />
-            )}
-          </ReactCSSTransitionGroup>
+              />, modalPortal)
+          )}
           {authHasLoaded ? (
-            <Routes />
+            <Routes/>
           ) : (
-              <AuthLoading/>
+            <AuthLoading/>
           )}
         </AuthContextProvider>
         <ToastContainer
@@ -197,7 +119,7 @@ class App extends Component<{}, AppState> {
           closeOnClick
           toastClassName="toast-global"
           closeButton={
-            <ToastCloseIcon color="#fff" height="16px" width="16px" />
+            <ToastCloseIcon color="#fff" height="16px" width="16px"/>
           }
         />
       </div>

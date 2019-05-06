@@ -13,22 +13,15 @@ import {
   ModalTitle,
   Section
 } from "../account/MyAccountModal";
-import firebase from "../../firebaseConfig";
+import firebase from "../../config/firebaseConfig";
 import LoadingIcon from "../../Icons/LoadingIcon";
 import ActivityForm from "./ActivityForm";
 import {toast} from "react-toastify";
 import styled from "styled-components";
-import {AuthObject} from "../../App";
-import {Company} from "../companies/CompanyList";
 import {deleteActivity, updateActivity} from "../../api/activityApi";
 import {getCompaniesByActivityId, updateCompanies} from "../../api/companyApi";
-import {Activity} from "../../types/activityTypes";
-
-export const ButtonRow = styled.div`
-  display: flex;
-  justify-content: ${(props: ButtonRowProps) => props.isNew ? "flex-end" : "space-between"};
-  width: 100%;
-`;
+import {Activity, Company} from "../../types/types";
+import {updateTimeReportByActivityId} from "../../api/timeReportApi";
 
 export interface ButtonRowProps {
   isNew: boolean;
@@ -37,6 +30,7 @@ export interface ButtonRowProps {
 interface ActivityModalProps {
   toggleModal: (event?: React.MouseEvent) => void;
   activityId: string;
+  getAllActivities: () => Promise<void>;
 }
 
 const ActivityModal: FunctionComponent<ActivityModalProps> = props => {
@@ -98,6 +92,7 @@ const ActivityModal: FunctionComponent<ActivityModalProps> = props => {
         const updatedCompaniesList = updateActivityNameOnCompanies(companies, activity.id, activity.name);
         await updateCompanies(updatedCompaniesList);
         await updateActivity(activity);
+        await updateTimeReportByActivityId(activity.id, activity.name);
         setOriginalActivity(activity);
       }
     } catch (error) {
@@ -133,12 +128,17 @@ const ActivityModal: FunctionComponent<ActivityModalProps> = props => {
   };
 
   const onSubmit = async (): Promise<void> => {
+    if (!hasActivityNameChanged()) {
+      return;
+    }
     setLoading(true);
     if (isNew) {
       await onCreateActivity();
     } else {
       await onUpdateActivity();
     }
+    // noinspection JSIgnoredPromiseFromCall
+    props.getAllActivities();
     setLoading(false);
   };
 
@@ -166,6 +166,10 @@ const ActivityModal: FunctionComponent<ActivityModalProps> = props => {
       setDeleteLoading(false);
       console.log(error);
     }
+  };
+
+  const hasActivityNameChanged = (): boolean => {
+    return !(originalActivity.name === activity.name)
   };
 
   return (
@@ -214,3 +218,9 @@ const ActivityModal: FunctionComponent<ActivityModalProps> = props => {
 };
 
 export default ActivityModal;
+
+export const ButtonRow = styled.div`
+  display: flex;
+  justify-content: ${(props: ButtonRowProps) => props.isNew ? "flex-end" : "space-between"};
+  width: 100%;
+`;

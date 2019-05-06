@@ -5,14 +5,11 @@ import React, {
 } from "react";
 import Input from "../general/Input";
 import {Row} from "../authentication/RegisterForm";
-import {Company} from "./CompanyList";
 import {PaddingRow} from "../authentication/LoginForm";
 import {ValueType} from "react-select/lib/types";
 import Select from "react-select";
 import {SmallerHeading} from "../employees/EmployeeModalForm";
-import {ActivitySelectOptions} from "./CompanyModal";
-import {Activity} from "../../types/activityTypes";
-
+import {ActivitySelectOptions, Company} from "../../types/types";
 
 interface CompanyFormProps {
   form: Company;

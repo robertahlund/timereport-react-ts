@@ -2,25 +2,6 @@ import React, {FunctionComponent} from 'react';
 import styled from "styled-components";
 import LoadingIcon from "../../Icons/LoadingIcon";
 
-export const ButtonItem = styled.button`
-    align-self: flex-end;
-    text-transform: uppercase;
-    padding: 10px 50px;
-    border: none;
-    border-radius: 3px;
-    background-color: ${(props: ButtonStyleProps) => props.buttonType === "Delete" ? '#FE9161' : '#FEC861'};
-    margin-top: 25px;
-    font-size: 14px;
-    color: #393E41;
-    cursor: pointer;
-    display: flex;
-    transition: background-color .2s;
-    position: relative;
-    &.active {
-      cursor: not-allowed;
-    }
-`;
-
 interface ButtonProps {
   type: 'button' | 'submit';
   text: string;
@@ -42,3 +23,22 @@ const Button: FunctionComponent<ButtonProps> = (props) => {
 };
 
 export default Button;
+
+export const ButtonItem = styled.button`
+    align-self: flex-end;
+    text-transform: uppercase;
+    padding: 10px 50px;
+    border: none;
+    border-radius: 3px;
+    background-color: ${(props: ButtonStyleProps) => props.buttonType === "Delete" ? '#FE9161' : '#FEC861'};
+    margin-top: 25px;
+    font-size: 14px;
+    color: #393E41;
+    cursor: pointer;
+    display: flex;
+    transition: background-color .2s;
+    position: relative;
+    &.active {
+      cursor: not-allowed;
+    }
+`;

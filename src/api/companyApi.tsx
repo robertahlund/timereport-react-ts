@@ -1,7 +1,5 @@
-import firebase from '../firebaseConfig';
-import {Company} from "../components/companies/CompanyList";
-import {ActivityCompanySelectOption} from "../types/activityTypes";
-import {CompanySelectOptions} from "../types/companyTypes";
+import firebase from '../config/firebaseConfig';
+import {ActivityCompanySelectOption, Company, CompanySelectOptions} from "../types/types";
 
 export const getCompanies = async (): Promise<Company[] | string> => {
   const db = firebase.firestore();
@@ -17,7 +15,7 @@ export const getCompanies = async (): Promise<Company[] | string> => {
       });
     return new Promise<Company[]>(resolve => resolve(companyList))
   } catch (error) {
-    return new Promise<Company[] | string>(reject => reject("Error"))
+    return new Promise<string>(reject => reject("Error"))
   }
 };
 
@@ -25,36 +23,46 @@ export const getCompanyActivitiesByCompanies = async (companies: CompanySelectOp
   const db = firebase.firestore();
   const activities: ActivityCompanySelectOption[] = [];
   for (const company of companies) {
-    await db
-      .collection("companies")
-      .doc(company.value)
-      .get()
-      .then(doc => {
-        if (doc.exists) {
-          doc.data()!.activities.forEach((activity: ActivityCompanySelectOption) => {
-            activities.push({
-              label: `${company.label} - ${activity.label}`,
-              value: activity.value,
-              companyId: company.value,
-              companyName: company.label
+    try {
+      await db
+        .collection("companies")
+        .doc(company.value)
+        .get()
+        .then(doc => {
+          if (doc.exists) {
+            doc.data()!.activities.forEach((activity: ActivityCompanySelectOption) => {
+              activities.push({
+                label: `${company.label} - ${activity.label}`,
+                value: activity.value,
+                companyId: company.value,
+                companyName: company.label
+              })
             })
-          })
-        }
-      })
+          }
+        })
+    } catch (error) {
+      return new Promise<string>(reject => reject("Activity list is empty"))
+    }
   }
   if (activities.length > 0) {
-    return new Promise<ActivityCompanySelectOption[] | string>(resolve => resolve(activities))
+    return new Promise<ActivityCompanySelectOption[]>(resolve => resolve(activities))
   } else {
-    return new Promise<ActivityCompanySelectOption[] | string>(reject => reject("Activity list is empty"))
+    return new Promise<string>(reject => reject("Activity list is empty"))
   }
 };
 
 export const getCompaniesByActivityId = async (activityId: string): Promise<Company[] | string> => {
-  const companies = await getCompanies();
-  if (typeof companies === "string") {
-    return new Promise(reject => reject("Error"))
-  } else {
-    return companies.filter((company: Company) => company.activities!.some(activity => activity.value === activityId));
+  try {
+    const companies = await getCompanies();
+    if (typeof companies !== "string") {
+      return new Promise<Company[]>(resolve => resolve(
+        companies.filter((company: Company) => company.activities!.some(activity => activity.value === activityId))
+        )
+      )
+    }
+    return new Promise<string>(reject => reject("Error"))
+  } catch (error) {
+    return new Promise<string>(reject => reject("Error"))
   }
 };
 

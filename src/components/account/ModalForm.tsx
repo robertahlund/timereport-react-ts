@@ -6,19 +6,11 @@ import React, {
 import Input from "../general/Input";
 import { PaddingRow } from "../authentication/LoginForm";
 import { Row } from "../authentication/RegisterForm";
-import { RegisterFormState } from "../authentication/Register";
 import styled from "styled-components";
-
-const ShowPasswordText = styled.span`
-  font-size: 14px;
-  color: #fec861;
-  padding-bottom: 10px;
-  cursor: pointer;
-  display: block;
-`;
+import {RegisterFormValue} from "../../types/types";
 
 interface ModalFormProps {
-  form: RegisterFormState;
+  form: RegisterFormValue;
   onFormChange: (event: ChangeEvent<HTMLInputElement>) => void;
   showPassword: boolean;
   setShowPassword: (showPassword: boolean) => void;
@@ -87,3 +79,11 @@ const ModalForm: FunctionComponent<ModalFormProps> = props => {
 };
 
 export default ModalForm;
+
+const ShowPasswordText = styled.span`
+  font-size: 14px;
+  color: #fec861;
+  padding-bottom: 10px;
+  cursor: pointer;
+  display: block;
+`;

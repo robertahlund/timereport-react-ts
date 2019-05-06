@@ -1,15 +1,13 @@
 import React, {
-  ReactNode,
   FunctionComponent,
-  Fragment,
   ChangeEvent,
   useState
 } from "react";
-import { WeekDay } from "./WeekDay";
+import WeekDay from "./WeekDay";
 import styled from "styled-components";
 import CloseIcon from "../../Icons/CloseIcon";
 import ReactCSSTransitionGroup from "react-addons-css-transition-group";
-import {TimeReport} from "../../types/timeReportTypes";
+import {TimeReport} from "../../types/types";
 
 interface WeekRowProps {
   timeReport: TimeReport;
@@ -26,46 +24,7 @@ interface WeekRowProps {
   ) => Promise<void>;
 }
 
-export const Row = styled.div`
-  background-color: #fff;
-  padding: 10px 5px 10px 10px;
-  display: flex;
-  justify-content: space-between;
-  border-bottom: 1px solid #f7f7f7;
-  position: relative;
-`;
-
-const Activity = styled.span`
-  font-weight: 500;
-`;
-
-const Company = styled.span`
-  font-weight: 300;
-`;
-
-export const TextWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  font-size: 15px;
-`;
-
-export const FieldWrapper = styled.div`
-  display: flex;
-`;
-
-export const DeleteContainer = styled.div`
-  position: absolute;
-  top: 9px;
-  right: -33px;
-  background-color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-top-right-radius: 3px;
-  border-bottom-right-radius: 3px;
-`;
-
-export const WeekRow: FunctionComponent<WeekRowProps> = props => {
+const WeekRow: FunctionComponent<WeekRowProps> = props => {
   const [showDeleteIcon, setShowDeleteIcon] = useState(false);
 
   const onRowHover = (): void => {
@@ -113,3 +72,44 @@ export const WeekRow: FunctionComponent<WeekRowProps> = props => {
     </Row>
   );
 };
+
+export default WeekRow;
+
+export const Row = styled.div`
+  background-color: #fff;
+  padding: 10px 5px 10px 10px;
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #f7f7f7;
+  position: relative;
+`;
+
+const Activity = styled.span`
+  font-weight: 500;
+`;
+
+const Company = styled.span`
+  font-weight: 300;
+`;
+
+export const TextWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  font-size: 15px;
+`;
+
+export const FieldWrapper = styled.div`
+  display: flex;
+`;
+
+export const DeleteContainer = styled.div`
+  position: absolute;
+  top: 9px;
+  right: -33px;
+  background-color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 3px;
+`;

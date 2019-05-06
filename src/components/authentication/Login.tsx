@@ -1,37 +1,11 @@
-import React, {ChangeEvent, useEffect, useState} from "react";
+import React, {ChangeEvent, FunctionComponent, useEffect, useState} from "react";
 import styled from "styled-components";
 import LoginForm from "./LoginForm";
 import LoginLinks from "./LoginLinks";
 import Button from "../general/Button";
-import firebase from "../../firebaseConfig";
+import firebase from "../../config/firebaseConfig";
 
-export const Section = styled.div`
-  display: flex;
-  justify-content: center;
-  border-radius: 3px;
-  background: #fff;
-  padding: 50px;
-  flex-direction: column;
-  align-items: center;
-  h3 {
-    font-weight: 500;
-    margin-top: 0;
-  }
-`;
-
-export const Wrapper = styled.section`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 85vh;
-`;
-
-export interface LoginFormState {
-  email: string;
-  password: string;
-}
-
-const Login = () => {
+const Login: FunctionComponent = () => {
   const [loginForm, setLoginForm] = useState({
     email: "",
     password: ""
@@ -78,3 +52,24 @@ const Login = () => {
 };
 
 export default Login;
+
+export const Section = styled.div`
+  display: flex;
+  justify-content: center;
+  border-radius: 3px;
+  background: #fff;
+  padding: 50px;
+  flex-direction: column;
+  align-items: center;
+  h3 {
+    font-weight: 500;
+    margin-top: 0;
+  }
+`;
+
+export const Wrapper = styled.section`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 85vh;
+`;

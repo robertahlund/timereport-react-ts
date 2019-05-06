@@ -1,14 +1,11 @@
-import {
-    DateSelectorEndValueFormatType,
-    DateSelectorStartValueFormatType,
-    DateSelectorValue,
-    TimeReport,
-    TimeReportDateFormat,
-    TimeReportSummary,
-    TimeStampFormat
-} from "../types/timeReportTypes";
 import {format} from "date-fns";
-import {ActivityCompanySelectOption} from "../types/activityTypes";
+import {
+  ActivityCompanySelectOption,
+  DateSelectorEndValueFormatType,
+  DateSelectorStartValueFormatType, DateSelectorValue, TimeReport,
+  TimeReportDateFormat, TimeReportSummary,
+  TimeStampFormat
+} from "../types/types";
 
 export const dateSelectorStartValueFormat: DateSelectorStartValueFormatType = "MMM[ ]D";
 export const dateSelectorEndValueFormat: DateSelectorEndValueFormatType = "[ - ]MMM[ ]D[, ]YYYY";
