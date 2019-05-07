@@ -20,6 +20,7 @@ import "../../styles/time-react-select.css";
 import "../../styles/close-button-transition.css";
 import { validateNumberInput } from "../../utilities/validateNumberInput";
 import {
+  awareOfUnicodeTokens,
   dateSelectorEndValueFormat,
   dateSelectorStartValueFormat,
   initialActivitySelect,
@@ -66,11 +67,13 @@ const Time: FunctionComponent = () => {
     const dateSelectorValue: DateSelectorValue = {
       from: format(
         startOfWeek(date, { weekStartsOn: 1 }),
-        dateSelectorStartValueFormat
+        dateSelectorStartValueFormat,
+        awareOfUnicodeTokens
       ),
       to: format(
         endOfWeek(date, { weekStartsOn: 1 }),
-        dateSelectorEndValueFormat
+        dateSelectorEndValueFormat,
+        awareOfUnicodeTokens
       )
     };
     setDateSelectorValue(dateSelectorValue);
@@ -82,7 +85,7 @@ const Time: FunctionComponent = () => {
     }
     setTimeReportLoading(true);
     const timeReports = await getTimeReportsByDate(
-      format(date, timeReportDateFormat),
+      format(date, timeReportDateFormat, awareOfUnicodeTokens),
       authContext.uid
     );
     if (typeof timeReports !== "string") {
@@ -204,14 +207,14 @@ const Time: FunctionComponent = () => {
       companyId: activity.companyId,
       companyName: activity.companyName,
       date: firstDayOfWeekDate,
-      prettyDate: format(firstDayOfWeekDate, timeReportDateFormat),
+      prettyDate: format(firstDayOfWeekDate, timeReportDateFormat, awareOfUnicodeTokens),
       timeReportRows: []
     };
     for (let i = 0; i <= 6; i++) {
       const newDate: Date = addDays(firstDayOfWeekDate, i);
       const timeReportCell: TimeReportRow = {
         date: newDate,
-        prettyDate: format(newDate, timeReportDateFormat),
+        prettyDate: format(newDate, timeReportDateFormat, awareOfUnicodeTokens),
         hours: ""
       };
       newTimeReportRow.timeReportRows.push(timeReportCell);
@@ -311,7 +314,7 @@ const Time: FunctionComponent = () => {
       const savedRows = await createOrUpdateTimeReportRows(timeReportRows);
       if (typeof savedRows !== "string") {
         setTimeReportRows(savedRows);
-        setLastSaved(format(new Date(), timeStampFormat));
+        setLastSaved(format(new Date(), timeStampFormat, awareOfUnicodeTokens));
       }
       console.log(savedRows);
     } catch (error) {
@@ -340,7 +343,7 @@ const Time: FunctionComponent = () => {
                 })
               );
             }
-            setLastSaved(format(new Date(), timeStampFormat));
+            setLastSaved(format(new Date(), timeStampFormat, awareOfUnicodeTokens));
             setRowIsSaved(true);
           }
         }
@@ -354,6 +357,17 @@ const Time: FunctionComponent = () => {
     return timeReport.timeReportRows.every(
       timeReportCell => timeReportCell.hours === ""
     );
+  };
+
+  const onDateSelect = async (date: Date): Promise<void> => {
+    setTimeReportLoading(true);
+    const newSelectedDate = date;
+    const newWeekStartDate = startOfWeek(newSelectedDate, {
+      weekStartsOn: 1
+    });
+    setSelectedDate(newWeekStartDate);
+    getFirstAndLastDayOfWeek(newSelectedDate);
+    await getInitialData(newWeekStartDate);
   };
 
   return (
@@ -372,6 +386,7 @@ const Time: FunctionComponent = () => {
         timeReportLoading={timeReportLoading}
         deleteRow={deleteRow}
         saveSingleRow={saveSingleRow}
+        onDateSelect={onDateSelect}
       />
     </ContentSection>
   );

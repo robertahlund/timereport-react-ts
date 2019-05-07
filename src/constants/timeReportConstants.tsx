@@ -7,10 +7,10 @@ import {
   TimeStampFormat
 } from "../types/types";
 
-export const dateSelectorStartValueFormat: DateSelectorStartValueFormatType = "MMM[ ]D";
-export const dateSelectorEndValueFormat: DateSelectorEndValueFormatType = "[ - ]MMM[ ]D[, ]YYYY";
+export const dateSelectorStartValueFormat: DateSelectorStartValueFormatType = "LLL' 'd";
+export const dateSelectorEndValueFormat: DateSelectorEndValueFormatType = "' - 'LLL' 'd', 'y";
 export const timeStampFormat: TimeStampFormat = "HH[:]mm[:]ss";
-export const timeReportDateFormat: TimeReportDateFormat = "YYYY-MM-DD";
+export const timeReportDateFormat: TimeReportDateFormat = "y-MM-dd";
 export const initialTimeReportRows: TimeReport[] = [];
 export const initialTotal: TimeReportSummary = {
     total: 0,
@@ -25,7 +25,10 @@ export const initialTotal: TimeReportSummary = {
     ]
 };
 export const initialActivitySelect: ActivityCompanySelectOption[] = [];
+export const awareOfUnicodeTokens = {
+  awareOfUnicodeTokens: true
+};
 export const initialDateSelectorValue: DateSelectorValue = {
-    from: format(new Date(), dateSelectorStartValueFormat),
-    to: format(new Date(), dateSelectorEndValueFormat)
+    from: format(new Date(), dateSelectorStartValueFormat, awareOfUnicodeTokens),
+    to: format(new Date(), dateSelectorEndValueFormat, awareOfUnicodeTokens)
 };

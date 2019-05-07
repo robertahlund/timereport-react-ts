@@ -16,6 +16,8 @@ import {checkIfUserInformationHasChanged, checkIfUserIsInactive, getEmployeeById
 import {AuthObject} from "./types/types";
 import ReactDOM from "react-dom";
 import {modalPortal} from "./constants/generalConstants";
+import {Modal} from "react-native";
+import ModalPortal from "./components/general/ModalPortal";
 
 interface AppState {
   auth: AuthObject | boolean;
@@ -98,13 +100,14 @@ class App extends Component<{}, AppState> {
       <div className="App">
         <AuthContextProvider value={auth}>
           <Menu toggleModal={this.toggleMyAccountModal}/>
-          {showMyAccountModal && modalPortal && (
-            ReactDOM.createPortal(
+          {showMyAccountModal && (
+            <ModalPortal>
               <MyAccountModal
                 toggleModal={this.toggleMyAccountModal}
                 setUserInfo={this.setUserInfo}
                 key="1"
-              />, modalPortal)
+              />
+            </ModalPortal>
           )}
           {authHasLoaded ? (
             <Routes/>

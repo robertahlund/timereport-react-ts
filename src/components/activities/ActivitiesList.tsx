@@ -16,6 +16,7 @@ import {Activity, Order} from "../../types/types";
 import ActivityModal from "./ActivityModal";
 import {getActivities} from "../../api/activityApi";
 import {modalPortal} from "../../constants/generalConstants";
+import ModalPortal from "../general/ModalPortal";
 
 
 type Column = "name";
@@ -192,14 +193,14 @@ const ActivitiesList: FunctionComponent = () => {
           <span>No activites.</span>
         </ListRow>
       )}
-      {showActivityModal && modalPortal && (
-        ReactDOM.createPortal(
-            <ActivityModal
-              activityId={activityId}
-              toggleModal={toggleActivityModal}
-              getAllActivities={getAllActivities}
-            />, modalPortal
-        )
+      {showActivityModal && (
+        <ModalPortal>
+          <ActivityModal
+            activityId={activityId}
+            toggleModal={toggleActivityModal}
+            getAllActivities={getAllActivities}
+          />
+        </ModalPortal>
       )}
     </Fragment>
   );

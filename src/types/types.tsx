@@ -30,10 +30,10 @@ export interface TimeReportSummary {
   rowTotals: TimeReportRowSummary[];
 }
 
-export type DateSelectorStartValueFormatType = "MMM[ ]D";
-export type DateSelectorEndValueFormatType = "[ - ]MMM[ ]D[, ]YYYY";
+export type DateSelectorStartValueFormatType = "LLL' 'd";
+export type DateSelectorEndValueFormatType = "' - 'LLL' 'd', 'y";
 export type TimeStampFormat = "HH[:]mm[:]ss";
-export type TimeReportDateFormat = "YYYY-MM-DD";
+export type TimeReportDateFormat = "y-MM-dd";
 
 export interface AuthObject {
   firstName?: string;

@@ -11,6 +11,7 @@ import {CompanyColumn, Company, CompanySort} from "../../types/types";
 import CompanyModal from "./CompanyModal";
 import {modalPortal} from "../../constants/generalConstants";
 import {getCompanies} from "../../api/companyApi";
+import ModalPortal from "../general/ModalPortal";
 
 const CompanyList: FunctionComponent = () => {
   const [searchValue, setSearchValue] = useState("");
@@ -204,14 +205,14 @@ const CompanyList: FunctionComponent = () => {
           <span>No companies.</span>
         </ListRow>
       )}
-      {showCompanyModal && modalPortal && (
-        ReactDOM.createPortal(
+      {showCompanyModal && (
+        <ModalPortal>
           <CompanyModal
             companyId={companyId}
             toggleModal={toggleCompanyModal}
             getAllCompanies={getAllCompanies}
-          />, modalPortal
-        )
+          />
+        </ModalPortal>
       )}
     </Fragment>
   );

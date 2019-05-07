@@ -38,6 +38,7 @@ interface TimeReportWrapperProps {
     timeReportIndex?: number,
     timeReportRowIndex?: number
   ) => Promise<void>;
+  onDateSelect: (date: Date) => void;
 }
 
 const TimeReportWrapper: FunctionComponent<TimeReportWrapperProps> = props => {
@@ -47,7 +48,8 @@ const TimeReportWrapper: FunctionComponent<TimeReportWrapperProps> = props => {
     handleSelectChange,
     total,
     lastSaved,
-    timeReportLoading
+    timeReportLoading,
+    selectedDate
   } = props;
   return (
     <Fragment>
@@ -55,6 +57,8 @@ const TimeReportWrapper: FunctionComponent<TimeReportWrapperProps> = props => {
         <DateSelector
           handleWeekChange={props.handleWeekChange}
           dateSelectorValue={props.dateSelectorValue}
+          selectedDate={selectedDate}
+          onDateSelect={props.onDateSelect}
         />
       </TimeReportListHeader>
       <WeekDateRow selectedDate={props.selectedDate} />

@@ -1,15 +1,13 @@
 import React, {ChangeEvent, Fragment, FunctionComponent, useEffect, useState} from "react";
-import ReactDOM from "react-dom";
 import styled from "styled-components";
 import LoadingIcon from "../../Icons/LoadingIcon";
-import firebase from "../../config/firebaseConfig";
 import Input from "../general/Input";
 import {PaddingRow} from "../authentication/LoginForm";
 import {initialEmployeeState, initialSortState} from "../../constants/employeeConstants";
-import {EmployeeColumn, EmployeeRow, EmployeeSort} from "../../types/types";
+import {CompanySelectOptions, EmployeeColumn, EmployeeRow, EmployeeSort} from "../../types/types";
 import EmployeeModal from "./EmployeeModal";
-import {modalPortal} from "../../constants/generalConstants";
 import {getEmployeesForList} from "../../api/employeeApi";
+import ModalPortal from "../general/ModalPortal";
 
 const EmployeeList: FunctionComponent = () => {
   const [employeeList, setEmployeeList] = useState(initialEmployeeState);
@@ -102,7 +100,7 @@ const EmployeeList: FunctionComponent = () => {
     }
     let searchList: EmployeeRow[];
     searchList = clonedEmployeeList.filter(
-      employee =>
+      (employee: EmployeeRow) =>
         employee.name.toLowerCase().indexOf(target.value.toLowerCase()) > -1 ||
         employee.email.toLowerCase().indexOf(target.value.toLowerCase()) > -1
     );
@@ -161,7 +159,7 @@ const EmployeeList: FunctionComponent = () => {
         <span>Roles</span>
       </ListHeader>
       {employeeList.length > 0 && !loading ? (
-        employeeList.map(employee => {
+        employeeList.map((employee: EmployeeRow) => {
           return (
             <ListRow
               key={employee.uid}
@@ -170,7 +168,7 @@ const EmployeeList: FunctionComponent = () => {
               <span>{employee.name}</span>
               <span>{employee.email}</span>
               <span>
-                {employee.companies.map((company, index) => {
+                {employee.companies.map((company: CompanySelectOptions, index: number) => {
                   if (index !== employee.companies.length - 1) {
                     return (
                       <Fragment key={company.value}>{company.label}, </Fragment>
@@ -201,8 +199,10 @@ const EmployeeList: FunctionComponent = () => {
           <span>No employees.</span>
         </ListRow>
       )}
-      {showEmployeeModal && modalPortal && (
-        ReactDOM.createPortal(<EmployeeModal uid={userUid} toggleModal={toggleEmployeeModal} getAllEmployees={getAllEmployees}/>, modalPortal)
+      {showEmployeeModal && (
+        <ModalPortal>
+          <EmployeeModal uid={userUid} toggleModal={toggleEmployeeModal} getAllEmployees={getAllEmployees}/>
+        </ModalPortal>
       )}
     </Fragment>
   );
