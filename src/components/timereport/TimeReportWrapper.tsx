@@ -11,7 +11,13 @@ import Button, { ButtonItem } from "../general/Button";
 import ReactCSSTransitionGroup from "react-addons-css-transition-group";
 import TimeReportLoading from "./TimeReportLoading";
 import LoadingIcon from "../../Icons/LoadingIcon";
-import {ActivityCompanySelectOption, DateSelectorValue, TimeReport, TimeReportSummary} from "../../types/types";
+import {
+  ActivityCompanySelectOption,
+  DateSelectorValue,
+  GroupedActivityOptions,
+  TimeReport,
+  TimeReportSummary
+} from "../../types/types";
 
 interface ActivityRowProps {
   lastSaved: string;
@@ -27,7 +33,7 @@ interface TimeReportWrapperProps {
     timeReportIndex?: number,
     timeReportRowIndex?: number
   ) => void;
-  selectOptions: ActivityCompanySelectOption[];
+  selectOptions: GroupedActivityOptions[];
   handleSelectChange: (option: ValueType<any>) => void;
   saveRows: () => Promise<void>;
   total: TimeReportSummary;
@@ -41,7 +47,38 @@ interface TimeReportWrapperProps {
   onDateSelect: (date: Date) => void;
 }
 
+const GroupBadgeStyles = styled.span`
+  color: #393E41;
+  font-size: 14px;
+  margin: 0;
+  padding: 5px 0;
+`;
+
+const GroupStyles = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 500;
+  ${GroupBadgeStyles}:last-child {
+    background-color: #fec861;
+    padding: 5px;
+    border-radius: 3px;
+  }
+`;
+
+
+
 const TimeReportWrapper: FunctionComponent<TimeReportWrapperProps> = props => {
+
+  const formatGroupLabel = (data: any) => {
+      return (
+        <GroupStyles>
+          <GroupBadgeStyles>{data.label}</GroupBadgeStyles>
+          <GroupBadgeStyles>{data.options.length}</GroupBadgeStyles>
+        </GroupStyles>
+      )
+  };
+
   const {
     timeReportRows,
     selectOptions,
@@ -125,6 +162,7 @@ const TimeReportWrapper: FunctionComponent<TimeReportWrapperProps> = props => {
           value={null}
           classNamePrefix="react-select-time"
           className="react-select-time"
+          formatGroupLabel={formatGroupLabel}
         />
       </ActivityRow>
     </Fragment>

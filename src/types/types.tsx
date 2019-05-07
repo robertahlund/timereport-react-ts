@@ -32,7 +32,7 @@ export interface TimeReportSummary {
 
 export type DateSelectorStartValueFormatType = "LLL' 'd";
 export type DateSelectorEndValueFormatType = "' - 'LLL' 'd', 'y";
-export type TimeStampFormat = "HH[:]mm[:]ss";
+export type TimeStampFormat = "HH':'mm':'ss";
 export type TimeReportDateFormat = "y-MM-dd";
 
 export interface AuthObject {
@@ -125,3 +125,9 @@ export interface LoginFormValue {
 }
 
 export type ButtonType = "Create" | "Delete";
+
+export interface GroupedActivityOptions {
+  label: string;
+  companyId: string;
+  options: ActivityCompanySelectOption[];
+}

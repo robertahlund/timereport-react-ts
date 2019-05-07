@@ -5,12 +5,12 @@ import React, {
   useEffect,
   useState
 } from "react";
-import { ContentSection } from "../employees/Employees";
+import {ContentSection} from "../employees/Employees";
 import TimeReportWrapper from "./TimeReportWrapper";
-import { addDays, endOfWeek, format, startOfWeek, subDays } from "date-fns";
+import {addDays, endOfWeek, format, startOfWeek, subDays} from "date-fns";
 import produce from "immer";
-import { getAllActivitiesAssignedToUser } from "../../api/employeeApi";
-import { ValueType } from "react-select/lib/types";
+import {getAllActivitiesAssignedToUser} from "../../api/employeeApi";
+import {ValueType} from "react-select/lib/types";
 import {
   createOrUpdateTimeReportRows,
   deleteTimeReport,
@@ -18,7 +18,7 @@ import {
 } from "../../api/timeReportApi";
 import "../../styles/time-react-select.css";
 import "../../styles/close-button-transition.css";
-import { validateNumberInput } from "../../utilities/validateNumberInput";
+import {validateNumberInput} from "../../utilities/validateNumberInput";
 import {
   awareOfUnicodeTokens,
   dateSelectorEndValueFormat,
@@ -33,16 +33,18 @@ import {
 import {AuthContext} from "../../context/authentication/authenticationContext";
 import {
   ActivityCompanySelectOption,
-  DateSelectorValue,
+  DateSelectorValue, GroupedActivityOptions,
   TimeReport,
   TimeReportRow,
   TimeReportSummary
 } from "../../types/types";
+// @ts-ignore
+import _ from "lodash";
 
 const Time: FunctionComponent = () => {
   const authContext = useContext(AuthContext);
   const [selectedDate, setSelectedDate] = useState(
-    startOfWeek(new Date(), { weekStartsOn: 1 })
+    startOfWeek(new Date(), {weekStartsOn: 1})
   );
   const [dateSelectorValue, setDateSelectorValue] = useState(
     initialDateSelectorValue
@@ -66,11 +68,11 @@ const Time: FunctionComponent = () => {
   const getFirstAndLastDayOfWeek = (date: Date) => {
     const dateSelectorValue: DateSelectorValue = {
       from: format(
-        startOfWeek(date, { weekStartsOn: 1 }),
+        startOfWeek(date, {weekStartsOn: 1}),
         dateSelectorStartValueFormat
       ),
       to: format(
-        endOfWeek(date, { weekStartsOn: 1 }),
+        endOfWeek(date, {weekStartsOn: 1}),
         dateSelectorEndValueFormat
       )
     };
@@ -140,7 +142,7 @@ const Time: FunctionComponent = () => {
       return;
     }
 
-    let { value } = event.target;
+    let {value} = event.target;
     //if the value is a decimal we can round it to 2 decimal points
     if (value.indexOf(".") > -1 && value.indexOf(".") !== value.length - 1) {
       value = String(Math.round(Number(event.target.value) * 100) / 100);
@@ -152,22 +154,20 @@ const Time: FunctionComponent = () => {
         produce(timeReportRows, draft => {
           draft[timeReportIndex].timeReportRows[
             timeReportRowIndex
-          ].hours = value;
+            ].hours = value;
         })
       );
       calculateTotals(
         produce(timeReportRows, draft => {
           draft[timeReportIndex].timeReportRows[
             timeReportRowIndex
-          ].hours = value;
+            ].hours = value;
         })
       );
     }
   };
 
-  const getAllAssignedActivities = async (): Promise<
-    ActivityCompanySelectOption[] | string
-  > => {
+  const getAllAssignedActivities = async (): Promise<ActivityCompanySelectOption[] | string> => {
     if (typeof authContext === "boolean" || authContext.uid === undefined) {
       return new Promise<ActivityCompanySelectOption[] | string>(reject =>
         reject("Error")
@@ -177,7 +177,7 @@ const Time: FunctionComponent = () => {
       | ActivityCompanySelectOption[]
       | string = await getAllActivitiesAssignedToUser(authContext.uid);
     if (typeof userActivities !== "string") {
-      setActivitySelectOptions(userActivities);
+      createOptionList(userActivities);
       return new Promise<ActivityCompanySelectOption[] | string>(resolve =>
         resolve(userActivities)
       );
@@ -188,6 +188,7 @@ const Time: FunctionComponent = () => {
   };
 
   const handleSelectChange = (option: ValueType<any>): void => {
+    console.log(option)
     createTimeReportRow(option);
     removeActivityFromCombobox(option.value, option.companyId);
   };
@@ -201,7 +202,7 @@ const Time: FunctionComponent = () => {
       id: "",
       userId: authContext.uid,
       activityId: activity.value,
-      activityName: activity.label.split("-")[1].trimStart(),
+      activityName: activity.label,
       companyId: activity.companyId,
       companyName: activity.companyName,
       date: firstDayOfWeekDate,
@@ -228,46 +229,33 @@ const Time: FunctionComponent = () => {
   ): void => {
     if (userActivities && timeReports && !activityId && !companyId) {
       timeReports.forEach(timeReport => {
-        userActivities = [
-          ...userActivities!.filter(activity => {
-            if (
-              activity.companyId !== timeReport.companyId &&
-              activity.value !== timeReport.activityId
-            ) {
-              return true;
-            } else if (
-              activity.companyId === timeReport.companyId &&
-              activity.value === timeReport.activityId
-            ) {
-              return false;
-            } else return true;
-          })
-        ];
-      });
-      setActivitySelectOptions(userActivities);
-    } else {
-      setActivitySelectOptions([
-        ...activitySelectOptions.filter(activity => {
-          if (
-            activity.companyId !== companyId &&
-            activity.value !== activityId
-          ) {
-            return true;
-          } else if (
-            activity.companyId === companyId &&
-            activity.value === activityId
-          ) {
-            return false;
-          } else return true;
+        _.remove(userActivities, (activity: ActivityCompanySelectOption) => {
+          return activity.value === timeReport.activityId && activity.companyId === timeReport.companyId
         })
-      ]);
+      });
+      createOptionList(userActivities)
+    } else {
+      const newActivityList: GroupedActivityOptions[] = _.cloneDeep(activitySelectOptions);
+      _.forEach(newActivityList, (activityListItem: GroupedActivityOptions) => {
+        _.remove(activityListItem.options, (activity: ActivityCompanySelectOption) => {
+          return activity.companyId === companyId && activity.value === activityId
+        })
+      });
+      setActivitySelectOptions(newActivityList);
     }
   };
 
   const addActivityToCombobox = (
     activity: ActivityCompanySelectOption
   ): void => {
-    setActivitySelectOptions([...activitySelectOptions, activity]);
+    const index = _.findIndex(activitySelectOptions, (activityList: GroupedActivityOptions) => {
+      return activityList.companyId === activityList.companyId
+    });
+    setActivitySelectOptions(
+      produce(activitySelectOptions, draft => {
+        draft[index].options.push(activity)
+      })
+    );
   };
 
   const calculateTotals = (timeReportRows: TimeReport[]) => {
@@ -282,22 +270,19 @@ const Time: FunctionComponent = () => {
   };
 
   const deleteRow = async (timeReport: TimeReport): Promise<void> => {
+    console.log(timeReport)
     try {
       await deleteTimeReport(timeReport.id);
-      setTimeReportRows(
-        [...timeReportRows].filter(
-          timeReportRow => timeReportRow.id !== timeReport.id
-        )
-      );
-      calculateTotals(
-        [...timeReportRows].filter(
-          timeReportRow => timeReportRow.id !== timeReport.id
-        )
-      );
+      const newTimeReportRows = _.cloneDeep(timeReportRows);
+      _.remove(newTimeReportRows, (timeReportItem: TimeReport) => {
+        return timeReportItem.companyId === timeReport.companyId && timeReportItem.activityId === timeReport.activityId
+      });
+      setTimeReportRows(newTimeReportRows);
+      calculateTotals(newTimeReportRows);
       if (timeReport.activityName && timeReport.companyName) {
         addActivityToCombobox({
           value: timeReport.activityId,
-          label: `${timeReport.companyName} - ${timeReport.activityName}`,
+          label: timeReport.activityName,
           companyId: timeReport.companyId,
           companyName: timeReport.companyName
         });
@@ -366,6 +351,18 @@ const Time: FunctionComponent = () => {
     setSelectedDate(newWeekStartDate);
     getFirstAndLastDayOfWeek(newSelectedDate);
     await getInitialData(newWeekStartDate);
+  };
+  const createOptionList = (userActivities: ActivityCompanySelectOption[]) => {
+    const optionList: GroupedActivityOptions[] = [];
+    const groupedList = _.groupBy(userActivities, "companyId");
+    _.forEach(groupedList, (value: ActivityCompanySelectOption[], key: string) => {
+      optionList.push({
+        label: value[0].companyName,
+        companyId: key,
+        options: value
+      })
+    });
+    setActivitySelectOptions(optionList);
   };
 
   return (

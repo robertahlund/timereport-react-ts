@@ -32,7 +32,7 @@ export const getCompanyActivitiesByCompanies = async (companies: CompanySelectOp
           if (doc.exists) {
             doc.data()!.activities.forEach((activity: ActivityCompanySelectOption) => {
               activities.push({
-                label: `${company.label} - ${activity.label}`,
+                label: activity.label,
                 value: activity.value,
                 companyId: company.value,
                 companyName: company.label
