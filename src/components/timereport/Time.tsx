@@ -67,13 +67,11 @@ const Time: FunctionComponent = () => {
     const dateSelectorValue: DateSelectorValue = {
       from: format(
         startOfWeek(date, { weekStartsOn: 1 }),
-        dateSelectorStartValueFormat,
-        awareOfUnicodeTokens
+        dateSelectorStartValueFormat
       ),
       to: format(
         endOfWeek(date, { weekStartsOn: 1 }),
-        dateSelectorEndValueFormat,
-        awareOfUnicodeTokens
+        dateSelectorEndValueFormat
       )
     };
     setDateSelectorValue(dateSelectorValue);
@@ -85,7 +83,7 @@ const Time: FunctionComponent = () => {
     }
     setTimeReportLoading(true);
     const timeReports = await getTimeReportsByDate(
-      format(date, timeReportDateFormat, awareOfUnicodeTokens),
+      format(date, timeReportDateFormat),
       authContext.uid
     );
     if (typeof timeReports !== "string") {
@@ -207,14 +205,14 @@ const Time: FunctionComponent = () => {
       companyId: activity.companyId,
       companyName: activity.companyName,
       date: firstDayOfWeekDate,
-      prettyDate: format(firstDayOfWeekDate, timeReportDateFormat, awareOfUnicodeTokens),
+      prettyDate: format(firstDayOfWeekDate, timeReportDateFormat),
       timeReportRows: []
     };
     for (let i = 0; i <= 6; i++) {
       const newDate: Date = addDays(firstDayOfWeekDate, i);
       const timeReportCell: TimeReportRow = {
         date: newDate,
-        prettyDate: format(newDate, timeReportDateFormat, awareOfUnicodeTokens),
+        prettyDate: format(newDate, timeReportDateFormat),
         hours: ""
       };
       newTimeReportRow.timeReportRows.push(timeReportCell);
@@ -314,7 +312,7 @@ const Time: FunctionComponent = () => {
       const savedRows = await createOrUpdateTimeReportRows(timeReportRows);
       if (typeof savedRows !== "string") {
         setTimeReportRows(savedRows);
-        setLastSaved(format(new Date(), timeStampFormat, awareOfUnicodeTokens));
+        setLastSaved(format(new Date(), timeStampFormat));
       }
       console.log(savedRows);
     } catch (error) {
@@ -343,7 +341,7 @@ const Time: FunctionComponent = () => {
                 })
               );
             }
-            setLastSaved(format(new Date(), timeStampFormat, awareOfUnicodeTokens));
+            setLastSaved(format(new Date(), timeStampFormat));
             setRowIsSaved(true);
           }
         }

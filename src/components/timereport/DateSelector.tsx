@@ -23,9 +23,11 @@ const DateSelector: FunctionComponent<DateSelectorProps> = props => {
       <DateSelectorButton onClick={() => props.handleWeekChange("prev")} type="button">
         <ArrowLeft width="24px" height="24px" color="#393e41"/>
       </DateSelectorButton>
-      <DatePicker onChange={props.onDateSelect} customInput={
-        <DateSelectorValueContainer>{props.dateSelectorValue.from}{props.dateSelectorValue.to}</DateSelectorValueContainer>
-      } todayButton={"Today"} selected={props.selectedDate} showWeekNumbers locale="enGB"/>
+      <DatePickerWrapper>
+        <DatePicker onChange={props.onDateSelect} customInput={
+          <DateSelectorValueContainer>{props.dateSelectorValue.from}{props.dateSelectorValue.to}</DateSelectorValueContainer>
+        } todayButton={"Today"} selected={props.selectedDate} showWeekNumbers locale="enGB"/>
+      </DatePickerWrapper>
       <DateSelectorButton onClick={() => props.handleWeekChange("next")} type="button">
         <ArrowRight width="24px" height="24px" color="#393e41"/>
       </DateSelectorButton>
@@ -39,6 +41,83 @@ const DateSelectorWrapper = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+`;
+
+export const DatePickerWrapper = styled.div`
+  .react-datepicker {
+    font-family: 'Roboto', sans-serif;
+    border-radius: 3px;
+    border: 1px solid #00000014
+  }
+  .react-datepicker-popper[data-placement^="bottom"] .react-datepicker__triangle, .react-datepicker-popper[data-placement^="bottom"] .react-datepicker__triangle::before {
+    border-top: none;
+    border-bottom-color: #F7F7F7;
+  }
+  .react-datepicker-popper[data-placement^="bottom"] .react-datepicker__triangle {
+    top: 0;
+    margin-top: -7px;
+}
+  //header
+  .react-datepicker__header {
+    background-color: #F7F7F7;
+    border-bottom: 1px solid #fff;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+  }
+  //day name
+  .react-datepicker__day-name {
+    font-weight: 400;
+  }
+  //day and weeknumber
+  .react-datepicker__day-name, .react-datepicker__day, .react-datepicker__time-name, .react-datepicker__week-number {
+    padding: 5px;
+    font-weight: 400;
+    font-size: 14px;
+  }
+  //current day
+  .react-datepicker__day--today, .react-datepicker__month-text--today {
+    font-weight: 600;
+  }
+  .react-datepicker__current-month, .react-datepicker-time__header, .react-datepicker-year-header {
+    margin-top: 0;
+    color: #393E41;
+    font-weight: 500;
+    font-size: 0.944rem;
+    padding: 10px 0;
+  }
+  //next/previous arrows
+  .react-datepicker__navigation {
+    top: 20px;
+  }
+  .react-datepicker__navigation--previous {
+    border-right-color: #393E41;
+  }
+  .react-datepicker__navigation--previous:hover {
+    border-right-color: #393E41;
+  }
+  .react-datepicker__navigation--next {
+    border-left-color: #393E41;
+  }
+  .react-datepicker__navigation--next:hover {
+    border-left-color: #393E41;
+  }
+  .react-datepicker__today-button {
+    background: #FEC861;
+    border-top: none;
+    cursor: pointer;
+    text-align: center;
+    font-weight: 400;
+    padding: 10px 0;
+    clear: left;
+    font-size: 14px;
+    border-bottom-right-radius: 3px;
+    border-bottom-left-radius: 3px;
+  }
+  .react-datepicker__day--selected, .react-datepicker__day--in-selecting-range, .react-datepicker__day--in-range, .react-datepicker__month-text--selected, .react-datepicker__month-text--in-selecting-range, .react-datepicker__month-text--in-range {
+    border-radius: 3px;
+    background-color: #FEC861;
+    color: #393E41;
+}
 `;
 
 const DateSelectorButton = styled.button`

@@ -1,6 +1,7 @@
 import React, {FunctionComponent} from 'react';
 import styled from "styled-components";
 import LoadingIcon from "../../Icons/LoadingIcon";
+import {ButtonType} from "../../types/types";
 
 interface ButtonProps {
   type: 'button' | 'submit';
@@ -13,8 +14,6 @@ interface ButtonProps {
 interface ButtonStyleProps {
   buttonType?: ButtonType;
 }
-
-type ButtonType = "Create" | "Delete";
 
 const Button: FunctionComponent<ButtonProps> = (props) => {
   return <ButtonItem type={props.type} className={props.loading ? "active" : ""}

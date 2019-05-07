@@ -123,3 +123,5 @@ export interface LoginFormValue {
   email: string;
   password: string;
 }
+
+export type ButtonType = "Create" | "Delete";

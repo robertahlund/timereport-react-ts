@@ -1,7 +1,6 @@
-import React, {FunctionComponent, Fragment, ReactNode} from 'react';
+import React, {FunctionComponent, ReactNode} from 'react';
 import styled from "styled-components";
 import {addDays, format} from "date-fns";
-import {awareOfUnicodeTokens} from "../../constants/timeReportConstants";
 
 interface WeekDateRowProps {
   selectedDate: Date;
@@ -15,8 +14,8 @@ const WeekDateRow: FunctionComponent<WeekDateRowProps> = props => {
     for (let i = 0; i <= 6; i++) {
       const dateItem =
         <DateContainer key={i}>
-          <Day>{format(addDays(initialDate, i), "E", awareOfUnicodeTokens)}</Day>
-          <Date>{format(addDays(initialDate, i), "LLL' 'd", awareOfUnicodeTokens)}</Date>
+          <Day>{format(addDays(initialDate, i), "E")}</Day>
+          <Date>{format(addDays(initialDate, i), "LLL' 'd")}</Date>
         </DateContainer>;
       dateList.push(dateItem)
     }
