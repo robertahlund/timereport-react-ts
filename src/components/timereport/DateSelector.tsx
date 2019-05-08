@@ -117,7 +117,10 @@ export const DatePickerWrapper = styled.div`
     border-radius: 3px;
     background-color: #FEC861;
     color: #393E41;
-}
+  }
+  .react-datepicker__day--selected:hover, .react-datepicker__day--in-selecting-range:hover, .react-datepicker__day--in-range:hover, .react-datepicker__month-text--selected:hover, .react-datepicker__month-text--in-selecting-range:hover, .react-datepicker__month-text--in-range:hover {
+    background-color: #FEC861;
+  }
 `;
 
 const DateSelectorButton = styled.button`
