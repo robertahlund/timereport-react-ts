@@ -5,7 +5,6 @@ import React, {
   useEffect,
   useState
 } from "react";
-import ReactDOM from "react-dom";
 import {PaddingRow} from "../authentication/LoginForm";
 import Input from "../general/Input";
 import Button from "../general/Button";
@@ -15,7 +14,6 @@ import {FlexContainer} from "../companies/CompanyList";
 import {Activity, Order} from "../../types/types";
 import ActivityModal from "./ActivityModal";
 import {getActivities} from "../../api/activityApi";
-import {modalPortal} from "../../constants/generalConstants";
 import ModalPortal from "../general/ModalPortal";
 
 

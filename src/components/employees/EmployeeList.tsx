@@ -1,6 +1,5 @@
 import React, {ChangeEvent, Fragment, FunctionComponent, useEffect, useState} from "react";
 import styled from "styled-components";
-import LoadingIcon from "../../icons/LoadingIcon";
 import Input from "../general/Input";
 import {PaddingRow} from "../authentication/LoginForm";
 import {initialEmployeeState, initialSortState} from "../../constants/employeeConstants";
@@ -8,6 +7,7 @@ import {CompanySelectOptions, EmployeeColumn, EmployeeRow, EmployeeSort} from ".
 import EmployeeModal from "./EmployeeModal";
 import {getEmployeesForList} from "../../api/employeeApi";
 import ModalPortal from "../general/ModalPortal";
+import LoadingIcon from "../../icons/LoadingIcon";
 
 const EmployeeList: FunctionComponent = () => {
   const [employeeList, setEmployeeList] = useState(initialEmployeeState);

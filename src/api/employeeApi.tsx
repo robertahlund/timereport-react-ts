@@ -1,9 +1,53 @@
-import firebase from '../config/firebaseConfig';
-import {getCompanyActivitiesByCompanies} from "./companyApi";
-import {User} from "firebase";
-import {ActivityCompanySelectOption, AuthObject, CompanySelectOptions, EmployeeRow} from "../types/types";
+import firebase from "../config/firebaseConfig";
+import { getCompanyActivitiesByCompanies } from "./companyApi";
+import { User } from "firebase";
+import {
+  ActivityCompanySelectOption,
+  AuthObject,
+  CompanySelectOptions,
+  EmployeeRow
+} from "../types/types";
 
-export const getEmployeeById = async (uid: string): Promise<AuthObject | string> => {
+export const createEmployee = async (
+  firstName: string,
+  lastName: string,
+  email: string,
+  password: string,
+  checkbox: boolean
+): Promise<string> => {
+  try {
+    await firebase.auth().createUserWithEmailAndPassword(email, password);
+    const user = await firebase.auth().currentUser;
+    if (user) {
+      await user.updateProfile({
+        displayName: `${firstName} ${lastName}`
+      });
+      const uid = user.uid;
+      const userDocument: AuthObject = {
+        firstName,
+        lastName,
+        uid,
+        email,
+        inactive: false,
+        roles: checkbox ? ["Administrator", "Employee"] : ["Employee"],
+        companies: []
+      };
+      const db = firebase.firestore();
+      await db
+        .collection("users")
+        .doc(uid)
+        .set(userDocument);
+      return new Promise<string>(resolve => resolve("Account created."))
+    }
+    return new Promise<string>(reject => reject("Error"))
+  } catch (error) {
+    throw new Error("Error")
+  }
+};
+
+export const getEmployeeById = async (
+  uid: string
+): Promise<AuthObject | string> => {
   const db = firebase.firestore();
   try {
     const usersCollection = db.collection("users");
@@ -22,11 +66,13 @@ export const getEmployeeById = async (uid: string): Promise<AuthObject | string>
       });
     return new Promise<AuthObject>(resolve => resolve(userData));
   } catch (error) {
-    return new Promise<string>(reject => reject("Error"))
+    return new Promise<string>(reject => reject("Error"));
   }
 };
 
-export const getEmployeesForList = async (): Promise<EmployeeRow[] | string> => {
+export const getEmployeesForList = async (): Promise<
+  EmployeeRow[] | string
+> => {
   const db = firebase.firestore();
   try {
     let employeeList: EmployeeRow[] = [];
@@ -42,11 +88,11 @@ export const getEmployeesForList = async (): Promise<EmployeeRow[] | string> => 
             roles: user.data().roles.join(", "),
             companies: user.data().companies
           });
-        })
+        });
       });
-    return new Promise<EmployeeRow[]>(resolve => resolve(employeeList))
+    return new Promise<EmployeeRow[]>(resolve => resolve(employeeList));
   } catch (error) {
-    return new Promise<string>(reject => reject("Error"))
+    return new Promise<string>(reject => reject("Error"));
   }
 };
 
@@ -60,26 +106,34 @@ export const getEmployees = async (): Promise<AuthObject[] | string> => {
       .then((userDocuments: any) => {
         userDocuments.forEach((user: any) => {
           employeeList.push(user.data());
-        })
+        });
       });
-    return new Promise<AuthObject[]>(resolve => resolve(employeeList))
+    return new Promise<AuthObject[]>(resolve => resolve(employeeList));
   } catch (error) {
-    return new Promise<string>(reject => reject("Error"))
+    return new Promise<string>(reject => reject("Error"));
   }
 };
 
-export const getEmployeesByCompanyId = async (companyId: string): Promise<AuthObject[] | string> => {
+export const getEmployeesByCompanyId = async (
+  companyId: string
+): Promise<AuthObject[] | string> => {
   const employees = await getEmployees();
   if (typeof employees === "string") {
-    return new Promise(reject => reject("Error"))
+    return new Promise(reject => reject("Error"));
   } else {
-    return new Promise<AuthObject[]>(resolve => resolve(
-      employees.filter((user: AuthObject) => user.companies!.some(company => company.value === companyId))
-    ));
+    return new Promise<AuthObject[]>(resolve =>
+      resolve(
+        employees.filter((user: AuthObject) =>
+          user.companies!.some(company => company.value === companyId)
+        )
+      )
+    );
   }
 };
 
-export const updateEmployees = async (employees: AuthObject[]): Promise<void> => {
+export const updateEmployees = async (
+  employees: AuthObject[]
+): Promise<void> => {
   const db = firebase.firestore();
   const batch = db.batch();
   try {
@@ -105,7 +159,9 @@ export const updateEmployee = async (employee: AuthObject): Promise<void> => {
   }
 };
 
-export const getAllActivitiesAssignedToUser = async (uid: string): Promise<ActivityCompanySelectOption[] | string> => {
+export const getAllActivitiesAssignedToUser = async (
+  uid: string
+): Promise<ActivityCompanySelectOption[] | string> => {
   const db = firebase.firestore();
   try {
     const userCompanies: CompanySelectOptions[] = await db
@@ -114,20 +170,26 @@ export const getAllActivitiesAssignedToUser = async (uid: string): Promise<Activ
       .get()
       .then(doc => {
         if (doc.exists) {
-          return doc.data()!.companies
+          return doc.data()!.companies;
         }
       });
-    const userActivities: ActivityCompanySelectOption[] | string = await getCompanyActivitiesByCompanies(userCompanies);
+    const userActivities:
+      | ActivityCompanySelectOption[]
+      | string = await getCompanyActivitiesByCompanies(userCompanies);
     if (typeof userActivities === "string") {
-      return new Promise<string>(reject => reject("Error"))
+      return new Promise<string>(reject => reject("Error"));
     }
-    return new Promise<ActivityCompanySelectOption[]>(resolve => (resolve(userActivities)))
+    return new Promise<ActivityCompanySelectOption[]>(resolve =>
+      resolve(userActivities)
+    );
   } catch (error) {
-    return new Promise<string>(reject => reject("Error"))
+    return new Promise<string>(reject => reject("Error"));
   }
 };
 
-export const checkIfUserIsInactive = async (user: User): Promise<boolean | string> => {
+export const checkIfUserIsInactive = async (
+  user: User
+): Promise<boolean | string> => {
   try {
     const db = firebase.firestore();
     const usersCollection = db.collection("users");
@@ -141,12 +203,13 @@ export const checkIfUserIsInactive = async (user: User): Promise<boolean | strin
       });
     return new Promise<boolean>(resolve => resolve(inactive));
   } catch (error) {
-    return new Promise<string>(reject => reject("Error"))
+    return new Promise<string>(reject => reject("Error"));
   }
-
 };
 
-export const checkIfUserInformationHasChanged = async (user: User): Promise<boolean | string> => {
+export const checkIfUserInformationHasChanged = async (
+  user: User
+): Promise<boolean | string> => {
   try {
     const db = firebase.firestore();
     const usersCollection = db.collection("users");
@@ -173,6 +236,6 @@ export const checkIfUserInformationHasChanged = async (user: User): Promise<bool
       });
     return new Promise<boolean>(resolve => resolve(updateNeeded));
   } catch (error) {
-    return new Promise<string>(reject => reject("Error"))
+    return new Promise<string>(reject => reject("Error"));
   }
 };

@@ -1,9 +1,14 @@
-import React, {ChangeEvent, FunctionComponent, useEffect, useState} from "react";
+import React, {
+  ChangeEvent,
+  FunctionComponent,
+  useEffect,
+  useState
+} from "react";
 import Button from "../general/Button";
-import {Section, Wrapper} from "./Login";
+import { Section, Wrapper } from "./Login";
 import RegisterForm from "./RegisterForm";
-import firebase from "../../config/firebaseConfig";
-import {AuthObject} from "../../types/types";
+import { createEmployee } from "../../api/employeeApi";
+import { toast } from "react-toastify";
 
 const Register: FunctionComponent = () => {
   const [form, setForm] = useState({
@@ -16,7 +21,7 @@ const Register: FunctionComponent = () => {
   const [checkbox, setCheckbox] = useState(false);
 
   useEffect(() => {
-    document.title = "Register"
+    document.title = "Register";
   }, []);
 
   const handleFormChange = (event: ChangeEvent<HTMLInputElement>): void => {
@@ -26,38 +31,21 @@ const Register: FunctionComponent = () => {
     });
   };
 
-  const formSubmit = async (
-    firstName: string,
-    lastName: string,
-    email: string,
-    password: string
-  ): Promise<void> => {
+  const formSubmit = async (): Promise<void> => {
+    const { firstName, lastName, email, password } = form;
     try {
       setLoading(true);
-      await firebase.auth().createUserWithEmailAndPassword(email, password);
-      const user = await firebase.auth().currentUser;
-      let uid;
-      if (user) {
-        await user.updateProfile({
-          displayName: `${firstName} ${lastName}`
-        });
-        uid = user.uid;
-        const userDocument: AuthObject = {
-          firstName,
-          lastName,
-          uid,
-          email,
-          roles: checkbox ? ['Administrator', 'Employee'] : ['Employee']
-        };
-        const db = firebase.firestore();
-        await db
-          .collection("users")
-          .doc(uid)
-          .set(userDocument);
-        console.log("Account created");
-      }
+      const success: string = await createEmployee(
+        firstName,
+        lastName,
+        email,
+        password,
+        checkbox
+      );
+      toast.success(success);
     } catch (error) {
       console.log(error);
+      toast.error(error.message);
       setLoading(false);
     }
     console.log(firstName, lastName, email, password);
@@ -67,16 +55,19 @@ const Register: FunctionComponent = () => {
     <Wrapper>
       <Section>
         <h3>Create new account</h3>
-        <RegisterForm onFormChange={handleFormChange}
-                      onCheckboxChange={(event: ChangeEvent<HTMLInputElement>) => setCheckbox(event.target.checked)}
-                      form={form} checked={checkbox}/>
+        <RegisterForm
+          onFormChange={handleFormChange}
+          onCheckboxChange={(event: ChangeEvent<HTMLInputElement>) =>
+            setCheckbox(event.target.checked)
+          }
+          form={form}
+          checked={checkbox}
+        />
         <Button
           type="button"
           text="Create"
           loading={loading}
-          onSubmit={() =>
-            formSubmit(form.firstName, form.lastName, form.email, form.password)
-          }
+          onSubmit={formSubmit}
         />
       </Section>
     </Wrapper>
