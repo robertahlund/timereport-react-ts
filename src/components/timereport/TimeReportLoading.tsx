@@ -1,6 +1,6 @@
 import React, {FunctionComponent} from 'react';
 import {Row} from "./WeekRow";
-import LoadingIcon from "../../Icons/LoadingIcon";
+import LoadingIcon from "../../icons/LoadingIcon";
 
 const TimeReportLoading: FunctionComponent = () => {
   return (

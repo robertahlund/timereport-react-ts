@@ -1,7 +1,7 @@
 import React, {FunctionComponent} from 'react';
 import styled from "styled-components";
-import ArrowLeft from "../../Icons/ArrowLeft";
-import ArrowRight from "../../Icons/ArrowRight";
+import ArrowLeft from "../../icons/ArrowLeft";
+import ArrowRight from "../../icons/ArrowRight";
 import {DateSelectorValue} from "../../types/types";
 import DatePicker, {registerLocale} from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";

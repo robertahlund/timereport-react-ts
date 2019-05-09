@@ -1,5 +1,5 @@
 import React, {FunctionComponent} from 'react';
-import CloseIcon from "../../Icons/CloseIcon";
+import CloseIcon from "../../icons/CloseIcon";
 import {ValueType} from "react-select/lib/types";
 import {ListContainer, Row} from "../employees/EmployeeModalCompanyList";
 import {ActivitySelectOptions} from "../../types/types";

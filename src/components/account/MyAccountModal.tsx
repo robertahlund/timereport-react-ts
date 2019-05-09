@@ -1,6 +1,6 @@
 import React, {ChangeEvent, FunctionComponent, useContext, useState} from "react";
 import styled from "styled-components";
-import CloseIcon from "../../Icons/CloseIcon";
+import CloseIcon from "../../icons/CloseIcon";
 import ModalForm from "./ModalForm";
 import Button from "../general/Button";
 import firebase from "../../config/firebaseConfig";

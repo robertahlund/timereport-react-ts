@@ -1,7 +1,7 @@
 import React, {FunctionComponent, Fragment, ChangeEvent} from 'react';
 import {Label} from "./Input";
 import styled from "styled-components";
-import CheckIcon from "../../Icons/CheckIcon";
+import CheckIcon from "../../icons/CheckIcon";
 
 interface CheckboxStyleProps {
   checked: boolean;

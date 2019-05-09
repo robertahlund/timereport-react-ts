@@ -10,7 +10,7 @@ import { ValueType } from "react-select/lib/types";
 import Button, { ButtonItem } from "../general/Button";
 import ReactCSSTransitionGroup from "react-addons-css-transition-group";
 import TimeReportLoading from "./TimeReportLoading";
-import LoadingIcon from "../../Icons/LoadingIcon";
+import LoadingIcon from "../../icons/LoadingIcon";
 import {
   ActivityCompanySelectOption,
   DateSelectorValue,

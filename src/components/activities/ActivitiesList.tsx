@@ -10,7 +10,7 @@ import {PaddingRow} from "../authentication/LoginForm";
 import Input from "../general/Input";
 import Button from "../general/Button";
 import {ListHeader, ListRow} from "../employees/EmployeeList";
-import LoadingIcon from "../../Icons/LoadingIcon";
+import LoadingIcon from "../../icons/LoadingIcon";
 import {FlexContainer} from "../companies/CompanyList";
 import {Activity, Order} from "../../types/types";
 import ActivityModal from "./ActivityModal";

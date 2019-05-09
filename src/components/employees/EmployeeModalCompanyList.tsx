@@ -1,6 +1,6 @@
 import React, {FunctionComponent} from 'react';
 import styled from "styled-components";
-import CloseIcon from "../../Icons/CloseIcon";
+import CloseIcon from "../../icons/CloseIcon";
 import {ValueType} from "react-select/lib/types";
 import ReactCSSTransitionGroup from "react-addons-css-transition-group";
 import {CompanySelectOptions} from "../../types/types";

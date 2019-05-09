@@ -4,7 +4,7 @@ import React, {
   useEffect,
   useState
 } from "react";
-import CloseIcon from "../../Icons/CloseIcon";
+import CloseIcon from "../../icons/CloseIcon";
 import Button from "../general/Button";
 import {
   ModalBackground,
@@ -14,7 +14,7 @@ import {
   Section
 } from "../account/MyAccountModal";
 import firebase from "../../config/firebaseConfig";
-import LoadingIcon from "../../Icons/LoadingIcon";
+import LoadingIcon from "../../icons/LoadingIcon";
 import ActivityForm from "./ActivityForm";
 import {toast} from "react-toastify";
 import styled from "styled-components";

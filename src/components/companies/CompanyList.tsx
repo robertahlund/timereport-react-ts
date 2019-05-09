@@ -2,7 +2,7 @@ import React, {ChangeEvent, Fragment, FunctionComponent, useEffect, useState} fr
 import ReactDOM from "react-dom";
 import {PaddingRow} from "../authentication/LoginForm";
 import Input from "../general/Input";
-import LoadingIcon from "../../Icons/LoadingIcon";
+import LoadingIcon from "../../icons/LoadingIcon";
 import {ListHeader, ListRow} from "../employees/EmployeeList";
 import Button from "../general/Button";
 import styled from "styled-components";

@@ -1,6 +1,6 @@
 import React, {FunctionComponent} from 'react';
 import styled from "styled-components";
-import LoadingIcon from "../../Icons/LoadingIcon";
+import LoadingIcon from "../../icons/LoadingIcon";
 import {ButtonType} from "../../types/types";
 
 interface ButtonProps {

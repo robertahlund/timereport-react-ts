@@ -1,10 +1,10 @@
 import React, {ChangeEvent, Fragment, FunctionComponent, useEffect, useState} from "react";
 import styled from "styled-components";
-import CloseIcon from "../../Icons/CloseIcon";
+import CloseIcon from "../../icons/CloseIcon";
 import Button from "../general/Button";
 import firebase from "../../config/firebaseConfig";
 import EmployeeModalForm from "./EmployeeModalForm";
-import LoadingIcon from "../../Icons/LoadingIcon";
+import LoadingIcon from "../../icons/LoadingIcon";
 import {ValueType} from "react-select/lib/types";
 import EmployeeModalCompanyList from "./EmployeeModalCompanyList";
 import {AuthObject, CompanySelectOptions, EmployeeCompanyList} from "../../types/types";

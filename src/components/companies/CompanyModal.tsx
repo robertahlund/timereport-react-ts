@@ -1,9 +1,9 @@
 import React, {ChangeEvent, FunctionComponent, useEffect, useState} from 'react';
-import CloseIcon from "../../Icons/CloseIcon";
+import CloseIcon from "../../icons/CloseIcon";
 import Button from "../general/Button";
 import {ModalBackground, ModalContent, ModalHeader, ModalTitle, Section} from "../account/MyAccountModal";
 import firebase from "../../config/firebaseConfig";
-import LoadingIcon from "../../Icons/LoadingIcon";
+import LoadingIcon from "../../icons/LoadingIcon";
 import CompanyForm from "./CompanyForm";
 import CompanyModalActivityList from "./CompanyModalActivityList";
 import {ValueType} from "react-select/lib/types";

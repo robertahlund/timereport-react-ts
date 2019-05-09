@@ -9,7 +9,7 @@ import MyAccountModal from "./components/account/MyAccountModal";
 import {User} from "firebase";
 import {toast, ToastContainer} from "react-toastify";
 import "react-toastify/dist/ReactToastify.min.css";
-import ToastCloseIcon from "./Icons/ToastCloseIcon";
+import ToastCloseIcon from "./icons/ToastCloseIcon";
 import AuthLoading from "./components/authentication/AuthLoading";
 import {AuthContextProvider} from "./context/authentication/authenticationContext";
 import {checkIfUserInformationHasChanged, checkIfUserIsInactive, getEmployeeById} from "./api/employeeApi";

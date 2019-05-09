@@ -1,6 +1,6 @@
 import React, { FunctionComponent } from "react";
 import styled from "styled-components";
-import LoadingIcon from "../../Icons/LoadingIcon";
+import LoadingIcon from "../../icons/LoadingIcon";
 
 const AuthLoading: FunctionComponent = () => {
   return (

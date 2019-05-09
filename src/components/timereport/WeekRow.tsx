@@ -5,7 +5,7 @@ import React, {
 } from "react";
 import WeekDay from "./WeekDay";
 import styled from "styled-components";
-import CloseIcon from "../../Icons/CloseIcon";
+import CloseIcon from "../../icons/CloseIcon";
 import ReactCSSTransitionGroup from "react-addons-css-transition-group";
 import {TimeReport} from "../../types/types";
 

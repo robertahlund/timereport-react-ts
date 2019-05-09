@@ -1,6 +1,6 @@
 import React, {ChangeEvent, Fragment, FunctionComponent, useEffect, useState} from "react";
 import styled from "styled-components";
-import LoadingIcon from "../../Icons/LoadingIcon";
+import LoadingIcon from "../../icons/LoadingIcon";
 import Input from "../general/Input";
 import {PaddingRow} from "../authentication/LoginForm";
 import {initialEmployeeState, initialSortState} from "../../constants/employeeConstants";
