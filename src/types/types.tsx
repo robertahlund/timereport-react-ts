@@ -113,10 +113,17 @@ export type EmployeeColumn = "name" | "email";
 export type Order = "asc" | "desc";
 
 export interface RegisterFormValue {
-  firstName?: string;
-  lastName?: string;
-  email?: string;
-  password?: string;
+  valid: boolean;
+  firstName?: FormValue;
+  lastName?: FormValue;
+  email?: FormValue;
+  password?: FormValue;
+}
+
+export interface FormValue {
+  value?: string;
+  valid: boolean;
+  validationMessage: string;
 }
 
 export interface LoginFormValue {

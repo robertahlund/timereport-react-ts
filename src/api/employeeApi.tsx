@@ -1,12 +1,13 @@
 import firebase from "../config/firebaseConfig";
-import { getCompanyActivitiesByCompanies } from "./companyApi";
-import { User } from "firebase";
+import {getCompanyActivitiesByCompanies} from "./companyApi";
+import {User} from "firebase";
 import {
   ActivityCompanySelectOption,
   AuthObject,
   CompanySelectOptions,
   EmployeeRow
 } from "../types/types";
+import {dateCompare} from "../utilities/dateCompare";
 
 export const createEmployee = async (
   firstName: string,
@@ -15,34 +16,30 @@ export const createEmployee = async (
   password: string,
   checkbox: boolean
 ): Promise<string> => {
-  try {
-    await firebase.auth().createUserWithEmailAndPassword(email, password);
-    const user = await firebase.auth().currentUser;
-    if (user) {
-      await user.updateProfile({
-        displayName: `${firstName} ${lastName}`
-      });
-      const uid = user.uid;
-      const userDocument: AuthObject = {
-        firstName,
-        lastName,
-        uid,
-        email,
-        inactive: false,
-        roles: checkbox ? ["Administrator", "Employee"] : ["Employee"],
-        companies: []
-      };
-      const db = firebase.firestore();
-      await db
-        .collection("users")
-        .doc(uid)
-        .set(userDocument);
-      return new Promise<string>(resolve => resolve("Account created."))
-    }
-    return new Promise<string>(reject => reject("Error"))
-  } catch (error) {
-    throw new Error("Error")
-  }
+  await firebase.auth().createUserWithEmailAndPassword(email, password);
+  const user: User | null = await firebase.auth().currentUser;
+  if (user) {
+    await user.updateProfile({
+      displayName: `${firstName} ${lastName}`
+    });
+    const uid = user.uid;
+    const userDocument: AuthObject = {
+      firstName,
+      lastName,
+      uid,
+      email,
+      inactive: false,
+      roles: checkbox ? ["Administrator", "Employee"] : ["Employee"],
+      companies: []
+    };
+    const db = firebase.firestore();
+    await db
+      .collection("users")
+      .doc(uid)
+      .set(userDocument);
+    console.log(userDocument, "account created");
+    return new Promise<string>(resolve => resolve("Account created."))
+  } else return new Promise<string>(reject => reject("Error"))
 };
 
 export const getEmployeeById = async (
@@ -70,9 +67,7 @@ export const getEmployeeById = async (
   }
 };
 
-export const getEmployeesForList = async (): Promise<
-  EmployeeRow[] | string
-> => {
+export const getEmployeesForList = async (): Promise<EmployeeRow[] | string> => {
   const db = firebase.firestore();
   try {
     let employeeList: EmployeeRow[] = [];
@@ -199,7 +194,7 @@ export const checkIfUserIsInactive = async (
       .then(doc => {
         if (doc.exists) {
           return doc.data()!.inactive;
-        } else return true;
+        } else return false;
       });
     return new Promise<boolean>(resolve => resolve(inactive));
   } catch (error) {

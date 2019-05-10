@@ -24,7 +24,7 @@ const ModalForm: FunctionComponent<ModalFormProps> = props => {
       <form autoComplete="off">
         <Row direction="row">
           <Input
-            value={firstName}
+            value={firstName!.value}
             labelValue="First name"
             type="text"
             name="firstName"
@@ -32,7 +32,7 @@ const ModalForm: FunctionComponent<ModalFormProps> = props => {
             width="171px"
           />
           <Input
-            value={lastName}
+            value={lastName!.value}
             labelValue="Last name"
             type="text"
             name="lastName"
@@ -44,7 +44,7 @@ const ModalForm: FunctionComponent<ModalFormProps> = props => {
           <PaddingRow>
             <Input
               name="email"
-              value={email}
+              value={email!.value}
               labelValue="Email"
               type="text"
               onFormChange={props.onFormChange}
@@ -58,7 +58,7 @@ const ModalForm: FunctionComponent<ModalFormProps> = props => {
               </ShowPasswordText>
               <Input
                 name="password"
-                value={password}
+                value={password!.value}
                 labelValue="New password"
                 type="password"
                 onFormChange={props.onFormChange}

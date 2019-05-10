@@ -9,14 +9,13 @@ import { Section, Wrapper } from "./Login";
 import RegisterForm from "./RegisterForm";
 import { createEmployee } from "../../api/employeeApi";
 import { toast } from "react-toastify";
+import {validateRegisterForm} from "../../utilities/validateRegisterForm";
+import {RegisterFormValue} from "../../types/types";
+import {initialRegisterForm} from "../../constants/registerConstants";
+import _ from "lodash";
 
 const Register: FunctionComponent = () => {
-  const [form, setForm] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: ""
-  });
+  const [form, setForm] = useState(initialRegisterForm);
   const [loading, setLoading] = useState(false);
   const [checkbox, setCheckbox] = useState(false);
 
@@ -27,19 +26,29 @@ const Register: FunctionComponent = () => {
   const handleFormChange = (event: ChangeEvent<HTMLInputElement>): void => {
     setForm({
       ...form,
-      [event.target.name]: event.target.value
+      [event.target.name]: {
+        valid: true,
+        validationMessage: "",
+        value: event.target.value
+      }
     });
   };
 
   const formSubmit = async (): Promise<void> => {
+    const validatedForm: RegisterFormValue = _.cloneDeep(validateRegisterForm(form));
+    if (!validatedForm.valid) {
+      console.log(validatedForm);
+      setForm(validatedForm);
+      return;
+    }
     const { firstName, lastName, email, password } = form;
     try {
       setLoading(true);
       const success: string = await createEmployee(
-        firstName,
-        lastName,
-        email,
-        password,
+        firstName!.value!,
+        lastName!.value!,
+        email!.value!,
+        password!.value!,
         checkbox
       );
       toast.success(success);

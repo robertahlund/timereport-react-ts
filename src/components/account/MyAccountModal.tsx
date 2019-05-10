@@ -16,10 +16,27 @@ const MyAccountModal: FunctionComponent<MyAccountModalProps> = props => {
   const authContext = useContext(AuthContext);
   const [showPassword, setShowPassword] = useState(false);
   const [form, setForm] = useState({
-    firstName: typeof authContext === "object" ? authContext.firstName : "",
-    lastName: typeof authContext === "object" ? authContext.lastName : "",
-    email: typeof authContext === "object" ? authContext.email : "",
-    password: ""
+    valid: true,
+    firstName: {
+      value: typeof authContext === "object" ? authContext.firstName : "",
+      valid: true,
+      validationMessage: ""
+    },
+    lastName: {
+      value: typeof authContext === "object" ? authContext.lastName : "",
+      valid: true,
+      validationMessage: ""
+    },
+    email: {
+      value: typeof authContext === "object" ? authContext.email : "",
+      valid: true,
+      validationMessage: ""
+    },
+    password: {
+      value: "",
+      valid: true,
+      validationMessage: ""
+    }
   });
   const [loading, setLoading] = useState(false);
 
@@ -151,7 +168,7 @@ const MyAccountModal: FunctionComponent<MyAccountModalProps> = props => {
                 type="button"
                 text="Update"
                 loading={loading}
-                onSubmit={() => onSubmit(firstName, lastName, email, password)}
+                onSubmit={() => onSubmit(firstName.value, lastName.value, email.value, password.value)}
               />
             </Section>
           </ModalContent>

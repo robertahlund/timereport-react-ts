@@ -14,9 +14,6 @@ import AuthLoading from "./components/authentication/AuthLoading";
 import {AuthContextProvider} from "./context/authentication/authenticationContext";
 import {checkIfUserInformationHasChanged, checkIfUserIsInactive, getEmployeeById} from "./api/employeeApi";
 import {AuthObject} from "./types/types";
-import ReactDOM from "react-dom";
-import {modalPortal} from "./constants/generalConstants";
-import {Modal} from "react-native";
 import ModalPortal from "./components/general/ModalPortal";
 
 interface AppState {
@@ -81,7 +78,8 @@ class App extends Component<{}, AppState> {
         auth: userData,
         authHasLoaded: true
       });
-      displayToast ? toast.success(`Welcome back ${userData.firstName}.`) : null;
+      console.log(userData)
+      displayToast && userData.firstName ? toast.success(`Welcome back ${userData.firstName}.`) : null;
     }
   };
 

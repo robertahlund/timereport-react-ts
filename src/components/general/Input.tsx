@@ -21,17 +21,20 @@ interface InputProps {
     timeReportIndex?: number,
     timeReportRowIndex?: number
   ) => Promise<void>;
+  valid?: boolean;
+  validationMessage?: string;
 }
 
 interface InputFieldProps {
   width: string;
   textAlign?: string;
   fontWeight?: string;
+  valid?: boolean;
 }
 
 const Input: FunctionComponent<InputProps> = props => {
   return (
-    <div>
+    <RelativeContainer>
       {props.labelValue && (
         <Label htmlFor={props.name}>{props.labelValue}</Label>
       )}
@@ -41,6 +44,7 @@ const Input: FunctionComponent<InputProps> = props => {
         name={props.name}
         value={props.value}
         type={props.type}
+        valid={props.valid === undefined ? true : props.valid}
         onChange={(event: ChangeEvent<HTMLInputElement>) =>
           props.onFormChange(
             event,
@@ -60,7 +64,8 @@ const Input: FunctionComponent<InputProps> = props => {
             : null
         }
       />
-    </div>
+      {!props.valid && <ErrorMessage>{props.validationMessage}</ErrorMessage>}
+    </RelativeContainer>
   );
 };
 
@@ -77,7 +82,7 @@ export const Label = styled.label`
 const InputField = styled.input`
   background-color: #fbfbfb;
   border-radius: 3px;
-  border: 1px solid #f1f1f1;
+  border: ${(props: InputFieldProps) => props.valid ? "1px solid #f1f1f1;" : "1px solid #FE9161;"}
   padding: 10px;
   font-size: 15px;
   width: ${(props: InputFieldProps) => props.width};
@@ -85,4 +90,15 @@ const InputField = styled.input`
   props.textAlign ? props.textAlign : "left"};
   font-weight: ${(props: InputFieldProps) =>
   props.fontWeight ? props.fontWeight : 400};
+`;
+
+const RelativeContainer = styled.div`
+  position: relative;
+`;
+
+const ErrorMessage = styled.span`
+  color: #FE9161;
+  font-size: 12px;
+  display: block;
+  padding: 5px 0;
 `;

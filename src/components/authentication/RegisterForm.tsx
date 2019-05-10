@@ -23,40 +23,48 @@ const RegisterForm: FunctionComponent<RegisterFormProps> = props => {
     <form autoComplete="off">
       <Row direction="row">
         <Input
-          value={firstName}
+          value={firstName!.value}
           labelValue="First name"
           type="text"
           name="firstName"
           onFormChange={props.onFormChange}
           width="171px"
+          validationMessage={firstName!.validationMessage}
+          valid={firstName!.valid}
         />
         <Input
-          value={lastName}
+          value={lastName!.value}
           labelValue="Last name"
           type="text"
           name="lastName"
           onFormChange={props.onFormChange}
           width="171px"
+          validationMessage={lastName!.validationMessage}
+          valid={lastName!.valid}
         />
       </Row>
       <Row direction="column">
         <PaddingRow>
           <Input
             name="email"
-            value={email}
+            value={email!.value}
             labelValue="Email"
             type="text"
             onFormChange={props.onFormChange}
             width="378px"
+            validationMessage={email!.validationMessage}
+            valid={email!.valid}
           />
         </PaddingRow>
         <Input
           name="password"
-          value={password}
+          value={password!.value}
           labelValue="Password"
           type="password"
           onFormChange={props.onFormChange}
           width="378px"
+          validationMessage={password!.validationMessage}
+          valid={password!.valid}
         />
       </Row>
       <Row direction="column">
