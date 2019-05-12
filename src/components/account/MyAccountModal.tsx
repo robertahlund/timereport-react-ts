@@ -18,17 +18,17 @@ const MyAccountModal: FunctionComponent<MyAccountModalProps> = props => {
   const [form, setForm] = useState({
     valid: true,
     firstName: {
-      value: typeof authContext === "object" ? authContext.firstName : "",
+      value: typeof authContext === "object" ? authContext.firstName! : "",
       valid: true,
       validationMessage: ""
     },
     lastName: {
-      value: typeof authContext === "object" ? authContext.lastName : "",
+      value: typeof authContext === "object" ? authContext.lastName! : "",
       valid: true,
       validationMessage: ""
     },
     email: {
-      value: typeof authContext === "object" ? authContext.email : "",
+      value: typeof authContext === "object" ? authContext.email! : "",
       valid: true,
       validationMessage: ""
     },

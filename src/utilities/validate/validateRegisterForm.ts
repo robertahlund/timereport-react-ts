@@ -1,16 +1,16 @@
-import {FormValue, RegisterFormValue} from "../types/types";
+import {FormValue, RegisterFormValue} from "../../types/types";
 import _ from "lodash";
 
 export const validateRegisterForm = (form: RegisterFormValue): RegisterFormValue => {
-  form.firstName = validateInputField(form.firstName!);
-  form.lastName = validateInputField(form.lastName!);
-  form.email = validateEmail(form.email!);
-  form.password = validatePassword(form.password!);
+  form.firstName = validateInputField(form.firstName);
+  form.lastName = validateInputField(form.lastName);
+  form.email = validateEmail(form.email);
+  form.password = validatePassword(form.password);
   form.valid = form.firstName.valid && form.lastName.valid && form.email.valid && form.password.valid;
   return form;
 };
 
-const validateEmail = (email: FormValue): FormValue => {
+export const validateEmail = (email: FormValue): FormValue => {
   const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   const isValid: boolean = !_.isNil(email.value) && email.value.length > 0 && emailRegex.test(email.value.toLowerCase());
   let validationMessage: string = "";
@@ -24,7 +24,7 @@ const validateEmail = (email: FormValue): FormValue => {
   }
 };
 
-const validateInputField = (field: FormValue): FormValue => {
+export const validateInputField = (field: FormValue): FormValue => {
   const isValid: boolean = !_.isNil(field.value) && field.value.length > 0;
   let validationMessage: string = "";
   if (!isValid) {
@@ -37,7 +37,7 @@ const validateInputField = (field: FormValue): FormValue => {
   }
 };
 
-const validatePassword = (password: FormValue): FormValue => {
+export const validatePassword = (password: FormValue): FormValue => {
   const isValid: boolean = !_.isNil(password.value) && password.value.length >= 6;
   let validationMessage: string = "";
   if (!isValid) {

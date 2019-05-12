@@ -9,7 +9,7 @@ import {ValueType} from "react-select/lib/types";
 import EmployeeModalCompanyList from "./EmployeeModalCompanyList";
 import {AuthObject, CompanySelectOptions, EmployeeCompanyList} from "../../types/types";
 import {getEmployeeById, updateEmployee} from "../../api/employeeApi";
-import {stringCompare} from "../../utilities/stringCompare";
+import {stringCompare} from "../../utilities/compare/stringCompare";
 
 interface EmployeeModalProps {
   toggleModal: (event: React.MouseEvent) => void;

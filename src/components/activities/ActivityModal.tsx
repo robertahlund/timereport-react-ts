@@ -161,6 +161,8 @@ const ActivityModal: FunctionComponent<ActivityModalProps> = props => {
         await deleteActivity(activity.id);
         toast.success(`Successfully deleted ${activity.name}.`);
         props.toggleModal();
+        // noinspection JSIgnoredPromiseFromCall
+        props.getAllActivities();
       }
     } catch (error) {
       setDeleteLoading(false);

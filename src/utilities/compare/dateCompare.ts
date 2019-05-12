@@ -1,4 +1,4 @@
-import {dateSelectorStartValueFormat} from "../constants/timeReportConstants";
+import {dateSelectorStartValueFormat} from "../../constants/timeReportConstants";
 import {format} from "date-fns";
 
 export const dateCompare = (firstDate: Date, lastDate: Date): boolean => {

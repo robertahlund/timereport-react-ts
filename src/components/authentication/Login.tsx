@@ -4,25 +4,36 @@ import LoginForm from "./LoginForm";
 import LoginLinks from "./LoginLinks";
 import Button from "../general/Button";
 import firebase from "../../config/firebaseConfig";
+import {toast} from "react-toastify";
+import {initialLoginFormState} from "../../constants/employeeConstants";
+import {validateLoginForm} from "../../utilities/validate/validateLoginForm";
+import {LoginFormValue} from "../../types/types";
 
 const Login: FunctionComponent = () => {
-  const [loginForm, setLoginForm] = useState({
-    email: "",
-    password: ""
-  });
+  const [loginForm, setLoginForm] = useState(initialLoginFormState);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     document.title = "Login"
   }, []);
 
-  const formSubmit = async (email: string, password: string): Promise<void> => {
+  const formSubmit = async (): Promise<void> => {
+
+    const validatedForm: LoginFormValue = {...validateLoginForm(loginForm)};
+    if (!validatedForm.valid) {
+      console.log(validatedForm);
+      setLoginForm(validatedForm);
+      return;
+    }
+    const password: string = loginForm.password.value;
+    const email: string = loginForm.email.value;
     try {
       setLoading(true);
       await firebase.auth().signInWithEmailAndPassword(email, password);
       setLoading(false);
     } catch (error) {
       setLoading(false);
+      toast.error(error.message);
       console.log(error);
     }
   };
@@ -30,7 +41,11 @@ const Login: FunctionComponent = () => {
   const onLoginFormChange = (event: ChangeEvent<HTMLInputElement>): void => {
     setLoginForm({
       ...loginForm,
-      [event.target.name]: event.target.value
+      [event.target.name]: {
+        valid: true,
+        validationMessage: "",
+        value: event.target.value
+      }
     });
   };
 
@@ -43,7 +58,7 @@ const Login: FunctionComponent = () => {
         <Button
           type="button"
           text="Login"
-          onSubmit={() => formSubmit(loginForm.email, loginForm.password)}
+          onSubmit={formSubmit}
           loading={loading}
         />
       </Section>

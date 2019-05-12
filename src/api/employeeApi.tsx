@@ -7,7 +7,6 @@ import {
   CompanySelectOptions,
   EmployeeRow
 } from "../types/types";
-import {dateCompare} from "../utilities/dateCompare";
 
 export const createEmployee = async (
   firstName: string,

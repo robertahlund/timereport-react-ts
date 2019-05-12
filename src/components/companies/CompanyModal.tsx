@@ -13,7 +13,7 @@ import {getEmployeesByCompanyId, updateEmployees} from "../../api/employeeApi";
 import {createCompany, deleteCompany, updateCompany} from "../../api/companyApi";
 import {ActivitySelectOptions, AuthObject, Company} from "../../types/types";
 import {updateTimeReportByCompanyId} from "../../api/timeReportApi";
-import {stringCompare} from "../../utilities/stringCompare";
+import {stringCompare} from "../../utilities/compare/stringCompare";
 
 interface CompanyModalProps {
   toggleModal: (event?: React.MouseEvent) => void;
@@ -227,8 +227,10 @@ const CompanyModal: FunctionComponent<CompanyModalProps> = props => {
         const updatedEmployeeList = removeCompanyFromEmployeeList(employees, company.id);
         await updateEmployees(updatedEmployeeList);
         await deleteCompany(company.id);
-        toast.success(`Successfully deleted ${company.name}`);
+        toast.success(`Successfully deleted ${company.name}!`);
         props.toggleModal();
+        // noinspection JSIgnoredPromiseFromCall
+        props.getAllCompanies()
       }
     } catch (error) {
       console.log(error);

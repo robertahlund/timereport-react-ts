@@ -15,20 +15,24 @@ const LoginForm: FunctionComponent<LoginFormProps> = props => {
       <PaddingRow>
         <Input
           name="email"
-          value={email}
+          value={email.value}
           labelValue="Email"
           type="text"
           onFormChange={props.onFormChange}
           width="300px"
+          valid={email.valid}
+          validationMessage={email.validationMessage}
         />
       </PaddingRow>
       <Input
         name="password"
-        value={password}
+        value={password.value}
         labelValue="Password"
         type="password"
         onFormChange={props.onFormChange}
         width="300px"
+        valid={password.valid}
+        validationMessage={password.validationMessage}
       />
     </form>
   );

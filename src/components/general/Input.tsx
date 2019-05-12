@@ -1,6 +1,6 @@
 import React, { ChangeEvent, Fragment, FunctionComponent } from "react";
 import styled from "styled-components";
-import {TimeReport} from "../../types/types";
+import { TimeReport } from "../../types/types";
 
 interface InputProps {
   value?: string;
@@ -64,7 +64,10 @@ const Input: FunctionComponent<InputProps> = props => {
             : null
         }
       />
-      {!props.valid && <ErrorMessage>{props.validationMessage}</ErrorMessage>}
+      {!props.valid &&
+        props.valid !== undefined && (
+          <ErrorMessage>{props.validationMessage}</ErrorMessage>
+        )}
     </RelativeContainer>
   );
 };
@@ -82,14 +85,15 @@ export const Label = styled.label`
 const InputField = styled.input`
   background-color: #fbfbfb;
   border-radius: 3px;
-  border: ${(props: InputFieldProps) => props.valid ? "1px solid #f1f1f1;" : "1px solid #FE9161;"}
+  border: ${(props: InputFieldProps) =>
+    props.valid ? "1px solid #f1f1f1;" : "1px solid #FE9161;"}
   padding: 10px;
   font-size: 15px;
   width: ${(props: InputFieldProps) => props.width};
   text-align: ${(props: InputFieldProps) =>
-  props.textAlign ? props.textAlign : "left"};
+    props.textAlign ? props.textAlign : "left"};
   font-weight: ${(props: InputFieldProps) =>
-  props.fontWeight ? props.fontWeight : 400};
+    props.fontWeight ? props.fontWeight : 400};
 `;
 
 const RelativeContainer = styled.div`
@@ -97,7 +101,7 @@ const RelativeContainer = styled.div`
 `;
 
 const ErrorMessage = styled.span`
-  color: #FE9161;
+  color: #fe9161;
   font-size: 12px;
   display: block;
   padding: 5px 0;

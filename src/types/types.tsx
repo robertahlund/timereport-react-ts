@@ -104,31 +104,26 @@ export interface EmployeeRow {
   companies: EmployeeCompanyList;
 }
 
+export type EmployeeColumn = "name" | "email";
+export type Order = "asc" | "desc";
+
 export interface EmployeeSort {
   column: EmployeeColumn;
   order: Order;
 }
 
-export type EmployeeColumn = "name" | "email";
-export type Order = "asc" | "desc";
-
-export interface RegisterFormValue {
-  valid: boolean;
-  firstName?: FormValue;
-  lastName?: FormValue;
-  email?: FormValue;
-  password?: FormValue;
-}
-
 export interface FormValue {
-  value?: string;
+  value: string;
   valid: boolean;
   validationMessage: string;
 }
 
-export interface LoginFormValue {
-  email: string;
-  password: string;
+export interface RegisterFormValue {
+  valid: boolean;
+  firstName: FormValue;
+  lastName: FormValue;
+  email: FormValue;
+  password: FormValue;
 }
 
 export type ButtonType = "Create" | "Delete";
@@ -137,4 +132,10 @@ export interface GroupedActivityOptions {
   label: string;
   companyId: string;
   options: ActivityCompanySelectOption[];
+}
+
+export interface LoginFormValue {
+  valid: boolean;
+  email: FormValue,
+  password: FormValue
 }

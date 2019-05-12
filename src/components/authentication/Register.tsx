@@ -9,7 +9,7 @@ import { Section, Wrapper } from "./Login";
 import RegisterForm from "./RegisterForm";
 import { createEmployee } from "../../api/employeeApi";
 import { toast } from "react-toastify";
-import {validateRegisterForm} from "../../utilities/validateRegisterForm";
+import {validateRegisterForm} from "../../utilities/validate/validateRegisterForm";
 import {RegisterFormValue} from "../../types/types";
 import {initialRegisterForm} from "../../constants/registerConstants";
 import _ from "lodash";
