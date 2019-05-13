@@ -64,7 +64,9 @@ export const getCompanyActivitiesByCompanies = async (
         .get()
         .then(doc => {
           if (doc.exists) {
-              doc.data()!.activities.forEach((activity: ActivityCompanySelectOption) => {
+            doc
+              .data()!
+              .activities.forEach((activity: ActivityCompanySelectOption) => {
                 activities.push({
                   label: activity.label,
                   value: activity.value,

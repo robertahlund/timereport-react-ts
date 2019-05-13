@@ -29,11 +29,18 @@ import {
   getCompanyById,
   updateCompany
 } from "../../api/companyApi";
-import {Activity, ActivitySelectOptions, AuthObject, Company, CompanyFormValue} from "../../types/types";
+import {
+  Activity,
+  ActivitySelectOptions,
+  AuthObject,
+  Company,
+  CompanyFormValue
+} from "../../types/types";
 import { updateTimeReportByCompanyId } from "../../api/timeReportApi";
 import { stringCompare } from "../../utilities/compare/stringCompare";
-import {getActivities} from "../../api/activityApi";
-import {initialCompanyState} from "../../constants/companyConstants";
+import { getActivities } from "../../api/activityApi";
+import { initialCompanyState } from "../../constants/companyConstants";
+import { validateCompanyForm } from "../../utilities/validations/validateCompanyForm";
 
 interface CompanyModalProps {
   toggleModal: (event?: React.MouseEvent) => void;
@@ -93,14 +100,17 @@ const CompanyModal: FunctionComponent<CompanyModalProps> = props => {
         return new Promise<ActivitySelectOptions[]>(resolve =>
           resolve(companyData.activities)
         );
-      } else return new Promise<string>(reject => reject("Missing activity list."));
+      } else
+        return new Promise<string>(reject => reject("Missing activity list."));
     } else
       return new Promise<string>(reject =>
         reject("Error, something went wrong.")
       );
   };
 
-  const _getActivities = async (): Promise<ActivitySelectOptions[] | string> => {
+  const _getActivities = async (): Promise<
+    ActivitySelectOptions[] | string
+  > => {
     const activityData: ActivitySelectOptions[] = [];
     const activities: Activity[] | string = await getActivities();
     if (typeof activities !== "string") {
@@ -112,11 +122,12 @@ const CompanyModal: FunctionComponent<CompanyModalProps> = props => {
       });
       setActivityList(activityData);
       return new Promise<ActivitySelectOptions[] | string>(resolve =>
-          resolve(activityData)
+        resolve(activityData)
       );
-    } else return new Promise<ActivitySelectOptions[] | string>(reject =>
+    } else
+      return new Promise<ActivitySelectOptions[] | string>(reject =>
         reject("Error")
-    );
+      );
   };
 
   const removeAddedActivitiesFromList = async (): Promise<void> => {
@@ -213,11 +224,8 @@ const CompanyModal: FunctionComponent<CompanyModalProps> = props => {
   ): AuthObject[] => {
     employeeList.forEach(employee => {
       if (employee.companies) {
-        employee.companies.forEach(
-          company =>
-            company.value === companyId
-              ? (company.label = newCompanyName)
-              : null
+        employee.companies.forEach(company =>
+          company.value === companyId ? (company.label = newCompanyName) : null
         );
       }
     });
@@ -257,7 +265,7 @@ const CompanyModal: FunctionComponent<CompanyModalProps> = props => {
             validationMessage: ""
           }
         });
-        toast.success(`Successfully updated ${company.name.value}!`)
+        toast.success(`Successfully updated ${company.name.value}!`);
       }
     } catch (error) {
       console.log(error);
@@ -265,6 +273,12 @@ const CompanyModal: FunctionComponent<CompanyModalProps> = props => {
   };
 
   const onSubmit = async (): Promise<void> => {
+    const validatedForm: CompanyFormValue = { ...validateCompanyForm(company) };
+    if (!validatedForm.valid) {
+      console.log(validatedForm);
+      setCompany(validatedForm);
+      return;
+    }
     setLoading(true);
     try {
       if (isNew) {
@@ -274,7 +288,6 @@ const CompanyModal: FunctionComponent<CompanyModalProps> = props => {
         await onUpdateCompany();
         setLoading(false);
       }
-      // noinspection JSIgnoredPromiseFromCall
       props.getAllCompanies();
     } catch (error) {
       console.log(error);

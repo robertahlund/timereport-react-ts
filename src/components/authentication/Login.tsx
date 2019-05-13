@@ -18,7 +18,6 @@ const Login: FunctionComponent = () => {
   }, []);
 
   const formSubmit = async (): Promise<void> => {
-
     const validatedForm: LoginFormValue = {...validateLoginForm(loginForm)};
     if (!validatedForm.valid) {
       console.log(validatedForm);

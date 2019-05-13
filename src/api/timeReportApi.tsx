@@ -1,35 +1,45 @@
-import firebase from '../config/firebaseConfig';
-import {TimeReport} from "../types/types";
+import firebase from "../config/firebaseConfig";
+import { TimeReport } from "../types/types";
 
 const db = firebase.firestore();
 
-export const createOrUpdateTimeReportRows = async (timeReports: TimeReport[]): Promise<TimeReport[] | string> => {
+export const createOrUpdateTimeReportRows = async (
+  timeReports: TimeReport[]
+): Promise<TimeReport[] | string> => {
   try {
     const allTimeReports: TimeReport[] = [];
     for (const timeReport of timeReports) {
       if (!timeReport.id) {
-        const createdTimeReport: TimeReport | string = await createTimeReports(timeReport);
+        const createdTimeReport: TimeReport | string = await createTimeReports(
+          timeReport
+        );
         if (typeof createdTimeReport === "string") {
-          return new Promise<TimeReport[] | string>(reject => reject("Error"))
+          return new Promise<TimeReport[] | string>(reject => reject("Error"));
         } else {
           allTimeReports.push(createdTimeReport);
         }
       } else {
-        const updatedTimeReport: TimeReport | string = await updateTimeReports(timeReport);
+        const updatedTimeReport: TimeReport | string = await updateTimeReports(
+          timeReport
+        );
         if (typeof updatedTimeReport === "string") {
-          return new Promise<TimeReport[] | string>(reject => reject("Error"))
+          return new Promise<TimeReport[] | string>(reject => reject("Error"));
         } else {
           allTimeReports.push(updatedTimeReport);
         }
       }
     }
-    return new Promise<TimeReport[] | string>(resolve => resolve(allTimeReports))
+    return new Promise<TimeReport[] | string>(resolve =>
+      resolve(allTimeReports)
+    );
   } catch (error) {
-    return new Promise<TimeReport[] | string>(reject => reject("Error"))
+    return new Promise<TimeReport[] | string>(reject => reject("Error"));
   }
 };
 
-export const createTimeReports = async (timeReport: TimeReport): Promise<TimeReport | string> => {
+export const createTimeReports = async (
+  timeReport: TimeReport
+): Promise<TimeReport | string> => {
   try {
     timeReport = await db
       .collection("timeReports")
@@ -47,40 +57,47 @@ export const createTimeReports = async (timeReport: TimeReport): Promise<TimeRep
           id: document.id
         };
       });
-    return new Promise<TimeReport | string>(resolve => resolve(timeReport))
+    return new Promise<TimeReport | string>(resolve => resolve(timeReport));
   } catch (error) {
-    return new Promise<TimeReport | string>(reject => reject("Error"))
+    return new Promise<TimeReport | string>(reject => reject("Error"));
   }
 };
 
-export const updateTimeReports = async (timeReport: TimeReport): Promise<TimeReport | string> => {
+export const updateTimeReports = async (
+  timeReport: TimeReport
+): Promise<TimeReport | string> => {
   try {
     timeReport = await db
       .collection("timeReports")
       .doc(timeReport.id)
       .update(timeReport)
       .then(() => {
-        return timeReport
+        return timeReport;
       });
-    return new Promise<TimeReport | string>(resolve => resolve(timeReport))
+    return new Promise<TimeReport | string>(resolve => resolve(timeReport));
   } catch (error) {
-    return new Promise<TimeReport | string>(reject => reject("Error"))
+    return new Promise<TimeReport | string>(reject => reject("Error"));
   }
 };
 
-export const deleteTimeReport = async (timeReportId: string): Promise<string> => {
+export const deleteTimeReport = async (
+  timeReportId: string
+): Promise<string> => {
   try {
     await db
       .collection("timeReports")
       .doc(timeReportId)
       .delete();
-    return new Promise<string>(resolve => resolve("Successfully deleted row."))
+    return new Promise<string>(resolve => resolve("Successfully deleted row."));
   } catch (error) {
-    return new Promise<string>(reject => reject("Error deleting row."))
+    return new Promise<string>(reject => reject("Error deleting row."));
   }
 };
 
-export const getTimeReportsByDate = async (startDate: string, userId: string): Promise<TimeReport[] | string> => {
+export const getTimeReportsByDate = async (
+  startDate: string,
+  userId: string
+): Promise<TimeReport[] | string> => {
   const timeReports: TimeReport[] = [];
   try {
     await db
@@ -100,16 +117,19 @@ export const getTimeReportsByDate = async (startDate: string, userId: string): P
             date: doc.data().date,
             prettyDate: doc.data().prettyDate,
             timeReportRows: doc.data().timeReportRows
-          })
-        })
+          });
+        });
       });
-    return new Promise<TimeReport[]|string>(resolve => resolve(timeReports))
+    return new Promise<TimeReport[] | string>(resolve => resolve(timeReports));
   } catch (error) {
-    return new Promise<TimeReport[]|string>(reject => reject("Error"))
+    return new Promise<TimeReport[] | string>(reject => reject("Error"));
   }
 };
 
-export const updateTimeReportByActivityId = async (activityId: string, newActivityName: string): Promise<void> => {
+export const updateTimeReportByActivityId = async (
+  activityId: string,
+  newActivityName: string
+): Promise<void> => {
   try {
     const db = firebase.firestore();
     await db
@@ -123,15 +143,18 @@ export const updateTimeReportByActivityId = async (activityId: string, newActivi
             .doc(doc.id)
             .update({
               activityName: newActivityName
-            })
-        })
-      })
+            });
+        });
+      });
   } catch (error) {
     console.log(error);
   }
 };
 
-export const updateTimeReportByCompanyId = async (companyId: string, newCompanyName: string): Promise<void> => {
+export const updateTimeReportByCompanyId = async (
+  companyId: string,
+  newCompanyName: string
+): Promise<void> => {
   try {
     const db = firebase.firestore();
     await db
@@ -145,9 +168,9 @@ export const updateTimeReportByCompanyId = async (companyId: string, newCompanyN
             .doc(doc.id)
             .update({
               companyName: newCompanyName
-            })
-        })
-      })
+            });
+        });
+      });
   } catch (error) {
     console.log(error);
   }
