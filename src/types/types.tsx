@@ -139,3 +139,9 @@ export interface LoginFormValue {
   email: FormValue,
   password: FormValue
 }
+
+export interface ActivityFormValue {
+  id: string;
+  valid: boolean;
+  name: FormValue
+}

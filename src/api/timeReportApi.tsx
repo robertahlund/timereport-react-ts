@@ -1,5 +1,5 @@
 import firebase from '../config/firebaseConfig';
-import {Company, TimeReport} from "../types/types";
+import {TimeReport} from "../types/types";
 
 const db = firebase.firestore();
 
@@ -8,14 +8,14 @@ export const createOrUpdateTimeReportRows = async (timeReports: TimeReport[]): P
     const allTimeReports: TimeReport[] = [];
     for (const timeReport of timeReports) {
       if (!timeReport.id) {
-        const createdTimeReport = await createTimeReports(timeReport);
+        const createdTimeReport: TimeReport | string = await createTimeReports(timeReport);
         if (typeof createdTimeReport === "string") {
           return new Promise<TimeReport[] | string>(reject => reject("Error"))
         } else {
           allTimeReports.push(createdTimeReport);
         }
       } else {
-        const updatedTimeReport = await updateTimeReports(timeReport);
+        const updatedTimeReport: TimeReport | string = await updateTimeReports(timeReport);
         if (typeof updatedTimeReport === "string") {
           return new Promise<TimeReport[] | string>(reject => reject("Error"))
         } else {
@@ -74,9 +74,9 @@ export const deleteTimeReport = async (timeReportId: string): Promise<string> =>
       .collection("timeReports")
       .doc(timeReportId)
       .delete();
-    return new Promise<string>(resolve => resolve("Successfully deleted."))
+    return new Promise<string>(resolve => resolve("Successfully deleted row."))
   } catch (error) {
-    return new Promise<string>(reject => reject("Error"))
+    return new Promise<string>(reject => reject("Error deleting row."))
   }
 };
 

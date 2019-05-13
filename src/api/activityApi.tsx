@@ -2,8 +2,8 @@ import firebase from '../config/firebaseConfig';
 import {Activity} from "../types/types";
 
 export const getActivities = async (): Promise<Activity[] | string> => {
-  const db = firebase.firestore();
   try {
+    const db = firebase.firestore();
     const activityList: Activity[] = [];
     await db
       .collection("activities")
@@ -19,9 +19,30 @@ export const getActivities = async (): Promise<Activity[] | string> => {
   }
 };
 
-export const createActivity = async (activity: Activity): Promise<string> => {
-  const db = firebase.firestore();
+export const getActivityById = async (activityId: string): Promise<Activity | string> => {
   try {
+    const db = firebase.firestore();
+    // @ts-ignore
+    const activityData: Activity | undefined = await db
+        .collection("activities")
+        .doc(activityId)
+        .get()
+        .then(doc => {
+          if (doc.exists) {
+            return doc.data();
+          } else return undefined;
+        });
+    if (activityData) {
+      return new Promise<Activity>(resolve => resolve(activityData))
+    } else return new Promise<string>(reject => reject("Error retrieving data."))
+  } catch (error) {
+    return new Promise<string>(reject => reject("Error retrieving data."))
+  }
+};
+
+export const createActivity = async (activity: Activity): Promise<string> => {
+  try {
+    const db = firebase.firestore();
     const activityId = await db
       .collection("activities")
       .add(activity)
@@ -38,13 +59,13 @@ export const createActivity = async (activity: Activity): Promise<string> => {
     return new Promise<string>(resolve => resolve(activityId))
   } catch (error) {
     console.log(error);
-    return new Promise<string>(reject => reject("Error"));
+    return new Promise<string>(reject => reject("An error occured when creating the activity."));
   }
 };
 
 export const updateActivity = async (activity: Activity): Promise<void> => {
-  const db = firebase.firestore();
   try {
+    const db = firebase.firestore();
     await db
       .collection("activities")
       .doc(activity.id)
@@ -55,8 +76,8 @@ export const updateActivity = async (activity: Activity): Promise<void> => {
 };
 
 export const deleteActivity = async (activityId: string): Promise<void> => {
-  const db = firebase.firestore();
   try {
+    const db = firebase.firestore();
     await db
       .collection("activities")
       .doc(activityId)

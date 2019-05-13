@@ -18,9 +18,8 @@ import {
 } from "../../api/timeReportApi";
 import "../../styles/time-react-select.css";
 import "../../styles/close-button-transition.css";
-import { validateNumberInput } from "../../utilities/validate/validateNumberInput";
+import { validateNumberInput } from "../../utilities/validations/validateNumberInput";
 import {
-  awareOfUnicodeTokens,
   dateSelectorEndValueFormat,
   dateSelectorStartValueFormat,
   initialActivitySelect,
@@ -39,8 +38,8 @@ import {
   TimeReportRow,
   TimeReportSummary
 } from "../../types/types";
-// @ts-ignore
 import _ from "lodash";
+import {toast} from "react-toastify";
 
 const Time: FunctionComponent = () => {
   const authContext = useContext(AuthContext);
@@ -115,16 +114,16 @@ const Time: FunctionComponent = () => {
     }
     setTimeReportLoading(true);
     if (direction === "prev") {
-      const newSelectedDate = subDays(selectedDate, 7);
-      const newWeekStartDate = startOfWeek(newSelectedDate, {
+      const newSelectedDate: Date = subDays(selectedDate, 7);
+      const newWeekStartDate: Date = startOfWeek(newSelectedDate, {
         weekStartsOn: 1
       });
       setSelectedDate(newWeekStartDate);
       getFirstAndLastDayOfWeek(newSelectedDate);
       await getInitialData(newWeekStartDate);
     } else {
-      const newSelectedDate = addDays(selectedDate, 7);
-      const newWeekStartDate = startOfWeek(newSelectedDate, {
+      const newSelectedDate: Date = addDays(selectedDate, 7);
+      const newWeekStartDate: Date = startOfWeek(newSelectedDate, {
         weekStartsOn: 1
       });
       setSelectedDate(newWeekStartDate);
@@ -173,7 +172,7 @@ const Time: FunctionComponent = () => {
   > => {
     if (typeof authContext === "boolean" || authContext.uid === undefined) {
       return new Promise<ActivityCompanySelectOption[] | string>(reject =>
-        reject("Error")
+        reject("Authentication error.")
       );
     }
     const userActivities:
@@ -184,14 +183,13 @@ const Time: FunctionComponent = () => {
       return new Promise<ActivityCompanySelectOption[] | string>(resolve =>
         resolve(userActivities)
       );
-    }
-    return new Promise<ActivityCompanySelectOption[] | string>(reject =>
-      reject("Error")
-    );
+    } else
+      return new Promise<ActivityCompanySelectOption[] | string>(reject =>
+        reject("Error")
+      );
   };
 
   const handleSelectChange = (option: ValueType<any>): void => {
-    console.log(option);
     createTimeReportRow(option);
     removeActivityFromCombobox(option.value, option.companyId);
   };
@@ -261,7 +259,7 @@ const Time: FunctionComponent = () => {
   const addActivityToCombobox = (
     activity: ActivityCompanySelectOption
   ): void => {
-    const index = _.findIndex(
+    const index: number = _.findIndex(
       activitySelectOptions,
       (activityList: GroupedActivityOptions) => {
         return activityList.companyId === activity.companyId;
@@ -285,7 +283,7 @@ const Time: FunctionComponent = () => {
   };
 
   const calculateTotals = (timeReportRows: TimeReport[]) => {
-    let total: TimeReportSummary = JSON.parse(JSON.stringify(initialTotal));
+    let total: TimeReportSummary = _.cloneDeep(initialTotal);
     timeReportRows.forEach(timeReport => {
       timeReport.timeReportRows.forEach((row, index) => {
         total.rowTotals[index].total += Number(row.hours);
@@ -296,14 +294,17 @@ const Time: FunctionComponent = () => {
   };
 
   const deleteRow = async (timeReport: TimeReport): Promise<void> => {
-    console.log(timeReport);
-    try {
-      await deleteTimeReport(timeReport.id);
+    let response: string = "";
+    if (timeReport.id !== "") {
+      response = await deleteTimeReport(timeReport.id);
+    }
+    if (response !== "Error deleting row.") {
+      //TODO set up error constants for all errors
       const newTimeReportRows: TimeReport[] = _.cloneDeep(timeReportRows);
       _.remove(newTimeReportRows, (timeReportItem: TimeReport) => {
         return (
-          timeReportItem.companyId === timeReport.companyId &&
-          timeReportItem.activityId === timeReport.activityId
+            timeReportItem.companyId === timeReport.companyId &&
+            timeReportItem.activityId === timeReport.activityId
         );
       });
       setTimeReportRows(newTimeReportRows);
@@ -316,9 +317,13 @@ const Time: FunctionComponent = () => {
           companyName: timeReport.companyName
         });
       }
-    } catch (error) {
-      console.log(error);
+      if (response !== "") {
+        toast.success(response)
+      }
+    } else {
+      toast.error(response);
     }
+
   };
 
   const saveRows = async (): Promise<void> => {

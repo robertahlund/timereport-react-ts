@@ -6,7 +6,7 @@ import Button from "../general/Button";
 import firebase from "../../config/firebaseConfig";
 import {toast} from "react-toastify";
 import {initialLoginFormState} from "../../constants/employeeConstants";
-import {validateLoginForm} from "../../utilities/validate/validateLoginForm";
+import {validateLoginForm} from "../../utilities/validations/validateLoginForm";
 import {LoginFormValue} from "../../types/types";
 
 const Login: FunctionComponent = () => {

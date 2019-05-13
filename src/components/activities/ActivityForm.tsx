@@ -1,10 +1,10 @@
 import React, { FunctionComponent, Fragment, ChangeEvent } from "react";
 import Input from "../general/Input";
 import { Row } from "../authentication/RegisterForm";
-import {Activity} from "../../types/types";
+import {ActivityFormValue} from "../../types/types";
 
 interface ActivityFormProps {
-  form: Activity;
+  form: ActivityFormValue;
   onFormChange: (event: ChangeEvent<HTMLInputElement>) => void;
 }
 
@@ -15,12 +15,14 @@ const ActivityForm: FunctionComponent<ActivityFormProps> = props => {
       <form autoComplete="off">
         <Row direction="column">
             <Input
-              value={name}
+              value={name.value}
               labelValue="Name"
               type="text"
               name="name"
               onFormChange={props.onFormChange}
               width="378px"
+              valid={name.valid}
+              validationMessage={name.validationMessage}
             />
         </Row>
       </form>

@@ -13,15 +13,24 @@ import {
   ModalTitle,
   Section
 } from "../account/MyAccountModal";
-import firebase from "../../config/firebaseConfig";
 import LoadingIcon from "../../icons/LoadingIcon";
 import ActivityForm from "./ActivityForm";
-import {toast} from "react-toastify";
+import { toast } from "react-toastify";
 import styled from "styled-components";
-import {deleteActivity, updateActivity} from "../../api/activityApi";
-import {getCompaniesByActivityId, updateCompanies} from "../../api/companyApi";
-import {Activity, Company} from "../../types/types";
-import {updateTimeReportByActivityId} from "../../api/timeReportApi";
+import {
+  createActivity,
+  deleteActivity,
+  getActivityById,
+  updateActivity
+} from "../../api/activityApi";
+import {
+  getCompaniesByActivityId,
+  updateCompanies
+} from "../../api/companyApi";
+import { ActivityFormValue, Company } from "../../types/types";
+import { updateTimeReportByActivityId } from "../../api/timeReportApi";
+import { initialActivityState } from "../../constants/activityConstants";
+import { validateActivityForm } from "../../utilities/validations/validateActivityForm";
 
 export interface ButtonRowProps {
   isNew: boolean;
@@ -37,98 +46,115 @@ const ActivityModal: FunctionComponent<ActivityModalProps> = props => {
   const [loading, setLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [modalLoading, setModalLoading] = useState(true);
-  const initialActivityState: Activity = {
-    id: "",
-    name: ""
-  };
-  const [activity, setActivity] = useState(initialActivityState);
-  const [originalActivity, setOriginalActivity] = useState(initialActivityState);
-  const [isNew, setIsNew] = useState(props.activityId === "");
 
-  const getActivityById = async (): Promise<void> => {
-    const {activityId} = props;
-    const db = firebase.firestore();
-    await db
-      .collection("activities")
-      .doc(activityId)
-      .get()
-      .then(doc => {
-        if (doc.exists) {
-          // @ts-ignore
-          const activityData: Activity = doc.data();
-          setModalLoading(false);
-          setActivity(activityData);
-          setOriginalActivity(activityData)
-        }
-        console.log(doc.data());
-      });
-  };
+  const [activity, setActivity] = useState(initialActivityState);
+  const [originalActivity, setOriginalActivity] = useState(
+    initialActivityState
+  );
+  const [isNew, setIsNew] = useState(props.activityId === "");
 
   useEffect(() => {
     if (!isNew) {
       // noinspection JSIgnoredPromiseFromCall
-      getActivityById();
+      _getActivityById();
     }
   }, []);
+
+  const _getActivityById = async (): Promise<void> => {
+    const { activityId } = props;
+    const activityData = await getActivityById(activityId);
+    setModalLoading(false);
+    if (typeof activityData !== "string") {
+      setActivity({
+        id: activityData.id,
+        valid: true,
+        name: {
+          valid: true,
+          validationMessage: "",
+          value: activityData.name
+        }
+      });
+      setOriginalActivity({
+        id: activityData.id,
+        valid: true,
+        name: {
+          valid: true,
+          validationMessage: "",
+          value: activityData.name
+        }
+      });
+    } else {
+      toast.error(activityData);
+    }
+  };
 
   const onFormChange = (event: ChangeEvent<HTMLInputElement>): void => {
     setActivity({
       ...activity,
-      [event.target.name]: event.target.value
+      [event.target.name]: {
+        valid: true,
+        validationMessage: "",
+        value: event.target.value
+      }
     });
   };
 
-  const updateActivityNameOnCompanies = (companiesList: Company[], activityId: string, newActivityName: string): Company[] => {
+  const updateActivityNameOnCompanies = (
+    companiesList: Company[],
+    activityId: string,
+    newActivityName: string
+  ): Company[] => {
     companiesList.forEach(company => {
-      company.activities!.forEach(activity => activity.value === activityId ? activity.label = newActivityName : null)
+      company.activities!.forEach(
+        activity =>
+          activity.value === activityId
+            ? (activity.label = newActivityName)
+            : null
+      );
     });
     return companiesList;
   };
 
   const onUpdateActivity = async (): Promise<void> => {
-    try {
-      const companies = await getCompaniesByActivityId(activity.id);
-      if (typeof companies !== "string") {
-        const updatedCompaniesList = updateActivityNameOnCompanies(companies, activity.id, activity.name);
-        await updateCompanies(updatedCompaniesList);
-        await updateActivity(activity);
-        await updateTimeReportByActivityId(activity.id, activity.name);
-        setOriginalActivity(activity);
-      }
-    } catch (error) {
-      console.log(error);
+    const companies = await getCompaniesByActivityId(activity.id);
+    if (typeof companies !== "string") {
+      const updatedCompaniesList = updateActivityNameOnCompanies(
+        companies,
+        activity.id,
+        activity.name.value
+      );
+      await updateCompanies(updatedCompaniesList);
+      await updateActivity({ id: activity.id, name: activity.name.value });
+      await updateTimeReportByActivityId(activity.id, activity.name.value);
+      setOriginalActivity(activity);
+    } else {
+      console.log(companies);
     }
   };
 
   const onCreateActivity = async (): Promise<void> => {
-    if (activity.name === "") {
-      return;
-    }
-    try {
-      const db = firebase.firestore();
-      await db
-        .collection("activities")
-        .add(activity)
-        .then(document => {
-          db
-            .collection("activities")
-            .doc(document.id)
-            .update({...activity, id: document.id})
-            .then(() => {
-              setActivity({...activity, id: document.id});
-              toast.success(`Successfully created ${activity.name}!`);
-            });
-        });
-      setOriginalActivity(activity);
-      setIsNew(false);
-      setModalLoading(false);
-    } catch (error) {
-      console.log(error);
-    }
+      const activityId: string = await createActivity({
+        id: activity.id,
+        name: activity.name.value
+      });
+      if (activityId !== "Error") {
+        toast.success(`Successfully created ${activity.name.value}!`);
+        setActivity({ ...activity, id: activityId });
+        setOriginalActivity({ ...activity, id: activityId });
+        setIsNew(false);
+        setModalLoading(false);
+      } else {
+        toast.error(activityId)
+      }
   };
 
   const onSubmit = async (): Promise<void> => {
-    if (!hasActivityNameChanged()) {
+    const validatedForm: ActivityFormValue = {
+      ...validateActivityForm(activity)
+    };
+    if (!validatedForm.valid) {
+      console.log(validatedForm);
+      setActivity(validatedForm);
       return;
     }
     setLoading(true);
@@ -142,36 +168,38 @@ const ActivityModal: FunctionComponent<ActivityModalProps> = props => {
     setLoading(false);
   };
 
-  const removeActivityFromCompaniesList = (companiesList: Company[], activityId: string): Company[] => {
+  const removeActivityFromCompaniesList = (
+    companiesList: Company[],
+    activityId: string
+  ): Company[] => {
     let updatedCompaniesList: Company[] = [];
     companiesList.forEach(company => {
-      company.activities = company.activities!.filter(activity => activity.value !== activityId);
+      company.activities = company.activities!.filter(
+        activity => activity.value !== activityId
+      );
       updatedCompaniesList.push(company);
     });
     return updatedCompaniesList;
   };
 
   const onDeleteActivity = async (): Promise<void> => {
-    try {
       setDeleteLoading(true);
       const companies = await getCompaniesByActivityId(activity.id);
       if (typeof companies !== "string") {
-        const updatedCompaniesList = removeActivityFromCompaniesList(companies, activity.id);
+        const updatedCompaniesList = removeActivityFromCompaniesList(
+          companies,
+          activity.id
+        );
         await updateCompanies(updatedCompaniesList);
         await deleteActivity(activity.id);
-        toast.success(`Successfully deleted ${activity.name}.`);
+        toast.success(`Successfully deleted ${activity.name.value}.`);
         props.toggleModal();
         // noinspection JSIgnoredPromiseFromCall
         props.getAllActivities();
+      } else {
+        toast.error(companies);
+        setDeleteLoading(false);
       }
-    } catch (error) {
-      setDeleteLoading(false);
-      console.log(error);
-    }
-  };
-
-  const hasActivityNameChanged = (): boolean => {
-    return !(originalActivity.name === activity.name)
   };
 
   return (
@@ -188,7 +216,7 @@ const ActivityModal: FunctionComponent<ActivityModalProps> = props => {
         <ModalContent>
           <ModalHeader>
             <ModalTitle>
-              {isNew ? "Create new activity" : originalActivity.name}
+              {isNew ? "Create new activity" : originalActivity.name.value}
             </ModalTitle>
             <CloseIcon
               color="#fff"
@@ -201,10 +229,17 @@ const ActivityModal: FunctionComponent<ActivityModalProps> = props => {
             />
           </ModalHeader>
           <Section>
-            <ActivityForm form={activity} onFormChange={onFormChange}/>
+            <ActivityForm form={activity} onFormChange={onFormChange} />
             <ButtonRow isNew={isNew}>
-              {!isNew && <Button type="button" text="Delete" onSubmit={onDeleteActivity} buttonType="Delete"
-                                 loading={deleteLoading}/>}
+              {!isNew && (
+                <Button
+                  type="button"
+                  text="Delete"
+                  onSubmit={onDeleteActivity}
+                  buttonType="Delete"
+                  loading={deleteLoading}
+                />
+              )}
               <Button
                 type="button"
                 text={isNew ? "Create" : "Update"}
@@ -223,6 +258,7 @@ export default ActivityModal;
 
 export const ButtonRow = styled.div`
   display: flex;
-  justify-content: ${(props: ButtonRowProps) => props.isNew ? "flex-end" : "space-between"};
+  justify-content: ${(props: ButtonRowProps) =>
+    props.isNew ? "flex-end" : "space-between"};
   width: 100%;
 `;
