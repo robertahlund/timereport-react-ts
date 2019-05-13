@@ -1,24 +1,26 @@
-import React, {ChangeEvent, Fragment, FunctionComponent, useEffect, useState} from "react";
-import ReactDOM from "react-dom";
-import {PaddingRow} from "../authentication/LoginForm";
+import React, {
+  ChangeEvent,
+  Fragment,
+  FunctionComponent,
+  useEffect,
+  useState
+} from "react";
+import { PaddingRow } from "../authentication/LoginForm";
 import Input from "../general/Input";
 import LoadingIcon from "../../icons/LoadingIcon";
-import {ListHeader, ListRow} from "../employees/EmployeeList";
+import { ListHeader, ListRow } from "../employees/EmployeeList";
 import Button from "../general/Button";
 import styled from "styled-components";
-import firebase from "../../config/firebaseConfig";
-import {CompanyColumn, Company, CompanySort} from "../../types/types";
+import _ from "lodash";
+import { CompanyColumn, Company, CompanySort } from "../../types/types";
 import CompanyModal from "./CompanyModal";
-import {modalPortal} from "../../constants/generalConstants";
-import {getCompanies} from "../../api/companyApi";
+import { getCompanies } from "../../api/companyApi";
 import ModalPortal from "../general/ModalPortal";
+import { initialSortState } from "../../constants/companyConstants";
+import { toast } from "react-toastify";
 
 const CompanyList: FunctionComponent = () => {
   const [searchValue, setSearchValue] = useState("");
-  const initialSortState: CompanySort = {
-    column: "name",
-    order: "asc"
-  };
   const [sortMethod, setSortMethod] = useState(initialSortState);
   const [loading, setLoading] = useState(false);
   const initialCompanyListState: Company[] = [];
@@ -29,9 +31,13 @@ const CompanyList: FunctionComponent = () => {
   const [showCompanyModal, setShowCompanyModal] = useState(false);
   const [companyId, setCompanyId] = useState("");
 
+  useEffect(() => {
+    // noinspection JSIgnoredPromiseFromCall
+    getAllCompanies();
+  }, []);
 
   const handleSearchChange = (event: ChangeEvent<HTMLInputElement>): void => {
-    const {target} = event;
+    const { target } = event;
     setSearchValue(target.value);
     if (target.value === "") {
       setCompanyList(clonedCompanyList);
@@ -48,29 +54,15 @@ const CompanyList: FunctionComponent = () => {
 
   const getAllCompanies = async (): Promise<void> => {
     setLoading(true);
-    try {
-      const companyData = await getCompanies();
-      if (typeof companyData !== "string") {
-        setCompanyList(companyData);
-        setClonedCompanyList(companyData);
-        setLoading(false);
-      }
-    } catch (error) {
+    const companyData = await getCompanies();
+    if (typeof companyData !== "string") {
+      setCompanyList(companyData);
+      setClonedCompanyList(companyData);
       setLoading(false);
-      console.log(error);
+    } else {
+      toast.error("Error retrieving companies.");
     }
   };
-
-  useEffect(() => {
-    // noinspection JSIgnoredPromiseFromCall
-    getAllCompanies();
-    return () => {
-      const db = firebase.firestore();
-      const unsubscribe = db.collection("companies").onSnapshot(() => {
-      });
-      unsubscribe();
-    };
-  }, []);
 
   const sortData = (sortMethod: CompanySort) => {
     setSortMethod(sortMethod);
@@ -90,7 +82,7 @@ const CompanyList: FunctionComponent = () => {
   };
 
   const sortAsc = (column: CompanyColumn): void => {
-    const listToSort: Company[] = JSON.parse(JSON.stringify(companyList));
+    const listToSort: Company[] = _.cloneDeep(companyList);
     listToSort.sort((a: Company, b: Company): number => {
       const propA = a[column].toLowerCase();
       const propB = b[column].toLowerCase();
@@ -107,7 +99,7 @@ const CompanyList: FunctionComponent = () => {
   };
 
   const sortDesc = (column: CompanyColumn): void => {
-    const listToSort: Company[] = JSON.parse(JSON.stringify(companyList));
+    const listToSort: Company[] = _.cloneDeep(companyList);
     listToSort.sort((a: Company, b: Company): number => {
       const propA = a[column].toLowerCase();
       const propB = b[column].toLowerCase();
@@ -125,7 +117,7 @@ const CompanyList: FunctionComponent = () => {
 
   const toggleCompanyModal = (event?: React.MouseEvent): void => {
     if (event) {
-      const {target, currentTarget} = event;
+      const { target, currentTarget } = event;
       if (target === currentTarget) {
         setShowCompanyModal(!showCompanyModal);
       }
@@ -181,10 +173,7 @@ const CompanyList: FunctionComponent = () => {
       {companyList.length > 0 && !loading ? (
         companyList.map((company: Company) => {
           return (
-            <ListRow
-              key={company.id}
-              onClick={() => selectCompany(company.id)}
-            >
+            <ListRow key={company.id} onClick={() => selectCompany(company.id)}>
               <span>{company.name}</span>
               <span>{company.orgNumber}</span>
             </ListRow>

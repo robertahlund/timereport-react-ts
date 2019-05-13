@@ -8,8 +8,8 @@ export const getActivities = async (): Promise<Activity[] | string> => {
     await db
       .collection("activities")
       .get()
-      .then((userDocuments: any) => {
-        userDocuments.forEach((activity: any) => {
+      .then((doc: any) => {
+        doc.forEach((activity: any) => {
           activityList.push(activity.data());
         })
       });
@@ -22,14 +22,13 @@ export const getActivities = async (): Promise<Activity[] | string> => {
 export const getActivityById = async (activityId: string): Promise<Activity | string> => {
   try {
     const db = firebase.firestore();
-    // @ts-ignore
     const activityData: Activity | undefined = await db
         .collection("activities")
         .doc(activityId)
         .get()
         .then(doc => {
           if (doc.exists) {
-            return doc.data();
+            return doc.data() as Activity;
           } else return undefined;
         });
     if (activityData) {

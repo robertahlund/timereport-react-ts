@@ -9,10 +9,10 @@ import {PaddingRow} from "../authentication/LoginForm";
 import {ValueType} from "react-select/lib/types";
 import Select from "react-select";
 import {SmallerHeading} from "../employees/EmployeeModalForm";
-import {ActivitySelectOptions, Company} from "../../types/types";
+import {ActivitySelectOptions, CompanyFormValue} from "../../types/types";
 
 interface CompanyFormProps {
-  form: Company;
+  form: CompanyFormValue;
   onFormChange: (event: ChangeEvent<HTMLInputElement>) => void;
   selectOptions: ActivitySelectOptions[];
   handleSelectChange: (value: ValueType<object>) => void;
@@ -27,21 +27,25 @@ const CompanyForm: FunctionComponent<CompanyFormProps> = props => {
         <Row direction="column">
           <PaddingRow>
             <Input
-              value={name}
+              value={name.value}
               labelValue="Name"
               type="text"
               name="name"
               onFormChange={props.onFormChange}
               width="378px"
+              valid={name.valid}
+              validationMessage={name.validationMessage}
             />
           </PaddingRow>
           <Input
-            value={orgNumber}
+            value={orgNumber.value}
             labelValue="Org. number"
             type="text"
             name="orgNumber"
             onFormChange={props.onFormChange}
             width="378px"
+            valid={orgNumber.valid}
+            validationMessage={orgNumber.validationMessage}
           />
         </Row>
         <Row direction="column">

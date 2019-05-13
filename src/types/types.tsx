@@ -35,6 +35,13 @@ export type DateSelectorEndValueFormatType = "' - 'LLL' 'd', 'y";
 export type TimeStampFormat = "HH':'mm':'ss";
 export type TimeReportDateFormat = "y-MM-dd";
 
+export interface UserCompanies {
+  value: string;
+  label: string;
+}
+
+export type UserRoles = "Administrator" | "Employee";
+
 export interface AuthObject {
   firstName?: string;
   lastName?: string;
@@ -45,13 +52,6 @@ export interface AuthObject {
   inactive?: boolean;
   companies?: UserCompanies[];
 }
-
-export interface UserCompanies {
-  value: string;
-  label: string;
-}
-
-export type UserRoles = "Administrator" | "Employee";
 
 export interface EmployeeForm {
   firstName?: string;
@@ -66,6 +66,9 @@ export interface CompanySelectOptions {
 
 export type EmployeeCompanyList = CompanySelectOptions[];
 export type CompanyColumn = "name" | "orgNumber";
+
+export type EmployeeColumn = "name" | "email";
+export type Order = "asc" | "desc";
 
 export interface CompanySort {
   column: CompanyColumn;
@@ -89,11 +92,24 @@ export interface ActivitySelectOptions {
   label: string;
 }
 
+export interface FormValue {
+  value: string;
+  valid: boolean;
+  validationMessage: string;
+}
+
 export interface Company {
   id: string;
   name: string;
   orgNumber: string;
-  activities?: ActivitySelectOptions[];
+  activities: ActivitySelectOptions[];
+}
+
+export interface CompanyFormValue {
+  id: string;
+  valid: boolean;
+  name: FormValue;
+  orgNumber: FormValue;
 }
 
 export interface EmployeeRow {
@@ -104,18 +120,9 @@ export interface EmployeeRow {
   companies: EmployeeCompanyList;
 }
 
-export type EmployeeColumn = "name" | "email";
-export type Order = "asc" | "desc";
-
 export interface EmployeeSort {
   column: EmployeeColumn;
   order: Order;
-}
-
-export interface FormValue {
-  value: string;
-  valid: boolean;
-  validationMessage: string;
 }
 
 export interface RegisterFormValue {

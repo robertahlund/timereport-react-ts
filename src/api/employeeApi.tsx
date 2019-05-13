@@ -1,6 +1,6 @@
 import firebase from "../config/firebaseConfig";
-import {getCompanyActivitiesByCompanies} from "./companyApi";
-import {User} from "firebase";
+import { getCompanyActivitiesByCompanies } from "./companyApi";
+import { User } from "firebase";
 import {
   ActivityCompanySelectOption,
   AuthObject,
@@ -37,8 +37,8 @@ export const createEmployee = async (
       .doc(uid)
       .set(userDocument);
     console.log(userDocument, "account created");
-    return new Promise<string>(resolve => resolve("Account created."))
-  } else return new Promise<string>(reject => reject("Error"))
+    return new Promise<string>(resolve => resolve("Account created."));
+  } else return new Promise<string>(reject => reject("Error"));
 };
 
 export const getEmployeeById = async (
@@ -66,7 +66,9 @@ export const getEmployeeById = async (
   }
 };
 
-export const getEmployeesForList = async (): Promise<EmployeeRow[] | string> => {
+export const getEmployeesForList = async (): Promise<
+  EmployeeRow[] | string
+> => {
   const db = firebase.firestore();
   try {
     let employeeList: EmployeeRow[] = [];
@@ -117,9 +119,11 @@ export const getEmployeesByCompanyId = async (
   } else {
     return new Promise<AuthObject[]>(resolve =>
       resolve(
-        employees.filter((user: AuthObject) =>
-          user.companies!.some(company => company.value === companyId)
-        )
+        employees.filter((user: AuthObject) => {
+          if (user.companies) {
+            user.companies.some(company => company.value === companyId);
+          }
+        })
       )
     );
   }
@@ -213,7 +217,7 @@ export const checkIfUserInformationHasChanged = async (
       .get()
       .then(async doc => {
         if (doc.exists) {
-          userData = doc.data()!;
+          userData = doc.data() as AuthObject;
           const [firstName, lastName] = user.displayName!.split(" ");
           if (
             firstName !== userData.firstName ||
