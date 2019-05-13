@@ -8,6 +8,7 @@ import ForgotPassword from "../authentication/ForgotPassword";
 import Register from "../authentication/Register";
 import Activities from "../activities/Activities";
 import {AuthContext} from "../../context/authentication/authenticationContext";
+import TimeSummary from "../summary/TimeSummary";
 
 const Routes: FunctionComponent = () => {
   const authContext = useContext(AuthContext);
@@ -34,6 +35,19 @@ const Routes: FunctionComponent = () => {
           typeof authContext === "object" &&
           authContext.isAdmin ? (
             <Companies />
+          ) : (
+            <Redirect to="/" />
+          )
+        }
+      />
+      <Route
+        exact
+        path="/summary"
+        render={(): ReactNode =>
+          authContext &&
+          typeof authContext === "object" &&
+          authContext.isAdmin ? (
+            <TimeSummary />
           ) : (
             <Redirect to="/" />
           )

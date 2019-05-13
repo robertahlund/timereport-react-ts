@@ -30,6 +30,9 @@ const Menu: FunctionComponent<MenuProps> = props => {
               </NavLink>
               {typeof authContext === 'object' && authContext.isAdmin ? (
                 <Fragment>
+                  <NavLink to="/summary" activeClassName="active">
+                    <MenuItem text="Time Summary"/>
+                  </NavLink>
                   <NavLink to="/activities" activeClassName="active">
                     <MenuItem text="Activities"/>
                   </NavLink>

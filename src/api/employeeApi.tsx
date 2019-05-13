@@ -53,8 +53,7 @@ export const getEmployeeById = async (
       .get()
       .then(doc => {
         if (doc.exists) {
-          // @ts-ignore
-          userData = doc.data();
+          userData = doc.data() as AuthObject;
           userData.isAdmin = userData.roles
             ? userData.roles.includes("Administrator")
             : false;
@@ -75,8 +74,8 @@ export const getEmployeesForList = async (): Promise<
     await db
       .collection("users")
       .get()
-      .then((userDocuments: any) => {
-        userDocuments.forEach((user: any) => {
+      .then(userDocuments => {
+        userDocuments.forEach(user => {
           employeeList.push({
             name: `${user.data().firstName} ${user.data().lastName}`,
             uid: user.data().uid,
