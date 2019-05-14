@@ -2,6 +2,7 @@ import React, {FunctionComponent, Fragment, ChangeEvent} from 'react';
 import {Label} from "./Input";
 import styled from "styled-components";
 import CheckIcon from "../../icons/CheckIcon";
+import _ from "lodash";
 
 interface CheckboxStyleProps {
   checked: boolean;
@@ -17,13 +18,16 @@ interface CheckboxProps {
   id: string;
   labelValue: string;
   paddingTop: string;
+  uid?: string;
+  currentUserUid?: string;
 }
 
 const Checkbox: FunctionComponent<CheckboxProps> = props => {
   return (
     <CheckboxContainer paddingTop={props.paddingTop}>
       <CheckboxLabel htmlFor={props.id}>
-        <HiddenCheckbox type="checkbox" {...props}/>
+        <HiddenCheckbox type="checkbox"
+                        disabled={props.uid === props.currentUserUid && !_.isNil(props.uid) && !_.isNil(props.currentUserUid)} {...props}/>
         <StyledCheckbox checked={props.checked}><CheckIcon width="16px" height="16px"/></StyledCheckbox>
         <span>{props.labelValue}</span>
       </CheckboxLabel>

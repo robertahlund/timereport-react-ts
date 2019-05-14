@@ -112,6 +112,14 @@ export interface CompanyFormValue {
   orgNumber: FormValue;
 }
 
+export interface EmployeeFormValue {
+  uid: string;
+  valid: boolean;
+  firstName: FormValue;
+  lastName: FormValue;
+  email: FormValue;
+}
+
 export interface EmployeeRow {
   name: string;
   uid: string;

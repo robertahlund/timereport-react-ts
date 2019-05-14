@@ -7,9 +7,16 @@ import EmployeeModalForm from "./EmployeeModalForm";
 import LoadingIcon from "../../icons/LoadingIcon";
 import {ValueType} from "react-select/lib/types";
 import EmployeeModalCompanyList from "./EmployeeModalCompanyList";
-import {AuthObject, CompanySelectOptions, EmployeeCompanyList} from "../../types/types";
+import {
+  AuthObject,
+  CompanySelectOptions,
+  EmployeeCompanyList,
+  EmployeeFormValue
+} from "../../types/types";
 import {getEmployeeById, updateEmployee} from "../../api/employeeApi";
 import {stringCompare} from "../../utilities/compare/stringCompare";
+import {initialEmployeeFormState} from "../../constants/employeeConstants";
+import {validateEmployeeForm} from "../../utilities/validations/validateEmployeeForm";
 
 interface EmployeeModalProps {
   toggleModal: (event: React.MouseEvent) => void;
@@ -19,11 +26,7 @@ interface EmployeeModalProps {
 
 const EmployeeModal: FunctionComponent<EmployeeModalProps> = props => {
   const [userInactive, setUserInactive] = useState(false);
-  const [form, setForm] = useState({
-    firstName: "",
-    lastName: "",
-    email: ""
-  });
+  const [form, setForm] = useState(initialEmployeeFormState);
   const [loading, setLoading] = useState(false);
   const [modalLoading, setModalLoading] = useState(true);
   const [selectedUser, setSelectedUser] = useState();
@@ -48,9 +51,23 @@ const EmployeeModal: FunctionComponent<EmployeeModalProps> = props => {
           if (doc.exists) {
             setSelectedUser(doc.data());
             setForm({
-              firstName: doc.data()!.firstName ? doc.data()!.firstName : "",
-              lastName: doc.data()!.lastName,
-              email: doc.data()!.email
+              uid: doc.id,
+              valid: true,
+              firstName: {
+                valid: true,
+                validationMessage: "",
+                value: doc.data()!.firstName
+              },
+              lastName: {
+                valid: true,
+                validationMessage: "",
+                value: doc.data()!.lastName
+              },
+              email: {
+                valid: true,
+                validationMessage: "",
+                value: doc.data()!.email
+              }
             });
             setEmployeeCompanyList(doc.data()!.companies);
             setOriginalEmployeeCompanyList(doc.data()!.companies);
@@ -104,7 +121,11 @@ const EmployeeModal: FunctionComponent<EmployeeModalProps> = props => {
   const handleFormChange = (event: ChangeEvent<HTMLInputElement>): void => {
     setForm({
       ...form,
-      [event.target.name]: event.target.value
+      [event.target.name]: {
+        value: event.target.value,
+        valid: true,
+        validationMessage: ""
+      }
     });
   };
 
@@ -114,54 +135,33 @@ const EmployeeModal: FunctionComponent<EmployeeModalProps> = props => {
     return originalCompaniesListString !== newCompaniesListString;
   };
 
-  const hasUserEmailChanged = (
-    originalMail: string,
-    newMail: string
-  ): boolean => {
-    return !!(
-      originalMail !== newMail &&
-      newMail != null &&
-      originalMail != null
-    );
-  };
-
-  const hasUserNameChanged = (
-    originalName: string,
-    newName: string
-  ): boolean => {
-    return !!(
-      originalName !== newName &&
-      newName != null &&
-      originalName != null
-    );
-  };
-
-  const onSubmit = async (
-    firstName?: string,
-    lastName?: string,
-    email?: string,
-    inactive?: boolean,
-    companies?: EmployeeCompanyList
-  ): Promise<void> => {
+  const onSubmit = async (): Promise<void> => {
+    const validatedForm: EmployeeFormValue = {...validateEmployeeForm(form)};
+    if (!validatedForm.valid) {
+      console.log(validatedForm);
+      setForm(validatedForm);
+      return;
+    }
     try {
+      const {firstName, lastName, email} = form;
       setLoading(true);
       const user: AuthObject | string = await getEmployeeById(props.uid);
       if (user && typeof user !== "string" && user.firstName && user.lastName && firstName && lastName) {
-        if (stringCompare(user.firstName, firstName) || stringCompare(user.lastName, lastName) ||
-          user.inactive !== inactive || hasUserCompaniesChanged(originalEmployeeCompanyList, employeeCompanyList)) {
+        if (stringCompare(user.firstName, firstName.value) || stringCompare(user.lastName, lastName.value) ||
+          user.inactive !== userInactive || hasUserCompaniesChanged(originalEmployeeCompanyList, employeeCompanyList)) {
           await updateEmployee({
             uid: props.uid,
-            firstName,
-            lastName,
-            email,
-            inactive,
-            companies
+            firstName: firstName.value,
+            lastName: lastName.value,
+            email: email.value,
+            inactive: userInactive,
+            companies: employeeCompanyList
           });
           console.log("Updated collection with name, inactive status & companies.");
         }
         if (user.email && email) {
-          if (stringCompare(user.email, email)) {
-            await updateEmployee({uid: props.uid, email});
+          if (stringCompare(user.email, email.value)) {
+            await updateEmployee({uid: props.uid, email: email.value});
             console.log("Updated email in collection");
           }
         }
@@ -208,8 +208,6 @@ const EmployeeModal: FunctionComponent<EmployeeModalProps> = props => {
     setCompanyList([...companyList, {value: company.value, label: company.label}]);
   };
 
-  const {firstName, lastName, email} = form;
-
   return (
     <ModalBackground onClick={props.toggleModal}>
       {modalLoading ? (
@@ -246,7 +244,7 @@ const EmployeeModal: FunctionComponent<EmployeeModalProps> = props => {
               type="button"
               text="Update"
               loading={loading}
-              onSubmit={() => onSubmit(firstName, lastName, email, userInactive, employeeCompanyList)}
+              onSubmit={onSubmit}
             />
           </Section>
         </ModalContent>
