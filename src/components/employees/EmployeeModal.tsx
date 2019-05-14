@@ -8,7 +8,7 @@ import LoadingIcon from "../../icons/LoadingIcon";
 import {ValueType} from "react-select/lib/types";
 import EmployeeModalCompanyList from "./EmployeeModalCompanyList";
 import {
-  AuthObject,
+  AuthObject, Company,
   CompanySelectOptions,
   EmployeeCompanyList,
   EmployeeFormValue
@@ -17,6 +17,8 @@ import {getEmployeeById, updateEmployee} from "../../api/employeeApi";
 import {stringCompare} from "../../utilities/compare/stringCompare";
 import {initialEmployeeFormState} from "../../constants/employeeConstants";
 import {validateEmployeeForm} from "../../utilities/validations/validateEmployeeForm";
+import {getCompanies} from "../../api/companyApi";
+import _ from "lodash";
 
 interface EmployeeModalProps {
   toggleModal: (event: React.MouseEvent) => void;
@@ -72,30 +74,23 @@ const EmployeeModal: FunctionComponent<EmployeeModalProps> = props => {
     } else return new Promise(reject => reject("Error"));
   };
 
-  const getCompanies = async (): Promise<CompanySelectOptions[] | string> => {
-    try {
-      const db = firebase.firestore();
-      const companyData: CompanySelectOptions[] = [];
-      await db.collection('companies').get()
-        .then(documents => {
-          documents.forEach(doc => {
-            const company: CompanySelectOptions = {
-              value: doc.id,
-              label: doc.data().name
-            };
-            companyData.push(company);
-          })
-        });
+  const _getCompanies = async (): Promise<CompanySelectOptions[] | string> => {
+    const allCompanies: Company[] | string = await getCompanies();
+    const companyData: CompanySelectOptions[] = [];
+    if (typeof allCompanies !== "string") {
+      _.forEach(allCompanies, (company: Company) => {
+        companyData.push({
+          value: company.id,
+          label: company.name
+        })
+      });
       setCompanyList(companyData);
       return new Promise<CompanySelectOptions[] | string>(resolve => resolve(companyData));
-    } catch (error) {
-      console.log(error);
-      return new Promise<CompanySelectOptions[] | string>(reject => reject("Error"))
-    }
+    } else return new Promise<CompanySelectOptions[] | string>(reject => reject("Error"))
   };
 
   const removeAddedCompaniesFromList = async (): Promise<void> => {
-    let allCompanies = await getCompanies();
+    let allCompanies = await _getCompanies();
     const assignedCompanies: CompanySelectOptions[] | string | undefined = await getUserInformation();
     if (typeof assignedCompanies !== "string") {
       assignedCompanies.forEach(assignedCompany => {
@@ -169,7 +164,6 @@ const EmployeeModal: FunctionComponent<EmployeeModalProps> = props => {
   };
 
   const handleSelectChange = (value: ValueType<any>): void => {
-    console.log(value);
     setEmployeeCompanyList([
       ...employeeCompanyList,
       {

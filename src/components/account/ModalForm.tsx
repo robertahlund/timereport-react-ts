@@ -24,31 +24,37 @@ const ModalForm: FunctionComponent<ModalFormProps> = props => {
       <form autoComplete="off">
         <Row direction="row">
           <Input
-            value={firstName!.value}
+            value={firstName.value}
             labelValue="First name"
             type="text"
             name="firstName"
             onFormChange={props.onFormChange}
             width="171px"
+            valid={firstName.valid}
+            validationMessage={firstName.validationMessage}
           />
           <Input
-            value={lastName!.value}
+            value={lastName.value}
             labelValue="Last name"
             type="text"
             name="lastName"
             onFormChange={props.onFormChange}
             width="171px"
+            valid={lastName.valid}
+            validationMessage={lastName.validationMessage}
           />
         </Row>
         <Row direction="column">
           <PaddingRow>
             <Input
               name="email"
-              value={email!.value}
+              value={email.value}
               labelValue="Email"
               type="text"
               onFormChange={props.onFormChange}
               width="378px"
+              valid={email.valid}
+              validationMessage={email.validationMessage}
             />
           </PaddingRow>
           {showPassword ? (
@@ -58,11 +64,13 @@ const ModalForm: FunctionComponent<ModalFormProps> = props => {
               </ShowPasswordText>
               <Input
                 name="password"
-                value={password!.value}
+                value={password.value}
                 labelValue="New password"
                 type="password"
                 onFormChange={props.onFormChange}
                 width="378px"
+                valid={password.valid}
+                validationMessage={password.validationMessage}
               />
             </Fragment>
           ) : (

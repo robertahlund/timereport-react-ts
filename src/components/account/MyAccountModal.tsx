@@ -6,6 +6,9 @@ import Button from "../general/Button";
 import firebase from "../../config/firebaseConfig";
 import {User} from "firebase";
 import {AuthContext, AuthContextConsumer} from "../../context/authentication/authenticationContext";
+import {RegisterFormValue} from "../../types/types";
+import {validateMyAccountForm} from "../../utilities/validations/validateMyAccountForm";
+import {updateEmployee} from "../../api/employeeApi";
 
 interface MyAccountModalProps {
   toggleModal: (event: React.MouseEvent) => void;
@@ -43,7 +46,11 @@ const MyAccountModal: FunctionComponent<MyAccountModalProps> = props => {
   const handleFormChange = (event: ChangeEvent<HTMLInputElement>): void => {
     setForm({
       ...form,
-      [event.target.name]: event.target.value
+      [event.target.name]: {
+        valid: true,
+        validationMessage: "",
+        value: event.target.value
+      }
     });
   };
 
@@ -69,56 +76,48 @@ const MyAccountModal: FunctionComponent<MyAccountModalProps> = props => {
     );
   };
 
-  const onSubmit = async (
-    firstName?: string,
-    lastName?: string,
-    email?: string,
-    password?: string
-  ): Promise<void> => {
-    console.log(firstName, lastName, email, password);
+  const onSubmit = async (): Promise<void> => {
+    const validatedForm: RegisterFormValue = {...validateMyAccountForm(form, showPassword)};
+    if (!validatedForm.valid) {
+      setForm(validatedForm);
+      return;
+    }
+    const {firstName, lastName, email, password} = form;
     try {
-      const db = firebase.firestore();
       setLoading(true);
       const user = await firebase.auth().currentUser;
-      console.log(user, `${firstName} ${lastName}`);
       if (user) {
         if (
           user.displayName != null &&
           user.displayName !== "" &&
-          firstName !== "" &&
-          lastName !== ""
+          firstName.value !== "" &&
+          lastName.value !== ""
         ) {
           if (
-            hasUserNameChanged(user.displayName, `${firstName} ${lastName}`) &&
+            hasUserNameChanged(user.displayName, `${firstName.value} ${lastName.value}`) &&
             typeof authContext === "object"
           ) {
             await user.updateProfile({
-              displayName: `${firstName} ${lastName}`
+              displayName: `${firstName.value} ${lastName.value}`
             });
-            await db.collection("users").doc(authContext.uid).update({
-              firstName,
-              lastName,
-              email
-            });
+            await updateEmployee({uid: authContext.uid, firstName: firstName.value, lastName: lastName.value, email: email.value});
             console.log("Updated profile & collection with displayName.");
           }
         }
         if (
           user.email != null &&
-          email !== "" &&
-          email != null &&
-          email !== ""
+          email.value !== "" &&
+          email.value != null &&
+          email.value !== ""
         ) {
-          if (hasUserEmailChanged(user.email, email) && typeof authContext === "object") {
-            await user.updateEmail(email);
-            await db.collection('users').doc(authContext.uid).update({
-              email
-            });
+          if (hasUserEmailChanged(user.email, email.value) && typeof authContext === "object") {
+            await user.updateEmail(email.value);
+            await updateEmployee({uid: authContext.uid, email: email.value});
             console.log("Updated email, and email in collection");
           }
         }
-        if (showPassword && password != null && password !== "") {
-          await user.updatePassword(password);
+        if (showPassword && password != null && password.value !== "") {
+          await user.updatePassword(password.value);
           console.log("Updated password.");
         }
         await props.setUserInfo(user, false);
@@ -131,8 +130,6 @@ const MyAccountModal: FunctionComponent<MyAccountModalProps> = props => {
       setLoading(false);
     }
   };
-
-  const {firstName, lastName, email, password} = form;
 
   return (
     <AuthContextConsumer>
@@ -168,7 +165,7 @@ const MyAccountModal: FunctionComponent<MyAccountModalProps> = props => {
                 type="button"
                 text="Update"
                 loading={loading}
-                onSubmit={() => onSubmit(firstName.value, lastName.value, email.value, password.value)}
+                onSubmit={onSubmit}
               />
             </Section>
           </ModalContent>
