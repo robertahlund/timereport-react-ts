@@ -42,45 +42,34 @@ const EmployeeModal: FunctionComponent<EmployeeModalProps> = props => {
   }, []);
 
   const getUserInformation = async (): Promise<CompanySelectOptions[] | string> => {
-    try {
-      const db = firebase.firestore();
-      const user = await db.collection('users')
-        .doc(props.uid)
-        .get()
-        .then(doc => {
-          if (doc.exists) {
-            setSelectedUser(doc.data());
-            setForm({
-              uid: doc.id,
-              valid: true,
-              firstName: {
-                valid: true,
-                validationMessage: "",
-                value: doc.data()!.firstName
-              },
-              lastName: {
-                valid: true,
-                validationMessage: "",
-                value: doc.data()!.lastName
-              },
-              email: {
-                valid: true,
-                validationMessage: "",
-                value: doc.data()!.email
-              }
-            });
-            setEmployeeCompanyList(doc.data()!.companies);
-            setOriginalEmployeeCompanyList(doc.data()!.companies);
-            setUserInactive(doc.data()!.inactive);
-            setModalLoading(false);
-            return doc.data();
-          } else return new Promise(reject => reject("Error"));
-        });
-      return new Promise<CompanySelectOptions[] | string>(resolve => resolve(user!.companies))
-    } catch (error) {
-      console.log(error);
-      return new Promise(reject => reject("Error"));
-    }
+    const user: AuthObject | string = await getEmployeeById(props.uid);
+    if (typeof user !== "string" && user.uid && user.firstName && user.lastName && user.companies && user.email && user.inactive !== undefined) {
+      setSelectedUser(user);
+      setForm({
+        uid: user.uid,
+        valid: true,
+        firstName: {
+          valid: true,
+          validationMessage: "",
+          value: user.firstName
+        },
+        lastName: {
+          valid: true,
+          validationMessage: "",
+          value: user.lastName
+        },
+        email: {
+          valid: true,
+          validationMessage: "",
+          value: user.email
+        }
+      });
+      setEmployeeCompanyList(user.companies);
+      setOriginalEmployeeCompanyList(user.companies);
+      setUserInactive(user.inactive);
+      setModalLoading(false);
+      return new Promise<CompanySelectOptions[] | string>(resolve => resolve(user.companies))
+    } else return new Promise(reject => reject("Error"));
   };
 
   const getCompanies = async (): Promise<CompanySelectOptions[] | string> => {
