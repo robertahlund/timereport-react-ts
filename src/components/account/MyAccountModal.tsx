@@ -9,6 +9,7 @@ import {AuthContext, AuthContextConsumer} from "../../context/authentication/aut
 import {RegisterFormValue} from "../../types/types";
 import {validateMyAccountForm} from "../../utilities/validations/validateMyAccountForm";
 import {updateEmployee} from "../../api/employeeApi";
+import {toast} from "react-toastify";
 
 interface MyAccountModalProps {
   toggleModal: (event: React.MouseEvent) => void;
@@ -54,28 +55,6 @@ const MyAccountModal: FunctionComponent<MyAccountModalProps> = props => {
     });
   };
 
-  const hasUserEmailChanged = (
-    originalMail: string,
-    newMail: string
-  ): boolean => {
-    return !!(
-      originalMail !== newMail &&
-      newMail != null &&
-      originalMail != null
-    );
-  };
-
-  const hasUserNameChanged = (
-    originalName: string,
-    newName: string
-  ): boolean => {
-    return !!(
-      originalName !== newName &&
-      newName != null &&
-      originalName != null
-    );
-  };
-
   const onSubmit = async (): Promise<void> => {
     const validatedForm: RegisterFormValue = {...validateMyAccountForm(form, showPassword)};
     if (!validatedForm.valid) {
@@ -87,42 +66,27 @@ const MyAccountModal: FunctionComponent<MyAccountModalProps> = props => {
       setLoading(true);
       const user = await firebase.auth().currentUser;
       if (user) {
-        if (
-          user.displayName != null &&
-          user.displayName !== "" &&
-          firstName.value !== "" &&
-          lastName.value !== ""
-        ) {
-          if (
-            hasUserNameChanged(user.displayName, `${firstName.value} ${lastName.value}`) &&
-            typeof authContext === "object"
-          ) {
-            await user.updateProfile({
-              displayName: `${firstName.value} ${lastName.value}`
-            });
-            await updateEmployee({uid: authContext.uid, firstName: firstName.value, lastName: lastName.value, email: email.value});
-            console.log("Updated profile & collection with displayName.");
-          }
+        if (typeof authContext === "object") {
+          await user.updateProfile({
+            displayName: `${firstName.value} ${lastName.value}`
+          });
+          await user.updateEmail(email.value);
+          await updateEmployee({
+            uid: authContext.uid,
+            firstName: firstName.value,
+            lastName: lastName.value,
+            email: email.value
+          });
         }
-        if (
-          user.email != null &&
-          email.value !== "" &&
-          email.value != null &&
-          email.value !== ""
-        ) {
-          if (hasUserEmailChanged(user.email, email.value) && typeof authContext === "object") {
-            await user.updateEmail(email.value);
-            await updateEmployee({uid: authContext.uid, email: email.value});
-            console.log("Updated email, and email in collection");
-          }
-        }
-        if (showPassword && password != null && password.value !== "") {
+        if (showPassword) {
           await user.updatePassword(password.value);
           console.log("Updated password.");
         }
+        toast.success("Successfully updated your information!");
         await props.setUserInfo(user, false);
         setLoading(false);
       } else {
+        toast.error("Authentication error.");
         return;
       }
     } catch (error) {
