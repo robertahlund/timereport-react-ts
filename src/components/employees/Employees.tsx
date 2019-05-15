@@ -1,8 +1,6 @@
 import React, { useState, Fragment, FunctionComponent, useEffect } from "react";
 import styled from "styled-components";
 import EmployeeList from "./EmployeeList";
-import EmployeeModal from "./EmployeeModal";
-import ReactCSSTransitionGroup from "react-addons-css-transition-group";
 
 const Employees: FunctionComponent = () => {
   useEffect(() => {

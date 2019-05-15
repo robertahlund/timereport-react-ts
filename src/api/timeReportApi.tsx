@@ -1,7 +1,7 @@
 import firebase from "../config/firebaseConfig";
-import {TimeReport, TimeReportRow} from "../types/types";
-import {addDays, subDays} from "date-fns";
-import _, {Dictionary} from "lodash";
+import { TimeReport, TimeReportRow } from "../types/types";
+import { addDays, subDays } from "date-fns";
+import _, { Dictionary } from "lodash";
 
 const db = firebase.firestore();
 
@@ -16,7 +16,7 @@ export const createOrUpdateTimeReportRows = async (
           timeReport
         );
         if (typeof createdTimeReport === "string") {
-          return new Promise<TimeReport[] | string>(reject => reject("Error"));
+          return new Promise<string>(reject => reject("Error"));
         } else {
           allTimeReports.push(createdTimeReport);
         }
@@ -25,17 +25,17 @@ export const createOrUpdateTimeReportRows = async (
           timeReport
         );
         if (typeof updatedTimeReport === "string") {
-          return new Promise<TimeReport[] | string>(reject => reject("Error"));
+          return new Promise<string>(reject => reject("Error"));
         } else {
           allTimeReports.push(updatedTimeReport);
         }
       }
     }
-    return new Promise<TimeReport[] | string>(resolve =>
+    return new Promise<TimeReport[]>(resolve =>
       resolve(allTimeReports)
     );
   } catch (error) {
-    return new Promise<TimeReport[] | string>(reject => reject("Error"));
+    return new Promise<string>(reject => reject("Error"));
   }
 };
 
@@ -112,6 +112,7 @@ export const getTimeReportsByDateAndUserId = async (
           timeReports.push({
             id: doc.data().id,
             userId: doc.data().userId,
+            username: doc.data().username,
             activityId: doc.data().activityId,
             activityName: doc.data().activityName,
             companyId: doc.data().companyId,
@@ -122,16 +123,16 @@ export const getTimeReportsByDateAndUserId = async (
           });
         });
       });
-    return new Promise<TimeReport[] | string>(resolve => resolve(timeReports));
+    return new Promise<TimeReport[]>(resolve => resolve(timeReports));
   } catch (error) {
-    return new Promise<TimeReport[] | string>(reject => reject("Error"));
+    return new Promise<string>(reject => reject("Error"));
   }
 };
 
 export const getTimeReportsByDate = async (
   startDate: Date,
   endDate: Date
-): Promise<Dictionary<TimeReport[]> | string> => {
+): Promise<TimeReport[] | string> => {
   const timeReports: TimeReport[] = [];
   try {
     await db
@@ -144,6 +145,7 @@ export const getTimeReportsByDate = async (
           timeReports.push({
             id: doc.data().id,
             userId: doc.data().userId,
+            username: doc.data().username,
             activityId: doc.data().activityId,
             activityName: doc.data().activityName,
             companyId: doc.data().companyId,
@@ -156,16 +158,16 @@ export const getTimeReportsByDate = async (
       });
     _.forEach(timeReports, (timeReport: TimeReport) => {
       _.remove(timeReport.timeReportRows, (timeReportRow: TimeReportRow) => {
-        return new Date(timeReportRow.prettyDate) < startDate || new Date(timeReportRow.prettyDate) > endDate ||
+        return (
+          new Date(timeReportRow.prettyDate) < startDate ||
+          new Date(timeReportRow.prettyDate) > endDate ||
           timeReportRow.hours === ""
-      })
+        );
+      });
     });
-    const groupedTimeReports: Dictionary<TimeReport[]> = _.groupBy(timeReports, "userId");
-    _.forEach(groupedTimeReports, (value, key) => {
-      console.log(key, value)
-      console.log("Find a way to get employee name in to the object")
-    })
-    return new Promise<Dictionary<TimeReport[]>>(resolve => resolve(groupedTimeReports));
+    return new Promise<TimeReport[]>(resolve =>
+      resolve(timeReports)
+    );
   } catch (error) {
     return new Promise<string>(reject => reject("Error"));
   }

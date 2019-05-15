@@ -20,6 +20,7 @@ import {getTimeReportsByDate} from "../../api/timeReportApi";
 import {toast} from "react-toastify";
 import {Dictionary} from "lodash";
 import _ from "lodash";
+import {initialTimeReportOverviewData} from "../../constants/summaryConstants";
 
 interface TimeSummaryListHeaderProps {
   showDetailView: boolean;
@@ -29,6 +30,7 @@ const TimeSummary: FunctionComponent = () => {
   const [searchValue, setSearchValue] = useState("");
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showDetailView, setShowDetailView] = useState(false);
+  const [timeReportOverviewData, setTimeReportOverviewData] = useState(initialTimeReportOverviewData);
   const [dateSelectorValue, setDateSelectorValue] = useState(
     initialDateSelectorValue
   );
@@ -53,7 +55,14 @@ const TimeSummary: FunctionComponent = () => {
         to: format(lastDayOfMonth, dateSelectorEndValueFormat)
       };
       setSelectedDate(firstDayOfMonth);
-      setDateSelectorValue(dateSelectorValue)
+      setDateSelectorValue(dateSelectorValue);
+      const timeReports: TimeReport[] | string = await getTimeReportsByDate(firstDayOfMonth, lastDayOfMonth);
+      if (typeof timeReports !== "string") {
+        const formattedTimeReports: Dictionary<TimeReport[]> = _.groupBy(timeReports, "userId");
+        calculateTimeReportTotals(formattedTimeReports);
+      } else {
+        toast.error("Error retrieving data.")
+      }
     } else {
       const newSelectedDate: Date = addMonths(selectedDate, 1);
       const firstDayOfMonth: Date = getFirstAndLastDateOfMonth(newSelectedDate).first;
@@ -63,11 +72,18 @@ const TimeSummary: FunctionComponent = () => {
         to: format(lastDayOfMonth, dateSelectorEndValueFormat)
       };
       setSelectedDate(firstDayOfMonth);
-      setDateSelectorValue(dateSelectorValue)
+      setDateSelectorValue(dateSelectorValue);
+      const timeReports: TimeReport[] | string = await getTimeReportsByDate(firstDayOfMonth, lastDayOfMonth);
+      if (typeof timeReports !== "string") {
+        const formattedTimeReports: Dictionary<TimeReport[]> = _.groupBy(timeReports, "userId");
+        calculateTimeReportTotals(formattedTimeReports);
+      } else {
+        toast.error("Error retrieving data.")
+      }
     }
   };
 
-  const onDateSelect = async (date: Date): Promise<void> => {
+  const onDateSelect = async (date: Date, isDetailViewtoggled = false): Promise<void> => {
     const newSelectedDate: Date = date;
     const firstDayOfMonth: Date = getFirstAndLastDateOfMonth(newSelectedDate).first;
     const lastDayOfMonth: Date = getFirstAndLastDateOfMonth(newSelectedDate).last;
@@ -77,9 +93,17 @@ const TimeSummary: FunctionComponent = () => {
     };
     setSelectedDate(getFirstAndLastDateOfMonth(newSelectedDate).first);
     setDateSelectorValue(dateSelectorValue);
-    const timeReports: Dictionary<TimeReport[]> | string = await getTimeReportsByDate(firstDayOfMonth, lastDayOfMonth);
+    const timeReports: TimeReport[] | string = await getTimeReportsByDate(firstDayOfMonth, lastDayOfMonth);
     if (typeof timeReports !== "string") {
-      calculateTimeReportTotals(timeReports);
+      if (isDetailViewtoggled) {
+        const formattedTimeReports: Dictionary<TimeReport[]> = _.groupBy(timeReports, report => {
+          return `${report.activityId}-${report.companyId}`;
+        });
+        calculateActivityTotals(formattedTimeReports);
+      } else {
+        const formattedTimeReports: Dictionary<TimeReport[]> = _.groupBy(timeReports, "userId");
+        calculateTimeReportTotals(formattedTimeReports);
+      }
     } else {
       toast.error("Error retrieving data.")
     }
@@ -89,27 +113,54 @@ const TimeSummary: FunctionComponent = () => {
     const timeReportOverviewData: TimeReportSummaryOverview[] = [];
     _.forEach(timeReports, (value, key) => {
       let total: number = 0;
-      console.log(timeReports[key])
+      let employeeName: string = "";
       _.forEach(timeReports[key], timeReportRow => {
-        console.log(timeReportRow)
+        employeeName = timeReportRow.username;
         total += _.sumBy(timeReportRow.timeReportRows, (row: TimeReportRow) => +row.hours);
-        console.log(total)
-      })
+      });
       timeReportOverviewData.push({
-        employeeId: key,
-        employeeName: "todo todo",
+        userId: key,
+        username: employeeName,
         totalHours: total
       })
-    })
-    console.log(timeReportOverviewData)
+    });
+    setTimeReportOverviewData(timeReportOverviewData);
+    console.log(timeReportOverviewData);
     return timeReportOverviewData;
   };
 
-  const toggleDetailView = (employeeId?: string): void => {
-    console.log(employeeId)
+  const calculateActivityTotals = (timeReports: Dictionary<TimeReport[]>): TimeReportSummaryOverview[] => {
+    console.log(timeReports)
+    const timeReportOverviewData: TimeReportSummaryOverview[] = [];
+    _.forEach(timeReports, (value, key) => {
+      let total: number = 0;
+      console.log(value);
+      let activityName: string | undefined = "";
+      let companyName: string | undefined = "";
+      _.forEach(timeReports[key], timeReportRow => {
+        activityName = timeReportRow.activityName;
+        companyName = timeReportRow.companyName;
+        total += _.sumBy(timeReportRow.timeReportRows, (row: TimeReportRow) => +row.hours);
+      });
+      timeReportOverviewData.push({
+        userId: key,
+        companyName,
+        activityName,
+        totalHours: total
+      })
+    });
+    setTimeReportOverviewData(timeReportOverviewData);
+    console.log(timeReportOverviewData);
+    return timeReportOverviewData;
+  };
+
+
+  const toggleDetailView = async (employeeId?: string): Promise<void> => {
     if (employeeId) {
+      await onDateSelect(selectedDate, true);
       setShowDetailView(true);
     } else {
+      await onDateSelect(selectedDate);
       setShowDetailView(false);
     }
   };
@@ -137,7 +188,11 @@ const TimeSummary: FunctionComponent = () => {
         />
       </TimeSummaryListHeader>
       <Wrapper>
-        <TimeCardContainer isDetailView={showDetailView} toggleDetailView={toggleDetailView}/>
+        <TimeCardContainer
+            isDetailView={showDetailView}
+            toggleDetailView={toggleDetailView}
+            timeReportOverviewData={timeReportOverviewData}
+        />
         {showDetailView && (
           <DetailedRowContainer/>
         )}
@@ -165,6 +220,7 @@ const Back = styled.div`
   align-items: center;
   border-radius: 3px;
   padding: 0 5px;
+  cursor: pointer;
   span {
     width: inherit;
     text-align: left;

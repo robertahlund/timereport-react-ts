@@ -202,6 +202,7 @@ const Time: FunctionComponent = () => {
     const newTimeReportRow: TimeReport = {
       id: "",
       userId: authContext.uid,
+      username: `${authContext.firstName} ${authContext.lastName}`,
       activityId: activity.value,
       activityName: activity.label,
       companyId: activity.companyId,
@@ -366,6 +367,8 @@ const Time: FunctionComponent = () => {
             }
             setLastSaved(format(new Date(), timeStampFormat));
             setRowIsSaved(true);
+          } else {
+            toast.error(savedRows)
           }
         }
       } catch (error) {

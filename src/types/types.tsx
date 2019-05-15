@@ -12,6 +12,7 @@ export interface TimeReportRow {
 export interface TimeReport {
   id: string;
   userId: string;
+  username: string;
   date: Date;
   prettyDate: string;
   activityId: string;
@@ -167,7 +168,9 @@ export interface FirstAndLastDate {
 }
 
 export interface TimeReportSummaryOverview {
-  employeeId: string;
-  employeeName: string;
+  userId: string;
+  username?: string;
+  activityName?: string;
+  companyName?: string;
   totalHours: number;
 }
