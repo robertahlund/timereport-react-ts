@@ -2,7 +2,6 @@ import React, {ChangeEvent, Fragment, FunctionComponent, useEffect, useState} fr
 import styled from "styled-components";
 import CloseIcon from "../../icons/CloseIcon";
 import Button from "../general/Button";
-import firebase from "../../config/firebaseConfig";
 import EmployeeModalForm from "./EmployeeModalForm";
 import LoadingIcon from "../../icons/LoadingIcon";
 import {ValueType} from "react-select/lib/types";
@@ -70,8 +69,8 @@ const EmployeeModal: FunctionComponent<EmployeeModalProps> = props => {
       setOriginalEmployeeCompanyList(user.companies);
       setUserInactive(user.inactive);
       setModalLoading(false);
-      return new Promise<CompanySelectOptions[] | string>(resolve => resolve(user.companies))
-    } else return new Promise(reject => reject("Error"));
+      return new Promise<CompanySelectOptions[]>(resolve => resolve(user.companies))
+    } else return new Promise<string>(reject => reject("Error"));
   };
 
   const _getCompanies = async (): Promise<CompanySelectOptions[] | string> => {
@@ -85,8 +84,8 @@ const EmployeeModal: FunctionComponent<EmployeeModalProps> = props => {
         })
       });
       setCompanyList(companyData);
-      return new Promise<CompanySelectOptions[] | string>(resolve => resolve(companyData));
-    } else return new Promise<CompanySelectOptions[] | string>(reject => reject("Error"))
+      return new Promise<CompanySelectOptions[]>(resolve => resolve(companyData));
+    } else return new Promise<string>(reject => reject("Error"))
   };
 
   const removeAddedCompaniesFromList = async (): Promise<void> => {
@@ -221,8 +220,10 @@ const EmployeeModal: FunctionComponent<EmployeeModalProps> = props => {
               selectOptions={companyList}
               handleSelectChange={handleSelectChange}
             />
-            <EmployeeModalCompanyList companySelectOptions={employeeCompanyList}
-                                      handleRemoveFromEmployeeCompanyList={handleRemoveFromEmployeeCompanyList}/>
+            <EmployeeModalCompanyList
+              companySelectOptions={employeeCompanyList}
+              handleRemoveFromEmployeeCompanyList={handleRemoveFromEmployeeCompanyList}
+            />
             <Button
               type="button"
               text="Update"

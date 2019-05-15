@@ -160,3 +160,14 @@ export interface ActivityFormValue {
   valid: boolean;
   name: FormValue
 }
+
+export interface FirstAndLastDate {
+  first: Date;
+  last: Date;
+}
+
+export interface TimeReportSummaryOverview {
+  employeeId: string;
+  employeeName: string;
+  totalHours: number;
+}

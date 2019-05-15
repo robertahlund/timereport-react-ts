@@ -92,6 +92,7 @@ const MyAccountModal: FunctionComponent<MyAccountModalProps> = props => {
     } catch (error) {
       console.log(error);
       setLoading(false);
+      toast.error("Authentication error.");
     }
   };
 

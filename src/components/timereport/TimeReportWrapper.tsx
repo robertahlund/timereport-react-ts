@@ -96,6 +96,7 @@ const TimeReportWrapper: FunctionComponent<TimeReportWrapperProps> = props => {
           dateSelectorValue={props.dateSelectorValue}
           selectedDate={selectedDate}
           onDateSelect={props.onDateSelect}
+          showMonths={false}
         />
       </TimeReportListHeader>
       <WeekDateRow selectedDate={props.selectedDate} />
@@ -171,7 +172,7 @@ const TimeReportWrapper: FunctionComponent<TimeReportWrapperProps> = props => {
 
 export default TimeReportWrapper;
 
-const TimeReportListHeader = styled(ListHeader)`
+export const TimeReportListHeader = styled(ListHeader)`
   justify-content: flex-end;
 `;
 

@@ -1,5 +1,7 @@
 import firebase from "../config/firebaseConfig";
-import { TimeReport } from "../types/types";
+import {TimeReport, TimeReportRow} from "../types/types";
+import {addDays, subDays} from "date-fns";
+import _, {Dictionary} from "lodash";
 
 const db = firebase.firestore();
 
@@ -94,7 +96,7 @@ export const deleteTimeReport = async (
   }
 };
 
-export const getTimeReportsByDate = async (
+export const getTimeReportsByDateAndUserId = async (
   startDate: string,
   userId: string
 ): Promise<TimeReport[] | string> => {
@@ -123,6 +125,49 @@ export const getTimeReportsByDate = async (
     return new Promise<TimeReport[] | string>(resolve => resolve(timeReports));
   } catch (error) {
     return new Promise<TimeReport[] | string>(reject => reject("Error"));
+  }
+};
+
+export const getTimeReportsByDate = async (
+  startDate: Date,
+  endDate: Date
+): Promise<Dictionary<TimeReport[]> | string> => {
+  const timeReports: TimeReport[] = [];
+  try {
+    await db
+      .collection("timeReports")
+      .where("date", ">=", subDays(startDate, 7))
+      .where("date", "<=", addDays(endDate, 7))
+      .get()
+      .then(documents => {
+        documents.forEach(doc => {
+          timeReports.push({
+            id: doc.data().id,
+            userId: doc.data().userId,
+            activityId: doc.data().activityId,
+            activityName: doc.data().activityName,
+            companyId: doc.data().companyId,
+            companyName: doc.data().companyName,
+            date: doc.data().date,
+            prettyDate: doc.data().prettyDate,
+            timeReportRows: doc.data().timeReportRows
+          });
+        });
+      });
+    _.forEach(timeReports, (timeReport: TimeReport) => {
+      _.remove(timeReport.timeReportRows, (timeReportRow: TimeReportRow) => {
+        return new Date(timeReportRow.prettyDate) < startDate || new Date(timeReportRow.prettyDate) > endDate ||
+          timeReportRow.hours === ""
+      })
+    });
+    const groupedTimeReports: Dictionary<TimeReport[]> = _.groupBy(timeReports, "userId");
+    _.forEach(groupedTimeReports, (value, key) => {
+      console.log(key, value)
+      console.log("Find a way to get employee name in to the object")
+    })
+    return new Promise<Dictionary<TimeReport[]>>(resolve => resolve(groupedTimeReports));
+  } catch (error) {
+    return new Promise<string>(reject => reject("Error"));
   }
 };
 

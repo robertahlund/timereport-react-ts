@@ -15,6 +15,7 @@ interface DateSelectorProps {
   dateSelectorValue: DateSelectorValue;
   selectedDate: Date;
   onDateSelect: (date: Date) => void;
+  showMonths: boolean;
 }
 
 const DateSelector: FunctionComponent<DateSelectorProps> = props => {
@@ -26,7 +27,7 @@ const DateSelector: FunctionComponent<DateSelectorProps> = props => {
       <DatePickerWrapper>
         <DatePicker onChange={props.onDateSelect} customInput={
           <DateSelectorValueContainer>{props.dateSelectorValue.from}{props.dateSelectorValue.to}</DateSelectorValueContainer>
-        } todayButton={"Today"} selected={props.selectedDate} showWeekNumbers locale="enGB"/>
+        } todayButton={"Today"} selected={props.selectedDate} showWeekNumbers locale="enGB" showMonthYearPicker={props.showMonths}/>
       </DatePickerWrapper>
       <DateSelectorButton onClick={() => props.handleWeekChange("next")} type="button">
         <ArrowRight width="24px" height="24px" color="#393e41"/>
@@ -47,7 +48,7 @@ export const DatePickerWrapper = styled.div`
   .react-datepicker {
     font-family: 'Roboto', sans-serif;
     border-radius: 3px;
-    border: 1px solid #00000014
+    border: 1px solid #00000014;
   }
   .react-datepicker-popper[data-placement^="bottom"] .react-datepicker__triangle, .react-datepicker-popper[data-placement^="bottom"] .react-datepicker__triangle::before {
     border-top: none;
@@ -64,6 +65,10 @@ export const DatePickerWrapper = styled.div`
     border-top-left-radius: 3px;
     border-top-right-radius: 3px;
   }
+  .react-datepicker-year-header {
+    padding-top: 18px!important;
+    padding-bottom: 18px!important;
+  }
   //day name
   .react-datepicker__day-name {
     font-weight: 400;
@@ -73,6 +78,21 @@ export const DatePickerWrapper = styled.div`
     padding: 5px;
     font-weight: 400;
     font-size: 14px;
+  }
+  //month selector
+  .react-datepicker__month .react-datepicker__month-text {
+    display: inline-block;
+    width: 4rem;
+    margin: 2px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    font-weight: 400;
+    font-size: 14px;
+  }
+  //active month
+  .react-datepicker__month--selected, .react-datepicker__month--in-selecting-range, .react-datepicker__month--in-range {
+    background: #FEC861;
+    color: #393E41;
   }
   //current day
   .react-datepicker__day--today, .react-datepicker__month-text--today {
@@ -119,6 +139,9 @@ export const DatePickerWrapper = styled.div`
     color: #393E41;
   }
   .react-datepicker__day--selected:hover, .react-datepicker__day--in-selecting-range:hover, .react-datepicker__day--in-range:hover, .react-datepicker__month-text--selected:hover, .react-datepicker__month-text--in-selecting-range:hover, .react-datepicker__month-text--in-range:hover {
+    background-color: #FEC861;
+  }
+  .react-datepicker__month-text.react-datepicker__month--selected:hover, .react-datepicker__month-text.react-datepicker__month--in-range:hover {
     background-color: #FEC861;
   }
 `;

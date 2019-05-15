@@ -14,7 +14,7 @@ import { ValueType } from "react-select/lib/types";
 import {
   createOrUpdateTimeReportRows,
   deleteTimeReport,
-  getTimeReportsByDate
+  getTimeReportsByDateAndUserId
 } from "../../api/timeReportApi";
 import "../../styles/time-react-select.css";
 import "../../styles/close-button-transition.css";
@@ -84,7 +84,7 @@ const Time: FunctionComponent = () => {
       return;
     }
     setTimeReportLoading(true);
-    const timeReports = await getTimeReportsByDate(
+    const timeReports = await getTimeReportsByDateAndUserId(
       format(date, timeReportDateFormat),
       authContext.uid
     );

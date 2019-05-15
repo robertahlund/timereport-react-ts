@@ -23,7 +23,7 @@ export default Employees;
 export const ContentSection = styled.section`
   display: flex;
   flex-direction: column;
-  margin: 100px auto 0 auto;
+  margin: 100px auto 100px auto;
   width: 70vw;
   max-width: 1440px;
 `;
