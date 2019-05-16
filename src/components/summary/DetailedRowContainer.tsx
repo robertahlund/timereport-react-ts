@@ -1,25 +1,46 @@
-import React, {FunctionComponent, ReactNode, Fragment} from "react";
+import React, {FunctionComponent, ReactNode, Fragment, useEffect} from "react";
 import DetailedRow from "./DetailedRow";
 import styled from "styled-components";
 import {CardHeader} from "./TimeCard";
+import {TimeReportRowSummaryDetail} from "../../types/types";
 
 interface DetailedRowContainerProps {
-
+  rowDetails: TimeReportRowSummaryDetail[];
 }
 
 const DetailedRowContainer: FunctionComponent<DetailedRowContainerProps> = props => {
-  const sampleData = (): ReactNode[] => {
-    const data: ReactNode[] = [];
-    for(let i = 0; i<10; i++) {
-      data.push(<DetailedRow hoursWorked={5} activityName="Activity 1" companyName="Company 1" formatedDate="2019-04-01" key={i}/>)
-    }
-    return data;
-  };
+  useEffect(() => {
+    console.log("effect")
+    props.rowDetails.sort((a, b) => {
+      if (a.formattedDate > b.formattedDate) {
+        return 1;
+      } else if (b.formattedDate > a.formattedDate) {
+        return -1;
+      }
+      return 1;
+    })
+  }, [props.rowDetails]);
+  const {rowDetails} = props;
 
   return (
     <RowWrapper>
       <CardHeader/>
-    {sampleData()}
+      {rowDetails.length === 0 ? (
+        <DetailedRow
+          activityName="No data for this month."
+        />
+      ) : (
+        <Fragment>
+          {rowDetails.map(row => (
+            <DetailedRow
+              hoursWorked={row.hours}
+              activityName={row.activityName}
+              companyName={row.companyName}
+              formattedDate={row.formattedDate}
+              key={`${row.formattedDate}-${row.companyName}-${row.activityName}-${row.hours}`}/>
+          ))}
+        </Fragment>
+      )}
     </RowWrapper>
   )
 };
@@ -28,7 +49,7 @@ export default DetailedRowContainer;
 
 const RowWrapper = styled.div`
   background-color: #F7F7F7;
-  margin: 20px 5px;
+  margin: 7.5px 7.5px;
   width: 100%;
   border-radius: 3px;
 `;

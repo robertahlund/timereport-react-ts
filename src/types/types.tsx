@@ -174,3 +174,10 @@ export interface TimeReportSummaryOverview {
   companyName?: string;
   totalHours: number;
 }
+
+export interface TimeReportRowSummaryDetail {
+  activityName: string;
+  companyName: string;
+  hours: number;
+  formattedDate: string;
+}

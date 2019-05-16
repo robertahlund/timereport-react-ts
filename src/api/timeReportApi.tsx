@@ -131,31 +131,57 @@ export const getTimeReportsByDateAndUserId = async (
 
 export const getTimeReportsByDate = async (
   startDate: Date,
-  endDate: Date
+  endDate: Date,
+  userId: string | undefined
 ): Promise<TimeReport[] | string> => {
   const timeReports: TimeReport[] = [];
   try {
-    await db
-      .collection("timeReports")
-      .where("date", ">=", subDays(startDate, 7))
-      .where("date", "<=", addDays(endDate, 7))
-      .get()
-      .then(documents => {
-        documents.forEach(doc => {
-          timeReports.push({
-            id: doc.data().id,
-            userId: doc.data().userId,
-            username: doc.data().username,
-            activityId: doc.data().activityId,
-            activityName: doc.data().activityName,
-            companyId: doc.data().companyId,
-            companyName: doc.data().companyName,
-            date: doc.data().date,
-            prettyDate: doc.data().prettyDate,
-            timeReportRows: doc.data().timeReportRows
+    if (_.isNil(userId)) {
+      await db
+        .collection("timeReports")
+        .where("date", ">=", subDays(startDate, 7))
+        .where("date", "<=", addDays(endDate, 7))
+        .get()
+        .then(documents => {
+          documents.forEach(doc => {
+            timeReports.push({
+              id: doc.data().id,
+              userId: doc.data().userId,
+              username: doc.data().username,
+              activityId: doc.data().activityId,
+              activityName: doc.data().activityName,
+              companyId: doc.data().companyId,
+              companyName: doc.data().companyName,
+              date: doc.data().date,
+              prettyDate: doc.data().prettyDate,
+              timeReportRows: doc.data().timeReportRows
+            });
           });
         });
-      });
+    } else {
+      await db
+        .collection("timeReports")
+        .where("date", ">=", subDays(startDate, 7))
+        .where("date", "<=", addDays(endDate, 7))
+        .where("userId", "==", userId)
+        .get()
+        .then(documents => {
+          documents.forEach(doc => {
+            timeReports.push({
+              id: doc.data().id,
+              userId: doc.data().userId,
+              username: doc.data().username,
+              activityId: doc.data().activityId,
+              activityName: doc.data().activityName,
+              companyId: doc.data().companyId,
+              companyName: doc.data().companyName,
+              date: doc.data().date,
+              prettyDate: doc.data().prettyDate,
+              timeReportRows: doc.data().timeReportRows
+            });
+          });
+        });
+    }
     _.forEach(timeReports, (timeReport: TimeReport) => {
       _.remove(timeReport.timeReportRows, (timeReportRow: TimeReportRow) => {
         return (
@@ -169,6 +195,7 @@ export const getTimeReportsByDate = async (
       resolve(timeReports)
     );
   } catch (error) {
+    console.log(error)
     return new Promise<string>(reject => reject("Error"));
   }
 };

@@ -14,23 +14,25 @@ interface TimeCardProps {
 const TimeCard: FunctionComponent<TimeCardProps> = props => {
   const {isDetailedView, hoursWorked, employeeName, activityName, companyName, employeeId, toggleDetailView} = props;
   return (
-    <Card>
-      <CardHeader/>
-      <DataWrapper>
-        <HoursWorked>{hoursWorked}h</HoursWorked>
-        {!isDetailedView ? (
-          <Fragment>
-            <EmployeeName>{employeeName}</EmployeeName>
-            <DetailLink onClick={() => toggleDetailView(employeeId)}>View detailed report</DetailLink>
-          </Fragment>
-        ) : (
-          <Fragment>
-            <ActivityName>{activityName}</ActivityName>
-            <CompanyName>{companyName}</CompanyName>
-          </Fragment>
-        )}
-      </DataWrapper>
-    </Card>
+    hoursWorked > 0 ? (
+      <Card>
+        <CardHeader/>
+        <DataWrapper>
+          <HoursWorked>{hoursWorked}h</HoursWorked>
+          {!isDetailedView ? (
+            <Fragment>
+              <EmployeeName>{employeeName}</EmployeeName>
+              <DetailLink onClick={() => toggleDetailView(employeeId)}>View detailed report</DetailLink>
+            </Fragment>
+          ) : (
+            <Fragment>
+              <ActivityName>{activityName}</ActivityName>
+              <CompanyName>{companyName}</CompanyName>
+            </Fragment>
+          )}
+        </DataWrapper>
+      </Card>
+    ) : null
   );
 };
 
@@ -38,9 +40,9 @@ export default TimeCard;
 
 const Card = styled.div`
   border-radius: 3px;
-  width: calc(20% - 10px);
+  width: calc(20% - 15px);
   min-width: 180px;
-  margin: 5px;
+  margin: 7.5px;
   background-color: #F7F7F7;
   display: flex;
   flex-direction: column;

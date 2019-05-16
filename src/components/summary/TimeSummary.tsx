@@ -1,26 +1,36 @@
-import React, {ChangeEvent, FunctionComponent, useEffect, useState} from "react";
+import React, {ChangeEvent, FunctionComponent, useEffect, useState, Fragment} from "react";
 import {ContentSection} from "../employees/Employees";
 import TimeSummarySearch from "./TimeSummarySearch";
 import DateSelector from "../timereport/DateSelector";
 import {TimeReportListHeader} from "../timereport/TimeReportWrapper";
-import {addDays, addMonths, endOfWeek, format, startOfWeek, subDays, subMonths} from "date-fns";
+import {addDays, addMonths, format, subMonths} from "date-fns";
 import {getFirstAndLastDateOfMonth} from "../../utilities/date/dateUtilities";
 import {
   dateSelectorEndValueFormat,
   dateSelectorStartValueFormat,
   initialDateSelectorValue
 } from "../../constants/timeReportConstants";
-import {DateSelectorValue, TimeReport, TimeReportRow, TimeReportSummaryOverview} from "../../types/types";
+import {
+  DateSelectorValue,
+  TimeReport,
+  TimeReportRow,
+  TimeReportRowSummaryDetail,
+  TimeReportSummaryOverview
+} from "../../types/types";
 import TimeCardContainer from "./TimeCardContainer";
 import styled from "styled-components";
 import DetailedRowContainer from "./DetailedRowContainer";
-import Button from "../general/Button";
 import ArrowLeft from "../../icons/ArrowLeft";
 import {getTimeReportsByDate} from "../../api/timeReportApi";
 import {toast} from "react-toastify";
 import {Dictionary} from "lodash";
 import _ from "lodash";
-import {initialTimeReportOverviewData} from "../../constants/summaryConstants";
+import {
+  initialDetailedRowData,
+  initialSelectedUserId,
+  initialTimeReportOverviewData
+} from "../../constants/summaryConstants";
+import LoadingIcon from "../../icons/LoadingIcon";
 
 interface TimeSummaryListHeaderProps {
   showDetailView: boolean;
@@ -31,21 +41,37 @@ const TimeSummary: FunctionComponent = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showDetailView, setShowDetailView] = useState(false);
   const [timeReportOverviewData, setTimeReportOverviewData] = useState(initialTimeReportOverviewData);
+  const [clonedTimeReportOverviewData, setClonedTimeReportOverviewData] = useState(initialTimeReportOverviewData);
+  const [detailedRowData, setDetailedRowData] = useState(initialDetailedRowData);
   const [dateSelectorValue, setDateSelectorValue] = useState(
     initialDateSelectorValue
   );
+  const [selectedUserId, setSelectedUserId] = useState(initialSelectedUserId);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    document.title = "Time Summary";
     // noinspection JSIgnoredPromiseFromCall
     onDateSelect(new Date());
   }, []);
 
   const handleSearchChange = (event: ChangeEvent<HTMLInputElement>): void => {
-    //TODO filter list
-    setSearchValue(event.target.value)
+    setSearchValue(event.target.value);
+    filterResults(event.target.value, clonedTimeReportOverviewData);
+  };
+
+  const filterResults = (value: string, clonedData: TimeReportSummaryOverview[]): TimeReportSummaryOverview[] => {
+    const searchResult: TimeReportSummaryOverview[] = _.filter(clonedData, (overviewData) => {
+      if (overviewData.username) {
+        return overviewData.username.toLowerCase().indexOf(value.toLowerCase()) > -1;
+      } else return false;
+    });
+    setTimeReportOverviewData(searchResult);
+    return searchResult;
   };
 
   const handleWeekChange = async (direction: "prev" | "next"): Promise<void> => {
+    setLoading(true);
     if (direction === "prev") {
       const newSelectedDate: Date = subMonths(selectedDate, 1);
       const firstDayOfMonth: Date = getFirstAndLastDateOfMonth(newSelectedDate).first;
@@ -56,12 +82,22 @@ const TimeSummary: FunctionComponent = () => {
       };
       setSelectedDate(firstDayOfMonth);
       setDateSelectorValue(dateSelectorValue);
-      const timeReports: TimeReport[] | string = await getTimeReportsByDate(firstDayOfMonth, lastDayOfMonth);
+      const timeReports: TimeReport[] | string = await getTimeReportsByDate(firstDayOfMonth, lastDayOfMonth, selectedUserId);
       if (typeof timeReports !== "string") {
-        const formattedTimeReports: Dictionary<TimeReport[]> = _.groupBy(timeReports, "userId");
-        calculateTimeReportTotals(formattedTimeReports);
+        if (showDetailView) {
+          const formattedTimeReports: Dictionary<TimeReport[]> = _.groupBy(timeReports, report => {
+            return `${report.activityId}-${report.companyId}`;
+          });
+          calculateActivityTotals(formattedTimeReports);
+          setLoading(false);
+        } else {
+          const formattedTimeReports: Dictionary<TimeReport[]> = _.groupBy(timeReports, "userId");
+          calculateTimeReportTotals(formattedTimeReports);
+          setLoading(false);
+        }
       } else {
-        toast.error("Error retrieving data.")
+        toast.error("Error retrieving data.");
+        setLoading(false);
       }
     } else {
       const newSelectedDate: Date = addMonths(selectedDate, 1);
@@ -73,17 +109,36 @@ const TimeSummary: FunctionComponent = () => {
       };
       setSelectedDate(firstDayOfMonth);
       setDateSelectorValue(dateSelectorValue);
-      const timeReports: TimeReport[] | string = await getTimeReportsByDate(firstDayOfMonth, lastDayOfMonth);
+      const timeReports: TimeReport[] | string = await getTimeReportsByDate(firstDayOfMonth, lastDayOfMonth, selectedUserId);
       if (typeof timeReports !== "string") {
-        const formattedTimeReports: Dictionary<TimeReport[]> = _.groupBy(timeReports, "userId");
-        calculateTimeReportTotals(formattedTimeReports);
+        if (showDetailView) {
+          const formattedTimeReports: Dictionary<TimeReport[]> = _.groupBy(timeReports, report => {
+            return `${report.activityId}-${report.companyId}`;
+          });
+          calculateActivityTotals(formattedTimeReports);
+          setLoading(false);
+        } else {
+          const formattedTimeReports: Dictionary<TimeReport[]> = _.groupBy(timeReports, "userId");
+          calculateTimeReportTotals(formattedTimeReports);
+          setLoading(false);
+        }
       } else {
-        toast.error("Error retrieving data.")
+        toast.error("Error retrieving data.");
+        setLoading(false);
       }
     }
   };
 
-  const onDateSelect = async (date: Date, isDetailViewtoggled = false): Promise<void> => {
+  const onDateSelect = async (date: Date, isDetailViewToggled = showDetailView, userId?: string): Promise<void> => {
+    setLoading(true);
+    if (_.isNil(userId)) {
+      userId = selectedUserId
+    } else if (userId === "") {
+      userId = undefined
+    }
+    if (typeof isDetailViewToggled === "object") {
+      isDetailViewToggled = showDetailView
+    }
     const newSelectedDate: Date = date;
     const firstDayOfMonth: Date = getFirstAndLastDateOfMonth(newSelectedDate).first;
     const lastDayOfMonth: Date = getFirstAndLastDateOfMonth(newSelectedDate).last;
@@ -93,24 +148,31 @@ const TimeSummary: FunctionComponent = () => {
     };
     setSelectedDate(getFirstAndLastDateOfMonth(newSelectedDate).first);
     setDateSelectorValue(dateSelectorValue);
-    const timeReports: TimeReport[] | string = await getTimeReportsByDate(firstDayOfMonth, lastDayOfMonth);
+    const timeReports: TimeReport[] | string = await getTimeReportsByDate(
+      firstDayOfMonth,
+      lastDayOfMonth,
+      userId
+    );
     if (typeof timeReports !== "string") {
-      if (isDetailViewtoggled) {
+      if (isDetailViewToggled) {
         const formattedTimeReports: Dictionary<TimeReport[]> = _.groupBy(timeReports, report => {
           return `${report.activityId}-${report.companyId}`;
         });
         calculateActivityTotals(formattedTimeReports);
+        setLoading(false);
       } else {
         const formattedTimeReports: Dictionary<TimeReport[]> = _.groupBy(timeReports, "userId");
         calculateTimeReportTotals(formattedTimeReports);
+        setLoading(false);
       }
     } else {
-      toast.error("Error retrieving data.")
+      toast.error("Error retrieving data.");
+      setLoading(false);
     }
   };
 
   const calculateTimeReportTotals = (timeReports: Dictionary<TimeReport[]>): TimeReportSummaryOverview[] => {
-    const timeReportOverviewData: TimeReportSummaryOverview[] = [];
+    let timeReportOverviewData: TimeReportSummaryOverview[] = [];
     _.forEach(timeReports, (value, key) => {
       let total: number = 0;
       let employeeName: string = "";
@@ -124,13 +186,17 @@ const TimeSummary: FunctionComponent = () => {
         totalHours: total
       })
     });
+    const clonedData: TimeReportSummaryOverview[] = _.cloneDeep(timeReportOverviewData);
+    setClonedTimeReportOverviewData(clonedData);
+    if (searchValue !== "") {
+      timeReportOverviewData = filterResults(searchValue, clonedData);
+    }
     setTimeReportOverviewData(timeReportOverviewData);
-    console.log(timeReportOverviewData);
     return timeReportOverviewData;
   };
 
   const calculateActivityTotals = (timeReports: Dictionary<TimeReport[]>): TimeReportSummaryOverview[] => {
-    console.log(timeReports)
+    const rowDetails: TimeReportRowSummaryDetail[] = [];
     const timeReportOverviewData: TimeReportSummaryOverview[] = [];
     _.forEach(timeReports, (value, key) => {
       let total: number = 0;
@@ -138,6 +204,14 @@ const TimeSummary: FunctionComponent = () => {
       let activityName: string | undefined = "";
       let companyName: string | undefined = "";
       _.forEach(timeReports[key], timeReportRow => {
+        _.forEach(timeReportRow.timeReportRows, row => {
+          rowDetails.push({
+            activityName: timeReportRow.activityName || "",
+            companyName: timeReportRow.companyName || "",
+            formattedDate: row.prettyDate,
+            hours: +row.hours
+          })
+        });
         activityName = timeReportRow.activityName;
         companyName = timeReportRow.companyName;
         total += _.sumBy(timeReportRow.timeReportRows, (row: TimeReportRow) => +row.hours);
@@ -150,23 +224,25 @@ const TimeSummary: FunctionComponent = () => {
       })
     });
     setTimeReportOverviewData(timeReportOverviewData);
-    console.log(timeReportOverviewData);
+    setDetailedRowData(rowDetails);
     return timeReportOverviewData;
   };
 
 
   const toggleDetailView = async (employeeId?: string): Promise<void> => {
     if (employeeId) {
-      await onDateSelect(selectedDate, true);
+      await onDateSelect(selectedDate, true, employeeId);
       setShowDetailView(true);
+      setSelectedUserId(employeeId);
     } else {
-      await onDateSelect(selectedDate);
+      await onDateSelect(selectedDate, false, "");
       setShowDetailView(false);
+      setSelectedUserId(undefined);
     }
   };
 
   return (
-    <ContentSection>
+    <TimeSummarySection showDetailView={showDetailView}>
       {!showDetailView && (
         <TimeSummarySearch
           searchValue={searchValue}
@@ -188,26 +264,43 @@ const TimeSummary: FunctionComponent = () => {
         />
       </TimeSummaryListHeader>
       <Wrapper>
-        <TimeCardContainer
-            isDetailView={showDetailView}
-            toggleDetailView={toggleDetailView}
-            timeReportOverviewData={timeReportOverviewData}
-        />
-        {showDetailView && (
-          <DetailedRowContainer/>
+        {loading ? (
+          <LoadingIconWrapper>
+            <LoadingIcon
+              height="30px"
+              width="30px"
+              color="#393e41"
+            />
+          </LoadingIconWrapper>
+        ) : (
+          <Fragment>
+            <TimeCardContainer
+              isDetailView={showDetailView}
+              toggleDetailView={toggleDetailView}
+              timeReportOverviewData={timeReportOverviewData}
+            />
+            {showDetailView && (
+              <DetailedRowContainer rowDetails={detailedRowData}/>
+            )}
+          </Fragment>
         )}
+
       </Wrapper>
-    </ContentSection>
+    </TimeSummarySection>
   )
 };
 
 export default TimeSummary;
 
+const TimeSummarySection = styled(ContentSection)`
+  margin: ${(props: TimeSummaryListHeaderProps) => props.showDetailView ? "175px auto 100px auto" : "100px auto 100px auto"}
+`;
+
 const Wrapper = styled.section`
   display: flex;
   flex-wrap: wrap;
   background-color: #fff;
-  padding: 10px;
+  padding: 7.5px;
 `;
 
 const TimeSummaryListHeader = styled(TimeReportListHeader)`
@@ -226,4 +319,8 @@ const Back = styled.div`
     text-align: left;
     padding: 0 10px 0 5px;
   }
+`;
+
+const LoadingIconWrapper = styled.div`
+  padding: 8.5px;
 `;

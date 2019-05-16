@@ -3,19 +3,19 @@ import styled from "styled-components";
 
 interface DetailedRowProps {
   activityName: string;
-  companyName: string;
-  hoursWorked: number;
-  formatedDate: string;
+  companyName?: string;
+  hoursWorked?: number;
+  formattedDate?: string;
 }
 
 const DetailedRow: FunctionComponent<DetailedRowProps> = props => {
-  const {activityName, companyName, hoursWorked, formatedDate} = props;
+  const {activityName, companyName, hoursWorked, formattedDate} = props;
   return (
     <Row>
       <DataText>{activityName}</DataText>
       <DataText>{companyName}</DataText>
-      <DataText>{hoursWorked}h</DataText>
-      <DataText>{formatedDate}</DataText>
+      <DataText>{hoursWorked && hoursWorked + "h"}</DataText>
+      <DataText>{formattedDate}</DataText>
     </Row>
   )
 };
