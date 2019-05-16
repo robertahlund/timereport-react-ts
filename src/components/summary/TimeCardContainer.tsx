@@ -15,6 +15,7 @@ interface EmptyMessageProps {
 
 const TimeCardContainer: FunctionComponent<TimeCardContainerProps> = props => {
   const {isDetailView, toggleDetailView, timeReportOverviewData} = props;
+  console.log(timeReportOverviewData)
   return (
     timeReportOverviewData.length === 0 ? (
       <EmptyMessage isDetailView={isDetailView}>
@@ -22,8 +23,8 @@ const TimeCardContainer: FunctionComponent<TimeCardContainerProps> = props => {
       </EmptyMessage>
     ) : (
       <Fragment>
-        {timeReportOverviewData.map((userSummary: TimeReportSummaryOverview) => (
-          <Fragment>
+        {timeReportOverviewData.map((userSummary: TimeReportSummaryOverview, index: number) => (
+          <Fragment key={userSummary.userId + index}>
             <TimeCard
               hoursWorked={userSummary.totalHours}
               toggleDetailView={toggleDetailView}
