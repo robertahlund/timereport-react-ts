@@ -31,6 +31,8 @@ import { ActivityFormValue, Company } from "../../types/types";
 import { updateTimeReportByActivityId } from "../../api/timeReportApi";
 import { initialActivityState } from "../../constants/activityConstants";
 import { validateActivityForm } from "../../utilities/validations/validateActivityForm";
+import {useSpring} from "react-spring";
+import {modalAnimation} from "../../constants/generalConstants";
 
 export interface ButtonRowProps {
   isNew: boolean;
@@ -202,6 +204,8 @@ const ActivityModal: FunctionComponent<ActivityModalProps> = props => {
       }
   };
 
+  const animation = useSpring(modalAnimation);
+
   return (
     <ModalBackground onClick={props.toggleModal}>
       {modalLoading && !isNew ? (
@@ -213,7 +217,7 @@ const ActivityModal: FunctionComponent<ActivityModalProps> = props => {
           color="#393e41"
         />
       ) : (
-        <ModalContent>
+        <ModalContent style={animation}>
           <ModalHeader>
             <ModalTitle>
               {isNew ? "Create new activity" : originalActivity.name.value}

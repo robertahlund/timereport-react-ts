@@ -24,6 +24,7 @@
     "react-router-dom": "^5.0.0",
     "react-scripts": "2.1.8",
     "react-select": "^2.4.3",
+    "react-spring": "^8.0.20",
     "react-toastify": "^5.1.0",
     "styled-components": "^4.2.0",
     "typescript": "3.4.2"

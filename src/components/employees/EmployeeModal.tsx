@@ -18,6 +18,8 @@ import {initialEmployeeFormState} from "../../constants/employeeConstants";
 import {validateEmployeeForm} from "../../utilities/validations/validateEmployeeForm";
 import {getCompanies} from "../../api/companyApi";
 import _ from "lodash";
+import {useSpring} from "react-spring";
+import {modalAnimation} from "../../constants/generalConstants";
 
 interface EmployeeModalProps {
   toggleModal: (event: React.MouseEvent) => void;
@@ -190,12 +192,14 @@ const EmployeeModal: FunctionComponent<EmployeeModalProps> = props => {
     setCompanyList([...companyList, {value: company.value, label: company.label}]);
   };
 
+  const animation = useSpring(modalAnimation);
+
   return (
     <ModalBackground onClick={props.toggleModal}>
       {modalLoading ? (
         <LoadingIcon position="relative" left="0px" height="100px" width="100px" color="#393e41"/>
       ) : (
-        <ModalContent>
+        <ModalContent style={animation}>
           <ModalHeader>
             <ModalTitle>
               {typeof selectedUser === 'object' ? (

@@ -10,6 +10,7 @@ import {RegisterFormValue} from "../../types/types";
 import {validateMyAccountForm} from "../../utilities/validations/validateMyAccountForm";
 import {updateEmployee} from "../../api/employeeApi";
 import {toast} from "react-toastify";
+import {animated, useSpring} from "react-spring";
 
 interface MyAccountModalProps {
   toggleModal: (event: React.MouseEvent) => void;
@@ -95,7 +96,6 @@ const MyAccountModal: FunctionComponent<MyAccountModalProps> = props => {
       toast.error("Authentication error.");
     }
   };
-
   return (
     <AuthContextConsumer>
       {authContext => (
@@ -155,7 +155,7 @@ export const ModalBackground = styled.div`
   z-index: 1;
 `;
 
-export const ModalContent = styled.div`
+export const ModalContent = styled(animated.div)`
   border-radius: 3px;
   background-color: #fff;
 `;

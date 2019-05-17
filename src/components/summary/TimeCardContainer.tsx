@@ -15,7 +15,6 @@ interface EmptyMessageProps {
 
 const TimeCardContainer: FunctionComponent<TimeCardContainerProps> = props => {
   const {isDetailView, toggleDetailView, timeReportOverviewData} = props;
-  console.log(timeReportOverviewData)
   return (
     timeReportOverviewData.length === 0 ? (
       <EmptyMessage isDetailView={isDetailView}>

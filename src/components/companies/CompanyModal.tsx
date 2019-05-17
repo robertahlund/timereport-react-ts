@@ -41,6 +41,8 @@ import { stringCompare } from "../../utilities/compare/stringCompare";
 import { getActivities } from "../../api/activityApi";
 import { initialCompanyState } from "../../constants/companyConstants";
 import { validateCompanyForm } from "../../utilities/validations/validateCompanyForm";
+import {modalAnimation} from "../../constants/generalConstants";
+import {useSpring} from "react-spring";
 
 interface CompanyModalProps {
   toggleModal: (event?: React.MouseEvent) => void;
@@ -333,6 +335,8 @@ const CompanyModal: FunctionComponent<CompanyModalProps> = props => {
     }
   };
 
+  const animation = useSpring(modalAnimation);
+
   return (
     <ModalBackground onClick={props.toggleModal}>
       {modalLoading && !isNew ? (
@@ -344,7 +348,7 @@ const CompanyModal: FunctionComponent<CompanyModalProps> = props => {
           color="#393e41"
         />
       ) : (
-        <ModalContent>
+        <ModalContent style={animation}>
           <ModalHeader>
             <ModalTitle>
               {isNew ? "Create new company" : originalCompany.name.value}
