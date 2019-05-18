@@ -20,7 +20,7 @@ import {
 } from "../../types/types";
 
 interface ActivityRowProps {
-  lastSaved: string;
+  lastSaved?: string | boolean;
 }
 
 interface TimeReportWrapperProps {
@@ -45,10 +45,12 @@ interface TimeReportWrapperProps {
     timeReportRowIndex?: number
   ) => Promise<void>;
   onDateSelect: (date: Date) => void;
+  getRowsFromPreviousWeek: () => Promise<void>;
+  previousWeekRowLoading: boolean;
 }
 
 const GroupBadgeStyles = styled.span`
-  color: #393E41;
+  color: #393e41;
   font-size: 14px;
   margin: 0;
   padding: 5px 0;
@@ -66,17 +68,14 @@ const GroupStyles = styled.div`
   }
 `;
 
-
-
 const TimeReportWrapper: FunctionComponent<TimeReportWrapperProps> = props => {
-
   const formatGroupLabel = (data: any) => {
-      return (
-        <GroupStyles>
-          <GroupBadgeStyles>{data.label}</GroupBadgeStyles>
-          <GroupBadgeStyles>{data.options.length}</GroupBadgeStyles>
-        </GroupStyles>
-      )
+    return (
+      <GroupStyles>
+        <GroupBadgeStyles>{data.label}</GroupBadgeStyles>
+        <GroupBadgeStyles>{data.options.length}</GroupBadgeStyles>
+      </GroupStyles>
+    );
   };
 
   const {
@@ -139,7 +138,9 @@ const TimeReportWrapper: FunctionComponent<TimeReportWrapperProps> = props => {
           />
         ) : (
           <Fragment>
-            <SummaryWrapper>Total: {Math.round(total.total * 100) / 100}h</SummaryWrapper>
+            <SummaryWrapper>
+              Total: {Math.round(total.total * 100) / 100}h
+            </SummaryWrapper>
             <FieldWrapper>
               {total.rowTotals.map((totalRow, index) => (
                 <TextWrapperSummary key={index}>
@@ -150,7 +151,20 @@ const TimeReportWrapper: FunctionComponent<TimeReportWrapperProps> = props => {
           </Fragment>
         )}
       </SummaryRow>
-      <ActivityRow lastSaved={lastSaved}>
+      <ActivityRow
+        lastSaved={
+          lastSaved || (timeReportRows.length === 0 && !timeReportLoading)
+        }
+      >
+        {timeReportRows.length === 0 && !timeReportLoading ? (
+          <Button
+            onSubmit={props.getRowsFromPreviousWeek}
+            text="Copy rows from previous week"
+            type="button"
+            loading={props.previousWeekRowLoading}
+            buttonType="Create"
+          />
+        ) : null}
         {lastSaved && (
           <LastSaved>
             Last saved <LastSavedTimeStamp>{lastSaved}</LastSavedTimeStamp>
@@ -188,7 +202,7 @@ const ActivityRow = styled(Row)`
   padding-right: 0;
   padding-left: 0;
   justify-content: ${(props: ActivityRowProps) =>
-  props.lastSaved ? "space-between" : "flex-end"};
+    props.lastSaved ? "space-between" : "flex-end"};
   button${ButtonItem} {
     margin: 0;
   }

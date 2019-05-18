@@ -39,7 +39,7 @@ import {
   TimeReportSummary
 } from "../../types/types";
 import _ from "lodash";
-import {toast} from "react-toastify";
+import { toast } from "react-toastify";
 
 const Time: FunctionComponent = () => {
   const authContext = useContext(AuthContext);
@@ -57,6 +57,7 @@ const Time: FunctionComponent = () => {
   const [lastSaved, setLastSaved] = useState("");
   const [timeReportLoading, setTimeReportLoading] = useState(false);
   const [rowIsSaved, setRowIsSaved] = useState(true);
+  const [previousWeekRowLoading, setPreviousWeekRowLoading] = useState(false);
 
   useEffect(() => {
     document.title = "Report Time";
@@ -112,6 +113,7 @@ const Time: FunctionComponent = () => {
     if (typeof authContext === "boolean" || authContext.uid === undefined) {
       return;
     }
+    setLastSaved("");
     setTimeReportLoading(true);
     if (direction === "prev") {
       const newSelectedDate: Date = subDays(selectedDate, 7);
@@ -266,7 +268,7 @@ const Time: FunctionComponent = () => {
         return activityList.companyId === activity.companyId;
       }
     );
-    if (activitySelectOptions.length > 0) {
+    if (activitySelectOptions.length > 0 && index > -1) {
       setActivitySelectOptions(
         produce(activitySelectOptions, draft => {
           draft[index].options.push(activity);
@@ -274,6 +276,7 @@ const Time: FunctionComponent = () => {
       );
     } else {
       setActivitySelectOptions([
+        ...activitySelectOptions,
         {
           label: activity.companyName,
           companyId: activity.companyId,
@@ -304,8 +307,8 @@ const Time: FunctionComponent = () => {
       const newTimeReportRows: TimeReport[] = _.cloneDeep(timeReportRows);
       _.remove(newTimeReportRows, (timeReportItem: TimeReport) => {
         return (
-            timeReportItem.companyId === timeReport.companyId &&
-            timeReportItem.activityId === timeReport.activityId
+          timeReportItem.companyId === timeReport.companyId &&
+          timeReportItem.activityId === timeReport.activityId
         );
       });
       setTimeReportRows(newTimeReportRows);
@@ -319,12 +322,11 @@ const Time: FunctionComponent = () => {
         });
       }
       if (response !== "") {
-        toast.success(response)
+        toast.success(response);
       }
     } else {
       toast.error(response);
     }
-
   };
 
   const saveRows = async (): Promise<void> => {
@@ -368,7 +370,7 @@ const Time: FunctionComponent = () => {
             setLastSaved(format(new Date(), timeStampFormat));
             setRowIsSaved(true);
           } else {
-            toast.error(savedRows)
+            toast.error(savedRows);
           }
         }
       } catch (error) {
@@ -410,6 +412,56 @@ const Time: FunctionComponent = () => {
     setActivitySelectOptions(optionList);
   };
 
+  const clearAllTimeReportHours = (timeReports: TimeReport[]): TimeReport[] => {
+    _.forEach(timeReports, timeReportRow => {
+      timeReportRow.id = "";
+      timeReportRow.date = selectedDate;
+      timeReportRow.prettyDate = format(selectedDate, timeReportDateFormat);
+      _.forEach(timeReportRow.timeReportRows, (timeReportCell, index) => {
+        timeReportCell.hours = "";
+        timeReportCell.date = addDays(selectedDate, index);
+        timeReportCell.prettyDate = format(
+          addDays(selectedDate, index),
+          timeReportDateFormat
+        );
+      });
+    });
+    return timeReports;
+  };
+
+  const getRowsFromPreviousWeek = async (): Promise<void> => {
+    if (typeof authContext === "boolean" || authContext.uid === undefined) {
+      return;
+    }
+    setPreviousWeekRowLoading(true);
+    const previousWeekStartDate = format(
+      subDays(selectedDate, 7),
+      timeReportDateFormat
+    );
+    let lastWeekRows:
+      | TimeReport[]
+      | string = await getTimeReportsByDateAndUserId(
+      previousWeekStartDate,
+      authContext.uid
+    );
+    if (typeof lastWeekRows !== "string") {
+      lastWeekRows = clearAllTimeReportHours(lastWeekRows);
+      setTimeReportRows(lastWeekRows);
+      const userActivities:
+        | ActivityCompanySelectOption[]
+        | string = await getAllAssignedActivities();
+      if (typeof userActivities !== "string") {
+        removeActivityFromCombobox(
+          undefined,
+          undefined,
+          lastWeekRows,
+          userActivities
+        );
+      }
+    }
+    setPreviousWeekRowLoading(false);
+  };
+
   return (
     <ContentSection>
       <TimeReportWrapper
@@ -427,6 +479,8 @@ const Time: FunctionComponent = () => {
         deleteRow={deleteRow}
         saveSingleRow={saveSingleRow}
         onDateSelect={onDateSelect}
+        getRowsFromPreviousWeek={getRowsFromPreviousWeek}
+        previousWeekRowLoading={previousWeekRowLoading}
       />
     </ContentSection>
   );
