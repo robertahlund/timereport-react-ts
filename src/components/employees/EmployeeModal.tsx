@@ -18,7 +18,7 @@ import {initialEmployeeFormState} from "../../constants/employeeConstants";
 import {validateEmployeeForm} from "../../utilities/validations/validateEmployeeForm";
 import {getCompanies} from "../../api/companyApi";
 import _ from "lodash";
-import {useSpring} from "react-spring";
+import {animated, useSpring} from "react-spring";
 import {modalAnimation} from "../../constants/generalConstants";
 
 interface EmployeeModalProps {
@@ -256,7 +256,7 @@ const ModalBackground = styled.div`
   z-index: 1;
 `;
 
-const ModalContent = styled.div`
+const ModalContent = styled(animated.div)`
   border-radius: 3px;
   background-color: #fff;
 `;
