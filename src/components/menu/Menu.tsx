@@ -28,10 +28,16 @@ const Menu: FunctionComponent<MenuProps> = props => {
               <NavLink to="/time" activeClassName="active">
                 <MenuItem text="Time"/>
               </NavLink>
+              <NavLink to="/expenses" activeClassName="active">
+                <MenuItem text="Expenses"/>
+              </NavLink>
               {typeof authContext === 'object' && authContext.isAdmin ? (
                 <Fragment>
                   <NavLink to="/summary" activeClassName="active">
                     <MenuItem text="Time Summary"/>
+                  </NavLink>
+                  <NavLink to="/expensecategories" activeClassName="active">
+                    <MenuItem text="Expense categories"/>
                   </NavLink>
                   <NavLink to="/activities" activeClassName="active">
                     <MenuItem text="Activities"/>
