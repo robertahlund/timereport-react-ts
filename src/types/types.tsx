@@ -76,6 +76,11 @@ export interface CompanySort {
   order: Order;
 }
 
+export interface ExpenseCategorySort {
+  column: "name";
+  order: Order;
+}
+
 export interface Activity {
   id: string;
   name: string;
@@ -180,4 +185,46 @@ export interface TimeReportRowSummaryDetail {
   companyName: string;
   hours: number;
   formattedDate: string;
+}
+
+export interface ExpenseCategory {
+  id: string;
+  name: string;
+}
+
+export interface Expense {
+  id: string;
+  userId: string;
+  expenseCategoryId: string;
+  amount: number;
+  vat: number;
+  note: string;
+  receiptUrl: string;
+}
+
+export interface ExpenseListItem extends Expense {
+  username: string;
+  expenseCategoryName: string;
+}
+
+export interface ExpenseCategoryFormValue {
+  id: string;
+  valid: boolean;
+  name: FormValue;
+}
+
+export interface ExpenseFormValue {
+  id: string;
+  userId: string;
+  valid: boolean;
+  expenseCategoryId: string;
+  amount: FormValue;
+  vat: FormValue;
+  note: FormValue;
+  receiptUrl: string;
+}
+
+export interface ExpenseSort {
+  column: "username";
+  order: Order;
 }

@@ -1,6 +1,5 @@
-import React, { ChangeEvent, Fragment, FunctionComponent } from "react";
+import React, { ChangeEvent, FunctionComponent } from "react";
 import styled from "styled-components";
-import { TimeReport } from "../../types/types";
 
 interface InputProps {
   value?: string;

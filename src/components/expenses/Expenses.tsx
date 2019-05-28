@@ -1,20 +1,20 @@
 import React, {Fragment, FunctionComponent, useEffect} from "react";
-import ExpenseCategoriesList from "./ExpenseCategoriesList";
+import ExpenseList from "./ExpenseList";
 import {ContentSection} from "../employees/Employees";
 
-const ExpenseCategories: FunctionComponent = () => {
+const Expenses: FunctionComponent = () => {
 
   useEffect(() => {
-    document.title = "Expense categories";
+    document.title = "Expenses";
   }, []);
 
   return (
     <Fragment>
       <ContentSection>
-        <ExpenseCategoriesList/>
+        <ExpenseList/>
       </ContentSection>
     </Fragment>
   );
 };
 
-export default ExpenseCategories;
+export default Expenses;

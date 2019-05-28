@@ -15,6 +15,7 @@ import {AuthContextProvider} from "./context/authentication/authenticationContex
 import {checkIfUserInformationHasChanged, checkIfUserIsInactive, getEmployeeById} from "./api/employeeApi";
 import {AuthObject} from "./types/types";
 import ModalPortal from "./components/general/ModalPortal";
+import {withRouter} from "react-router";
 
 interface AppState {
   auth: AuthObject | boolean;

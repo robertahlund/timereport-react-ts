@@ -208,7 +208,7 @@ export const updateTimeReportByActivityId = async (
     const db = firebase.firestore();
     await db
       .collection("timeReports")
-      .where("activityId", "==", activityId)
+      .where("expenseId", "==", activityId)
       .get()
       .then(documents => {
         documents.forEach(async doc => {

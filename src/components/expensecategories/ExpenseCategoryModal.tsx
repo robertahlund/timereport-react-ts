@@ -14,85 +14,81 @@ import {
   Section
 } from "../account/MyAccountModal";
 import LoadingIcon from "../../icons/LoadingIcon";
-import ActivityForm from "./ActivityForm";
+import ExpenseCategoryForm from "./ExpenseCategoryForm";
 import { toast } from "react-toastify";
-import styled from "styled-components";
+import { ExpenseCategory, ExpenseCategoryFormValue } from "../../types/types";
+import { useSpring } from "react-spring";
+import { modalAnimation } from "../../constants/generalConstants";
+import { initialExpenseCategoryForm } from "../../constants/expenseConstants";
 import {
-  createActivity,
-  deleteActivity,
-  getActivityById,
-  updateActivity
-} from "../../api/activityApi";
-import {
-  getCompaniesByActivityId,
-  updateCompanies
-} from "../../api/companyApi";
-import { ActivityFormValue, Company } from "../../types/types";
-import { updateTimeReportByActivityId } from "../../api/timeReportApi";
-import { initialActivityState } from "../../constants/activityConstants";
-import { validateActivityForm } from "../../utilities/validations/validateActivityForm";
-import {useSpring} from "react-spring";
-import {modalAnimation} from "../../constants/generalConstants";
+  createExpenseCategory,
+  deleteExpenseCategory,
+  getExpenseCategoryById,
+  updateExpenseCategory
+} from "../../api/expenseCategoryApi";
+import { validateExpenseCategoryForm } from "../../utilities/validations/validateExpenseCategoryForm";
+import { ButtonRow } from "../activities/ActivityModal";
+import _ from "lodash";
 
-export interface ButtonRowProps {
-  isNew: boolean;
-}
-
-interface ActivityModalProps {
+interface ExpenseCategoryModalProps {
   toggleModal: (event?: React.MouseEvent) => void;
-  activityId: string;
-  getAllActivities: () => Promise<void>;
+  expenseCategoryId: string;
+  getExpenseCategories: () => Promise<void>;
 }
 
-const ActivityModal: FunctionComponent<ActivityModalProps> = props => {
+const ExpenseCategoryModal: FunctionComponent<ExpenseCategoryModalProps> = props => {
   const [loading, setLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [modalLoading, setModalLoading] = useState(true);
 
-  const [activity, setActivity] = useState(initialActivityState);
-  const [originalActivity, setOriginalActivity] = useState(
-    initialActivityState
+  const [expenseCategory, setExpenseCategory] = useState(
+    initialExpenseCategoryForm
   );
-  const [isNew, setIsNew] = useState(props.activityId === "");
+  const [originalExpenseCategory, setOriginalExpenseCategory] = useState(
+    initialExpenseCategoryForm
+  );
+  const [isNew, setIsNew] = useState(props.expenseCategoryId === "");
 
   useEffect(() => {
     if (!isNew) {
       // noinspection JSIgnoredPromiseFromCall
-      _getActivityById();
+      _getExpenseCategoryById();
     }
   }, []);
 
-  const _getActivityById = async (): Promise<void> => {
-    const { activityId } = props;
-    const activityData = await getActivityById(activityId);
+  const _getExpenseCategoryById = async (): Promise<void> => {
+    const { expenseCategoryId } = props;
+    const expenseCategoryData:
+      | ExpenseCategory
+      | undefined = await getExpenseCategoryById(expenseCategoryId);
     setModalLoading(false);
-    if (typeof activityData !== "string") {
-      setActivity({
-        id: activityData.id,
+    if (!_.isNil(expenseCategoryId)) {
+      setExpenseCategory({
+        id: expenseCategoryData!.id,
         valid: true,
         name: {
           valid: true,
           validationMessage: "",
-          value: activityData.name
+          value: expenseCategoryData!.name
         }
       });
-      setOriginalActivity({
-        id: activityData.id,
+      setOriginalExpenseCategory({
+        id: expenseCategoryData!.id,
         valid: true,
         name: {
           valid: true,
           validationMessage: "",
-          value: activityData.name
+          value: expenseCategoryData!.name
         }
       });
     } else {
-      toast.error(activityData);
+      toast.error("Error retrieving expense category.");
     }
   };
 
   const onFormChange = (event: ChangeEvent<HTMLInputElement>): void => {
-    setActivity({
-      ...activity,
+    setExpenseCategory({
+      ...expenseCategory,
       [event.target.name]: {
         valid: true,
         validationMessage: "",
@@ -101,107 +97,58 @@ const ActivityModal: FunctionComponent<ActivityModalProps> = props => {
     });
   };
 
-  const updateActivityNameOnCompanies = (
-    companiesList: Company[],
-    activityId: string,
-    newActivityName: string
-  ): Company[] => {
-    companiesList.forEach(company => {
-      company.activities!.forEach(
-        activity =>
-          activity.value === activityId
-            ? (activity.label = newActivityName)
-            : null
-      );
+  const _updateExpenseCategory = async (): Promise<void> => {
+    await updateExpenseCategory({
+      id: expenseCategory.id,
+      name: expenseCategory.name.value
     });
-    return companiesList;
-  };
-
-  const onUpdateActivity = async (): Promise<void> => {
-    const companies = await getCompaniesByActivityId(activity.id);
-    if (typeof companies !== "string") {
-      const updatedCompaniesList = updateActivityNameOnCompanies(
-        companies,
-        activity.id,
-        activity.name.value
-      );
-      await updateCompanies(updatedCompaniesList);
-      await updateActivity({ id: activity.id, name: activity.name.value });
-      await updateTimeReportByActivityId(activity.id, activity.name.value);
-      setOriginalActivity(activity);
-    } else {
-      console.log(companies);
-    }
-  };
-
-  const onCreateActivity = async (): Promise<void> => {
-      const activityId: string = await createActivity({
-        id: activity.id,
-        name: activity.name.value
-      });
-      if (activityId !== "Error") {
-        toast.success(`Successfully created ${activity.name.value}!`);
-        setActivity({ ...activity, id: activityId });
-        setOriginalActivity({ ...activity, id: activityId });
-        setIsNew(false);
-        setModalLoading(false);
-      } else {
-        toast.error(activityId)
+    setOriginalExpenseCategory({
+      ...originalExpenseCategory,
+      name: {
+        ...originalExpenseCategory.name,
+        value: expenseCategory.name.value
       }
+    });
+  };
+
+  const _createExpenseCategory = async (): Promise<void> => {
+    const expenseCategoryId: string = await createExpenseCategory({
+      id: expenseCategory.id,
+      name: expenseCategory.name.value
+    });
+    toast.success(`Successfully created ${expenseCategory.name.value}!`);
+    setExpenseCategory({ ...expenseCategory, id: expenseCategoryId });
+    setOriginalExpenseCategory({ ...expenseCategory, id: expenseCategoryId });
+    setIsNew(false);
+    setModalLoading(false);
   };
 
   const onSubmit = async (): Promise<void> => {
-    const validatedForm: ActivityFormValue = {
-      ...validateActivityForm(activity)
+    const validatedForm: ExpenseCategoryFormValue = {
+      ...validateExpenseCategoryForm(expenseCategory)
     };
     if (!validatedForm.valid) {
-      console.log(validatedForm);
-      setActivity(validatedForm);
+      setExpenseCategory(validatedForm);
       return;
     }
     setLoading(true);
     if (isNew) {
-      await onCreateActivity();
+      await _createExpenseCategory();
     } else {
-      await onUpdateActivity();
+      await _updateExpenseCategory();
     }
     // noinspection JSIgnoredPromiseFromCall
-    props.getAllActivities();
+    props.getExpenseCategories();
     setLoading(false);
   };
 
-  const removeActivityFromCompaniesList = (
-    companiesList: Company[],
-    activityId: string
-  ): Company[] => {
-    let updatedCompaniesList: Company[] = [];
-    companiesList.forEach(company => {
-      company.activities = company.activities!.filter(
-        activity => activity.value !== activityId
-      );
-      updatedCompaniesList.push(company);
-    });
-    return updatedCompaniesList;
-  };
-
-  const onDeleteActivity = async (): Promise<void> => {
-      setDeleteLoading(true);
-      const companies = await getCompaniesByActivityId(activity.id);
-      if (typeof companies !== "string") {
-        const updatedCompaniesList = removeActivityFromCompaniesList(
-          companies,
-          activity.id
-        );
-        await updateCompanies(updatedCompaniesList);
-        await deleteActivity(activity.id);
-        toast.success(`Successfully deleted ${activity.name.value}.`);
-        props.toggleModal();
-        // noinspection JSIgnoredPromiseFromCall
-        props.getAllActivities();
-      } else {
-        toast.error(companies);
-        setDeleteLoading(false);
-      }
+  const _deleteExpenseCategory = async (): Promise<void> => {
+    setDeleteLoading(true);
+    await deleteExpenseCategory(expenseCategory.id);
+    toast.success(`Successfully deleted ${expenseCategory.name.value}.`);
+    props.toggleModal();
+    // noinspection JSIgnoredPromiseFromCall
+    props.getExpenseCategories();
   };
 
   const animation = useSpring(modalAnimation);
@@ -220,7 +167,9 @@ const ActivityModal: FunctionComponent<ActivityModalProps> = props => {
         <ModalContent style={animation}>
           <ModalHeader>
             <ModalTitle>
-              {isNew ? "Create new activity" : originalActivity.name.value}
+              {isNew
+                ? "Create new expense category"
+                : originalExpenseCategory.name.value}
             </ModalTitle>
             <CloseIcon
               color="#fff"
@@ -233,13 +182,16 @@ const ActivityModal: FunctionComponent<ActivityModalProps> = props => {
             />
           </ModalHeader>
           <Section>
-            <ActivityForm form={activity} onFormChange={onFormChange} />
+            <ExpenseCategoryForm
+              form={expenseCategory}
+              onFormChange={onFormChange}
+            />
             <ButtonRow isNew={isNew}>
               {!isNew && (
                 <Button
                   type="button"
                   text="Delete"
-                  onSubmit={onDeleteActivity}
+                  onSubmit={_deleteExpenseCategory}
                   buttonType="Delete"
                   loading={deleteLoading}
                 />
@@ -258,11 +210,4 @@ const ActivityModal: FunctionComponent<ActivityModalProps> = props => {
   );
 };
 
-export default ActivityModal;
-
-export const ButtonRow = styled.div`
-  display: flex;
-  justify-content: ${(props: ButtonRowProps) =>
-    props.isNew ? "flex-end" : "space-between"};
-  width: 100%;
-`;
+export default ExpenseCategoryModal;

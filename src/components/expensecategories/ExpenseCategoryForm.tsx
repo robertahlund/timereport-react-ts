@@ -1,14 +1,14 @@
 import React, { FunctionComponent, Fragment, ChangeEvent } from "react";
 import Input from "../general/Input";
 import { Row } from "../authentication/RegisterForm";
-import {ActivityFormValue} from "../../types/types";
+import {ExpenseCategoryFormValue} from "../../types/types";
 
 interface ActivityFormProps {
-  form: ActivityFormValue;
+  form: ExpenseCategoryFormValue;
   onFormChange: (event: ChangeEvent<HTMLInputElement>) => void;
 }
 
-const ActivityForm: FunctionComponent<ActivityFormProps> = props => {
+const ExpenseCategoryForm: FunctionComponent<ActivityFormProps> = props => {
   const { name } = props.form;
   return (
     <Fragment>
@@ -30,4 +30,4 @@ const ActivityForm: FunctionComponent<ActivityFormProps> = props => {
   );
 };
 
-export default ActivityForm;
+export default ExpenseCategoryForm;

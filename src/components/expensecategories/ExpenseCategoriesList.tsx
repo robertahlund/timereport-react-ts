@@ -5,63 +5,66 @@ import React, {
   useEffect,
   useState
 } from "react";
-import {PaddingRow} from "../authentication/LoginForm";
+import { PaddingRow } from "../authentication/LoginForm";
 import Input from "../general/Input";
 import Button from "../general/Button";
-import {ListHeader, ListRow} from "../employees/EmployeeList";
+import { ListHeader, ListRow } from "../employees/EmployeeList";
 import LoadingIcon from "../../icons/LoadingIcon";
-import {FlexContainer} from "../companies/CompanyList";
-import {Activity, Order} from "../../types/types";
-import ActivityModal from "./ActivityModal";
-import {getActivities} from "../../api/activityApi";
+import { FlexContainer } from "../companies/CompanyList";
+import {
+  ExpenseCategory,
+  ExpenseCategorySort
+} from "../../types/types";
+import ExpenseCategoryModal from "./ExpenseCategoryModal";
 import ModalPortal from "../general/ModalPortal";
+import { getExpenseCategories } from "../../api/expenseCategoryApi";
+import _ from "lodash";
 
-
-type Column = "name";
-
-interface Sort {
-  column: Column;
-  order: Order;
-}
-
-const ActivitiesList: FunctionComponent = () => {
+const ExpenseCategoriesList: FunctionComponent = () => {
   const [searchValue, setSearchValue] = useState("");
-  const initialSortState: Sort = {
+  const initialSortState: ExpenseCategorySort = {
     column: "name",
     order: "asc"
   };
   const [sortMethod, setSortMethod] = useState(initialSortState);
   const [loading, setLoading] = useState(false);
-  const initialActivityListState: Activity[] = [];
-  const [activityList, setActivityList] = useState(initialActivityListState);
-  const [clonedActivityList, setClonedActivityList] = useState(
-    initialActivityListState
+  const initialExpenseCategoryListState: ExpenseCategory[] = [];
+  const [expenseCategoryList, setExpenseCategoryList] = useState(
+    initialExpenseCategoryListState
   );
-  const [showActivityModal, setShowActivityModal] = useState(false);
-  const [activityId, setActivityId] = useState("");
+  const [clonedExpenseCategoryList, setClonedExpenseCategoryList] = useState(
+    initialExpenseCategoryListState
+  );
+  const [showExpenseCategoryModal, setShowExpenseCategoryModal] = useState(
+    false
+  );
+  const [expenseCategoryId, setExpenseCategoryId] = useState("");
 
   const handleSearchChange = (event: ChangeEvent<HTMLInputElement>): void => {
-    const {target} = event;
+    const { target } = event;
     setSearchValue(target.value);
     if (target.value === "") {
-      setActivityList(clonedActivityList);
+      setExpenseCategoryList(clonedExpenseCategoryList);
       return;
     }
-    let searchList: Activity[];
-    searchList = clonedActivityList.filter(
-      activity =>
-        activity.name.toLowerCase().indexOf(target.value.toLowerCase()) > -1
+    let searchList: ExpenseCategory[];
+    searchList = clonedExpenseCategoryList.filter(
+      expenseCategory =>
+        expenseCategory.name.toLowerCase().indexOf(target.value.toLowerCase()) >
+        -1
     );
-    setActivityList(searchList);
+    setExpenseCategoryList(searchList);
   };
 
-  const getAllActivities = async (): Promise<void> => {
+  const getAllExpenseCategories = async (): Promise<void> => {
     setLoading(true);
     try {
-      const activityData = await getActivities();
-      if (typeof activityData !== "string") {
-        setActivityList(activityData);
-        setClonedActivityList(activityData);
+      const expenseCategoryData:
+        | ExpenseCategory[]
+        | undefined = await getExpenseCategories();
+      if (expenseCategoryData) {
+        setExpenseCategoryList(expenseCategoryData);
+        setClonedExpenseCategoryList(expenseCategoryData);
         setLoading(false);
       }
     } catch (error) {
@@ -72,10 +75,10 @@ const ActivitiesList: FunctionComponent = () => {
 
   useEffect(() => {
     // noinspection JSIgnoredPromiseFromCall
-    getAllActivities();
+    getAllExpenseCategories();
   }, []);
 
-  const sortData = (sortMethod: Sort) => {
+  const sortData = (sortMethod: ExpenseCategorySort) => {
     setSortMethod(sortMethod);
     if (sortMethod.column === "name") {
       if (sortMethod.order === "asc") {
@@ -86,9 +89,9 @@ const ActivitiesList: FunctionComponent = () => {
     }
   };
 
-  const sortAsc = (column: Column): void => {
-    const listToSort: Activity[] = JSON.parse(JSON.stringify(activityList));
-    listToSort.sort((a: Activity, b: Activity): number => {
+  const sortAsc = (column: "name"): void => {
+    const listToSort: ExpenseCategory[] = _.cloneDeep(expenseCategoryList);
+    listToSort.sort((a: ExpenseCategory, b: ExpenseCategory): number => {
       const propA = a[column].toLowerCase();
       const propB = b[column].toLowerCase();
       if (propA < propB) {
@@ -99,13 +102,13 @@ const ActivitiesList: FunctionComponent = () => {
       }
       return 0;
     });
-    setActivityList(listToSort);
-    setClonedActivityList(listToSort);
+    setExpenseCategoryList(listToSort);
+    setClonedExpenseCategoryList(listToSort);
   };
 
-  const sortDesc = (column: Column): void => {
-    const listToSort: Activity[] = JSON.parse(JSON.stringify(activityList));
-    listToSort.sort((a: Activity, b: Activity): number => {
+  const sortDesc = (column: "name"): void => {
+    const listToSort: ExpenseCategory[] = _.cloneDeep(expenseCategoryList);
+    listToSort.sort((a: ExpenseCategory, b: ExpenseCategory): number => {
       const propA = a[column].toLowerCase();
       const propB = b[column].toLowerCase();
       if (propB < propA) {
@@ -116,22 +119,22 @@ const ActivitiesList: FunctionComponent = () => {
       }
       return 0;
     });
-    setActivityList(listToSort);
-    setClonedActivityList(listToSort);
+    setExpenseCategoryList(listToSort);
+    setClonedExpenseCategoryList(listToSort);
   };
 
-  const toggleActivityModal = (event?: React.MouseEvent): void => {
+  const toggleExpenseCategoryModal = (event?: React.MouseEvent): void => {
     if (event) {
-      const {target, currentTarget} = event;
+      const { target, currentTarget } = event;
       if (target === currentTarget) {
-        setShowActivityModal(!showActivityModal);
+        setShowExpenseCategoryModal(!showExpenseCategoryModal);
       }
-    } else setShowActivityModal(!showActivityModal);
+    } else setShowExpenseCategoryModal(!showExpenseCategoryModal);
   };
 
-  const selectActivity = (companyId: string): void => {
-    setActivityId(companyId);
-    toggleActivityModal();
+  const selectExpenseCategory = (expenseCategoryId: string): void => {
+    setExpenseCategoryId(expenseCategoryId);
+    toggleExpenseCategoryModal();
   };
 
   return (
@@ -148,8 +151,8 @@ const ActivitiesList: FunctionComponent = () => {
           />
           <Button
             type="button"
-            text="Add activity"
-            onSubmit={() => selectActivity("")}
+            text="Add expense category"
+            onSubmit={() => selectExpenseCategory("")}
           />
         </FlexContainer>
       </PaddingRow>
@@ -165,14 +168,14 @@ const ActivitiesList: FunctionComponent = () => {
           Name
         </span>
       </ListHeader>
-      {activityList.length > 0 && !loading ? (
-        activityList.map((activity: Activity) => {
+      {expenseCategoryList.length > 0 && !loading ? (
+        expenseCategoryList.map((expenseCategory: ExpenseCategory) => {
           return (
             <ListRow
-              key={activity.id}
-              onClick={() => selectActivity(activity.id)}
+              key={expenseCategory.id}
+              onClick={() => selectExpenseCategory(expenseCategory.id)}
             >
-              <span>{activity.name}</span>
+              <span>{expenseCategory.name}</span>
             </ListRow>
           );
         })
@@ -188,15 +191,15 @@ const ActivitiesList: FunctionComponent = () => {
         </ListRow>
       ) : (
         <ListRow>
-          <span>No activites.</span>
+          <span>No expense categories.</span>
         </ListRow>
       )}
-      {showActivityModal && (
+      {showExpenseCategoryModal && (
         <ModalPortal>
-          <ActivityModal
-            activityId={activityId}
-            toggleModal={toggleActivityModal}
-            getAllActivities={getAllActivities}
+          <ExpenseCategoryModal
+            expenseCategoryId={expenseCategoryId}
+            toggleModal={toggleExpenseCategoryModal}
+            getExpenseCategories={getAllExpenseCategories}
           />
         </ModalPortal>
       )}
@@ -204,4 +207,4 @@ const ActivitiesList: FunctionComponent = () => {
   );
 };
 
-export default ActivitiesList;
+export default ExpenseCategoriesList;

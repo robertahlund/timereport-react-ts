@@ -7,8 +7,10 @@ import Employees from "../employees/Employees";
 import ForgotPassword from "../authentication/ForgotPassword";
 import Register from "../authentication/Register";
 import Activities from "../activities/Activities";
-import {AuthContext} from "../../context/authentication/authenticationContext";
+import { AuthContext } from "../../context/authentication/authenticationContext";
 import TimeSummary from "../summary/TimeSummary";
+import ExpenseCategories from "../expensecategories/ExpenseCategories";
+import Expenses from "../expenses/Expenses";
 
 const Routes: FunctionComponent = () => {
   const authContext = useContext(AuthContext);
@@ -21,11 +23,15 @@ const Routes: FunctionComponent = () => {
           authContext ? <Redirect to="/time" /> : <Redirect to="/login" />
         }
       />
-      {/*TODO: should point to /time*/}
       <Route
         exact
         path="/time"
         render={(): ReactNode => (authContext ? <Time /> : <Redirect to="/" />)}
+      />
+      <Route
+        exact
+        path="/expenses"
+        render={(): ReactNode => (authContext ? <Expenses /> : <Redirect to="/" />)}
       />
       <Route
         exact
@@ -53,19 +59,32 @@ const Routes: FunctionComponent = () => {
           )
         }
       />
-        <Route
-            exact
-            path="/activities"
-            render={(): ReactNode =>
-                authContext &&
-                typeof authContext === "object" &&
-                authContext.isAdmin ? (
-                    <Activities />
-                ) : (
-                    <Redirect to="/" />
-                )
-            }
-        />
+      <Route
+        exact
+        path="/expensecategories"
+        render={(): ReactNode =>
+          authContext &&
+          typeof authContext === "object" &&
+          authContext.isAdmin ? (
+            <ExpenseCategories />
+          ) : (
+            <Redirect to="/" />
+          )
+        }
+      />
+      <Route
+        exact
+        path="/activities"
+        render={(): ReactNode =>
+          authContext &&
+          typeof authContext === "object" &&
+          authContext.isAdmin ? (
+            <Activities />
+          ) : (
+            <Redirect to="/" />
+          )
+        }
+      />
       <Route
         exact
         path="/employees"
