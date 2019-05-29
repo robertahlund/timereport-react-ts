@@ -199,6 +199,7 @@ export interface Expense {
   amount: number;
   vat: number;
   note: string;
+  filename: string;
   receiptUrl: string;
 }
 
@@ -221,6 +222,7 @@ export interface ExpenseFormValue {
   amount: FormValue;
   vat: FormValue;
   note: FormValue;
+  filename: string;
   receiptUrl: string;
 }
 

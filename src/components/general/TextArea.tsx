@@ -1,77 +1,54 @@
 import React, { ChangeEvent, FunctionComponent } from "react";
 import styled from "styled-components";
 
-interface InputProps {
+interface TextAreaProps {
   value?: string;
   labelValue?: string;
   type: "number" | "text" | "password";
   name?: string;
   onFormChange: (
-    event: ChangeEvent<HTMLInputElement>,
-    timeReportIndex?: number,
-    timeReportRowIndex?: number
+    event: ChangeEvent<any>
   ) => void;
   width: string;
   textAlign?: "left" | "right";
-  timeReportIndex?: number;
-  timeReportRowIndex?: number;
   fontWeight?: string;
-  saveSingleRow?: (
-    timeReportIndex?: number,
-    timeReportRowIndex?: number
-  ) => Promise<void>;
   valid?: boolean;
   validationMessage?: string;
 }
 
-interface InputFieldProps {
+interface TextAreaFieldProps {
   width: string;
   textAlign?: string;
   fontWeight?: string;
   valid?: boolean;
 }
 
-const Input: FunctionComponent<InputProps> = props => {
+const TextArea: FunctionComponent<TextAreaProps> = props => {
   return (
     <RelativeContainer>
       {props.labelValue && (
         <Label htmlFor={props.name}>{props.labelValue}</Label>
       )}
-      <InputField
+      <TextAreaField
         width={props.width}
         id={props.name}
         name={props.name}
         value={props.value}
-        type={props.type}
         valid={props.valid === undefined ? true : props.valid}
-        onChange={(event: ChangeEvent<HTMLInputElement>) =>
-          props.onFormChange(
-            event,
-            props.timeReportIndex,
-            props.timeReportRowIndex
-          )
-        }
+        onChange={props.onFormChange}
         autoComplete="off"
         textAlign={props.textAlign}
         fontWeight={props.fontWeight}
-        onBlur={() =>
-          props.saveSingleRow
-            ? props.saveSingleRow(
-                props.timeReportIndex,
-                props.timeReportRowIndex
-              )
-            : null
-        }
       />
       {!props.valid &&
-        props.valid !== undefined && (
-          <ErrorMessage>{props.validationMessage}</ErrorMessage>
-        )}
+      props.valid !== undefined && (
+        <ErrorMessage>{props.validationMessage}</ErrorMessage>
+      )}
     </RelativeContainer>
   );
 };
 
-export default Input;
+export default TextArea;
 
 export const Label = styled.label`
   display: block;
@@ -81,18 +58,18 @@ export const Label = styled.label`
   cursor: pointer;
 `;
 
-const InputField = styled.input`
+const TextAreaField = styled.textarea`
   background-color: #fbfbfb;
   border-radius: 3px;
-  border: ${(props: InputFieldProps) =>
-    props.valid ? "1px solid #f1f1f1;" : "1px solid #FE9161;"}
+  border: ${(props: TextAreaFieldProps) =>
+  props.valid ? "1px solid #f1f1f1;" : "1px solid #FE9161;"}
   padding: 10px;
   font-size: 15px;
-  width: ${(props: InputFieldProps) => props.width};
-  text-align: ${(props: InputFieldProps) =>
-    props.textAlign ? props.textAlign : "left"};
-  font-weight: ${(props: InputFieldProps) =>
-    props.fontWeight ? props.fontWeight : 400};
+  width: ${(props: TextAreaFieldProps) => props.width};
+  text-align: ${(props: TextAreaFieldProps) =>
+  props.textAlign ? props.textAlign : "left"};
+  font-weight: ${(props: TextAreaFieldProps) =>
+  props.fontWeight ? props.fontWeight : 400};
   font-family: 'Roboto', sans-serif;
 `;
 

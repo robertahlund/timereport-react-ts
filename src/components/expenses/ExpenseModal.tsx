@@ -29,6 +29,7 @@ import {
   updateExpense
 } from "../../api/expenseApi";
 import { validateExpenseForm } from "../../utilities/validations/validateExpenseForm";
+import firebase from "../../config/firebaseConfig"
 
 interface ExpenseModalProps {
   toggleModal: (event?: React.MouseEvent) => void;
@@ -43,6 +44,8 @@ const ExpenseModal: FunctionComponent<ExpenseModalProps> = props => {
 
   const [expense, setExpense] = useState(initialExpenseForm);
   const [isNew, setIsNew] = useState(props.expenseId === "");
+
+  const uploadInput: React.RefObject<HTMLInputElement> = React.createRef();
 
   useEffect(() => {
     if (!isNew) {
@@ -123,6 +126,26 @@ const ExpenseModal: FunctionComponent<ExpenseModalProps> = props => {
   };
 
   const onSubmit = async (): Promise<void> => {
+
+    if (!_.isNil(uploadInput.current) && !_.isNil(uploadInput.current.files)) {
+      const file: File = uploadInput.current.files[0];
+      console.log(file)
+      const storageService = firebase.storage();
+      const storageRef = storageService.ref();
+      const uploadProcess = storageRef.child(`receipts/${file.name}`)
+        .put(file);
+      uploadProcess.on('state_changed', snapshot => {
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        console.log(`Upload is ${progress}% done`)
+      }, error => {
+        console.log(error)
+      }, () => {
+        uploadProcess.snapshot.ref.getDownloadURL().then(url => {
+          console.log(url);
+          toast.success(`Upload successful, visit ${url} to view it.`, {autoClose: false})
+        })
+      })
+    }
     const validatedForm: ExpenseFormValue = {
       ...validateExpenseForm(expense)
     };
@@ -179,7 +202,7 @@ const ExpenseModal: FunctionComponent<ExpenseModalProps> = props => {
             />
           </ModalHeader>
           <Section>
-            <ExpenseForm form={expense} onFormChange={onFormChange} />
+            <ExpenseForm form={expense} onFormChange={onFormChange} uploadInput={uploadInput}/>
             <ButtonRow isNew={isNew}>
               {!isNew && (
                 <Button
