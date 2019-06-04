@@ -12,7 +12,7 @@ interface RegisterFormProps {
   checked: boolean;
 }
 
-interface RowProps {
+export interface RowProps {
   direction: string;
 }
 

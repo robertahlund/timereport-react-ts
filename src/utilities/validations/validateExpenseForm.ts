@@ -8,5 +8,6 @@ export const validateExpenseForm = (
     form.vat = validateInputField(form.vat);
     form.valid = form.amount.valid && form.vat.valid;
     //TODO should validate upladed file aswell
+    //TODO should validate input fields as numbers
     return form;
 };

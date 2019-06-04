@@ -8,11 +8,9 @@ import WeekRow, { TextWrapper } from "./WeekRow";
 import Select from "react-select";
 import { ValueType } from "react-select/lib/types";
 import Button, { ButtonItem } from "../general/Button";
-import ReactCSSTransitionGroup from "react-addons-css-transition-group";
 import TimeReportLoading from "./TimeReportLoading";
 import LoadingIcon from "../../icons/LoadingIcon";
 import {
-  ActivityCompanySelectOption,
   DateSelectorValue,
   GroupedActivityOptions,
   TimeReport,
@@ -49,35 +47,7 @@ interface TimeReportWrapperProps {
   previousWeekRowLoading: boolean;
 }
 
-const GroupBadgeStyles = styled.span`
-  color: #393e41;
-  font-size: 14px;
-  margin: 0;
-  padding: 5px 0;
-`;
-
-const GroupStyles = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-weight: 500;
-  ${GroupBadgeStyles}:last-child {
-    background-color: #fec861;
-    padding: 5px;
-    border-radius: 3px;
-  }
-`;
-
 const TimeReportWrapper: FunctionComponent<TimeReportWrapperProps> = props => {
-  const formatGroupLabel = (data: any) => {
-    return (
-      <GroupStyles>
-        <GroupBadgeStyles>{data.label}</GroupBadgeStyles>
-        <GroupBadgeStyles>{data.options.length}</GroupBadgeStyles>
-      </GroupStyles>
-    );
-  };
-
   const {
     timeReportRows,
     selectOptions,
@@ -87,6 +57,16 @@ const TimeReportWrapper: FunctionComponent<TimeReportWrapperProps> = props => {
     timeReportLoading,
     selectedDate
   } = props;
+
+  const formatGroupLabel = (data: any) => {
+    return (
+      <GroupStyles>
+        <GroupBadgeStyles>{data.label}</GroupBadgeStyles>
+        <GroupBadgeStyles>{data.options.length}</GroupBadgeStyles>
+      </GroupStyles>
+    );
+  };
+
   return (
     <Fragment>
       <TimeReportListHeader>
@@ -99,34 +79,28 @@ const TimeReportWrapper: FunctionComponent<TimeReportWrapperProps> = props => {
         />
       </TimeReportListHeader>
       <WeekDateRow selectedDate={props.selectedDate} />
-      <ReactCSSTransitionGroup
-        transitionName="modal-transition"
-        transitionEnterTimeout={0}
-        transitionLeaveTimeout={0}
-      >
-        {timeReportLoading ? (
-          <TimeReportLoading />
-        ) : (
-          <Fragment>
-            {timeReportRows.length > 0 ? (
-              <Fragment>
-                {timeReportRows.map((timeReport, index) => (
-                  <WeekRow
-                    timeReport={timeReport}
-                    key={index}
-                    timeReportIndex={index}
-                    onTimeReportRowChange={props.onTimeReportRowChange}
-                    deleteRow={props.deleteRow}
-                    saveSingleRow={props.saveSingleRow}
-                  />
-                ))}
-              </Fragment>
-            ) : (
-              <EmptyRow>No data for this week.</EmptyRow>
-            )}
-          </Fragment>
-        )}
-      </ReactCSSTransitionGroup>
+      {timeReportLoading ? (
+        <TimeReportLoading />
+      ) : (
+        <Fragment>
+          {timeReportRows.length > 0 ? (
+            <Fragment>
+              {timeReportRows.map((timeReport, index) => (
+                <WeekRow
+                  timeReport={timeReport}
+                  key={index}
+                  timeReportIndex={index}
+                  onTimeReportRowChange={props.onTimeReportRowChange}
+                  deleteRow={props.deleteRow}
+                  saveSingleRow={props.saveSingleRow}
+                />
+              ))}
+            </Fragment>
+          ) : (
+            <EmptyRow>No data for this week.</EmptyRow>
+          )}
+        </Fragment>
+      )}
       <SummaryRow>
         {timeReportLoading ? (
           <LoadingIcon
@@ -231,4 +205,23 @@ const LastSavedTimeStamp = styled.span`
 
 const EmptyRow = styled(SummaryRowWhite)`
   font-size: 15px;
+`;
+
+export const GroupBadgeStyles = styled.span`
+  color: #393e41;
+  font-size: 14px;
+  margin: 0;
+  padding: 5px 0;
+`;
+
+export const GroupStyles = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 500;
+  ${GroupBadgeStyles}:last-child {
+    background-color: #fec861;
+    padding: 5px;
+    border-radius: 3px;
+  }
 `;

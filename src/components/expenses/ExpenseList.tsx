@@ -51,12 +51,13 @@ const ExpenseList: FunctionComponent = () => {
   const _getExpenses = async (): Promise<void> => {
     setLoading(true);
     try {
-      const expenseCategoryData:
+      const expenseData:
         | ExpenseListItem[]
         | undefined = await getExpenses();
-      if (expenseCategoryData) {
-        setExpenseList(expenseCategoryData);
-        setClonedExpenseList(expenseCategoryData);
+      if (expenseData) {
+        console.log(expenseData)
+        setExpenseList(expenseData);
+        setClonedExpenseList(expenseData);
         setLoading(false);
       }
     } catch (error) {
@@ -143,7 +144,7 @@ const ExpenseList: FunctionComponent = () => {
           />
           <Button
             type="button"
-            text="Add expense category"
+            text="Add expense"
             onSubmit={() => selectExpense("")}
           />
         </FlexContainer>

@@ -3,11 +3,13 @@ import {
   AuthObject,
   Expense,
   ExpenseCategory,
+  ExpenseFileUpload,
   ExpenseListItem
 } from "../types/types";
 import { getExpenseCategories } from "./expenseCategoryApi";
 import _ from "lodash";
 import { getEmployees } from "./employeeApi";
+import uuidv4 from "uuid";
 
 const db = firebase.firestore();
 
@@ -30,6 +32,31 @@ export const createExpense = async (expense: Expense): Promise<string> => {
   } catch (error) {
     console.log(error);
     return new Promise<string>(reject => reject("Error creating expense"));
+  }
+};
+
+export const uploadExpenseFile = async (
+  file: File
+): Promise<ExpenseFileUpload | undefined> => {
+  try {
+    console.log(file);
+    const storageService = firebase.storage();
+    const storageRef = storageService.ref();
+    let fileUrl: string = "";
+    const filename: string = file.name.split(".")[0] + uuidv4() + "." + file.name.split(".")[1];
+    await storageRef
+      .child(`receipts/${filename}`)
+      .put(file)
+      .then(async snapshot => {
+        await snapshot.ref.getDownloadURL().then(url => {
+          fileUrl = url;
+        });
+      });
+    console.log("resolve time");
+    return Promise.resolve({ url: fileUrl, filename});
+  } catch (error) {
+    console.log(error);
+    return Promise.reject(new Error("Error uploading file"));
   }
 };
 
@@ -108,14 +135,17 @@ export const getExpenses = async (): Promise<ExpenseListItem[] | undefined> => {
             if (expenseCategoryName) {
               expenseListItem.expenseCategoryName = expenseCategoryName;
             } else expenseListItem.expenseCategoryName = "Deleted Category";
-              const username: string | undefined = _.find(
-                  users,
-                  (user: AuthObject) =>
-                      user.uid === expenseListItem.userId
-              )!.firstName;
-              if (username) {
-                  expenseListItem.username = username;
-              } else expenseListItem.username = "Deleted User";
+            const firstName: string | undefined = _.find(
+              users,
+              (user: AuthObject) => user.uid === expenseListItem.userId
+            )!.firstName;
+            const lastName: string | undefined = _.find(
+                users,
+                (user: AuthObject) => user.uid === expenseListItem.userId
+            )!.lastName;
+            if (firstName && lastName) {
+              expenseListItem.username = `${firstName} ${lastName}`;
+            } else expenseListItem.username = "Deleted User";
             expenses.push(expenseListItem);
           });
         });

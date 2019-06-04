@@ -1,4 +1,8 @@
-import {ExpenseCategoryFormValue, ExpenseFormValue, FormValue} from "../types/types";
+import {
+    ExpenseCategoryFormValue,
+    ExpenseCategorySelectOptions,
+    ExpenseFormValue,
+} from "../types/types";
 
 export const initialExpenseCategoryForm: ExpenseCategoryFormValue = {
     id: "",
@@ -30,5 +34,9 @@ export const initialExpenseForm: ExpenseFormValue = {
         value: "",
         valid: true
     },
+    filename: "",
     receiptUrl: ""
 };
+
+export const initialExpenseCategoryOptions: ExpenseCategorySelectOptions[] = [];
+export const initialSelectedExpenseCategory: ExpenseCategorySelectOptions | null = null;

@@ -230,3 +230,13 @@ export interface ExpenseSort {
   column: "username";
   order: Order;
 }
+
+export interface ExpenseFileUpload {
+  url: string;
+  filename: string;
+}
+
+export interface ExpenseCategorySelectOptions {
+  label: string;
+  value: string;
+}

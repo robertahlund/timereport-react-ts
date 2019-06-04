@@ -13,6 +13,7 @@
     "@types/react-router-dom": "^4.3.2",
     "@types/react-select": "^2.0.17",
     "@types/styled-components": "^4.1.14",
+    "@types/uuid": "^3.4.4",
     "date-fns": "^2.0.0-alpha.27",
     "firebase": "^5.9.4",
     "immer": "^3.1.1",
@@ -27,7 +28,8 @@
     "react-spring": "^8.0.20",
     "react-toastify": "^5.1.0",
     "styled-components": "^4.2.0",
-    "typescript": "3.4.2"
+    "typescript": "3.4.2",
+    "uuid": "^3.3.2"
   },
   "scripts": {
     "start": "react-scripts start",

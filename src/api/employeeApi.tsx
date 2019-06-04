@@ -190,7 +190,7 @@ export const checkIfUserIsInactive = async (
   try {
     const db = firebase.firestore();
     const usersCollection = db.collection("users");
-    const inactive = await usersCollection
+    const inactive: boolean = await usersCollection
       .doc(user.uid)
       .get()
       .then(doc => {
