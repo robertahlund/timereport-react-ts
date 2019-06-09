@@ -122,8 +122,8 @@ const ExpenseModal: FunctionComponent<ExpenseModalProps> = props => {
 
   const _getExpenseById = async (): Promise<void> => {
     const { expenseId } = props;
-    const expenseData: Expense | undefined = await getExpenseById(expenseId);
-    if (!_.isNil(expenseId) && expenseData) {
+    const expenseData: Expense = await getExpenseById(expenseId);
+    if (!_.isNil(expenseId)) {
       const expenseCategory:
         | ExpenseCategory
         | undefined = await getExpenseCategoryById(
@@ -133,7 +133,7 @@ const ExpenseModal: FunctionComponent<ExpenseModalProps> = props => {
         setSelectedExpenseCategory({
           value: expenseCategory.id,
           label: expenseCategory.name
-        })
+        });
       }
       setExpense({
         id: expenseData.id,
@@ -190,12 +190,15 @@ const ExpenseModal: FunctionComponent<ExpenseModalProps> = props => {
     try {
       if (
         !_.isNil(uploadInput.current) &&
-        !_.isNil(uploadInput.current.files)
+        !_.isNil(uploadInput.current.files) &&
+        !_.isNil(uploadInput.current.files[0])
       ) {
-        const uploadedFile:
-          | ExpenseFileUpload
-          | undefined = await uploadExpenseFile(uploadInput.current.files[0]);
-        if (uploadedFile && typeof user === "object") {
+        const uploadedFile: ExpenseFileUpload = await uploadExpenseFile(
+          uploadInput.current.files[0],
+          true,
+          expense.filename
+        );
+        if (typeof user === "object") {
           await updateExpense({
             id: expense.id,
             userId: user.uid as string,
@@ -206,18 +209,18 @@ const ExpenseModal: FunctionComponent<ExpenseModalProps> = props => {
             filename: uploadedFile.filename,
             receiptUrl: uploadedFile.url
           });
-        } else {
-          await updateExpense({
-            id: expense.id,
-            userId: expense.userId,
-            expenseCategoryId: expense.expenseCategoryId,
-            amount: Number(expense.amount.value),
-            vat: Number(expense.vat.value),
-            note: expense.note.value,
-            filename: expense.filename,
-            receiptUrl: expense.receiptUrl
-          });
         }
+      } else {
+        await updateExpense({
+          id: expense.id,
+          userId: expense.userId,
+          expenseCategoryId: expense.expenseCategoryId,
+          amount: Number(expense.amount.value),
+          vat: Number(expense.vat.value),
+          note: expense.note.value,
+          filename: expense.filename,
+          receiptUrl: expense.receiptUrl
+        });
       }
     } catch (error) {
       console.log(error);

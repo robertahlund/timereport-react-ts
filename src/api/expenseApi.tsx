@@ -36,13 +36,18 @@ export const createExpense = async (expense: Expense): Promise<string> => {
 };
 
 export const uploadExpenseFile = async (
-  file: File
-): Promise<ExpenseFileUpload | undefined> => {
+  file: File,
+  isUpdate?: boolean,
+  originalFilename?: string
+): Promise<ExpenseFileUpload> => {
   try {
     console.log(file);
     const storageService = firebase.storage();
     const storageRef = storageService.ref();
     let fileUrl: string = "";
+    if (isUpdate && originalFilename) {
+      await storageRef.child(`receipts/${originalFilename}`).delete();
+    }
     const filename: string = file.name.split(".")[0] + uuidv4() + "." + file.name.split(".")[1];
     await storageRef
       .child(`receipts/${filename}`)
@@ -52,11 +57,10 @@ export const uploadExpenseFile = async (
           fileUrl = url;
         });
       });
-    console.log("resolve time");
     return Promise.resolve({ url: fileUrl, filename});
   } catch (error) {
     console.log(error);
-    return Promise.reject(new Error("Error uploading file"));
+    return Promise.reject("Error uploading file");
   }
 };
 
@@ -83,33 +87,33 @@ export const deleteExpense = async (expenseId: string): Promise<void> => {
 };
 
 export const getExpenseById = async (
-  expenseId: string
-): Promise<Expense | undefined> => {
+    expenseId: string
+): Promise<Expense> => {
   try {
     const expenseCategories:
-      | ExpenseCategory[]
-      | undefined = await getExpenseCategories();
+        | ExpenseCategory[]
+        | undefined = await getExpenseCategories();
     if (expenseCategories) {
       const expense: Expense | undefined = await db
-        .collection("expenses")
-        .doc(expenseId)
-        .get()
-        .then(doc => {
-          if (doc.exists) {
-            return doc.data() as Expense;
-          } else return undefined;
-        });
+          .collection("expenses")
+          .doc(expenseId)
+          .get()
+          .then(doc => {
+            if (doc.exists) {
+              return doc.data() as Expense;
+            } else return undefined;
+          });
       if (expense) {
-        return new Promise<Expense>(resolve => resolve(expense));
+        return Promise.resolve(expense);
       } else {
-        return new Promise<undefined>(reject => reject(undefined));
+        return Promise.reject("No expense found.")
       }
     } else {
-      return new Promise<undefined>(reject => reject(undefined));
+      return Promise.reject("No expense categories found.")
     }
   } catch (error) {
     console.log(error);
-    return new Promise<undefined>(reject => reject(undefined));
+    return Promise.reject("An error occured.")
   }
 };
 
