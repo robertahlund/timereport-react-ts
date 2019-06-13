@@ -28,10 +28,10 @@ export const createExpense = async (expense: Expense): Promise<string> => {
           });
         return doc.id;
       });
-    return new Promise<string>(resolve => resolve(expenseId));
+    return Promise.resolve(expenseId);
   } catch (error) {
     console.log(error);
-    return new Promise<string>(reject => reject("Error creating expense"));
+    return Promise.reject("Error creating expense");
   }
 };
 
@@ -48,7 +48,8 @@ export const uploadExpenseFile = async (
     if (isUpdate && originalFilename) {
       await storageRef.child(`receipts/${originalFilename}`).delete();
     }
-    const filename: string = file.name.split(".")[0] + uuidv4() + "." + file.name.split(".")[1];
+    const filename: string =
+      file.name.split(".")[0] + uuidv4() + "." + file.name.split(".")[1];
     await storageRef
       .child(`receipts/${filename}`)
       .put(file)
@@ -57,7 +58,7 @@ export const uploadExpenseFile = async (
           fileUrl = url;
         });
       });
-    return Promise.resolve({ url: fileUrl, filename});
+    return Promise.resolve({ url: fileUrl, filename });
   } catch (error) {
     console.log(error);
     return Promise.reject("Error uploading file");
@@ -86,77 +87,69 @@ export const deleteExpense = async (expenseId: string): Promise<void> => {
   }
 };
 
-export const getExpenseById = async (
-    expenseId: string
-): Promise<Expense> => {
+export const getExpenseById = async (expenseId: string): Promise<Expense> => {
   try {
-    const expenseCategories:
-        | ExpenseCategory[]
-        | undefined = await getExpenseCategories();
-    if (expenseCategories) {
+    const expenseCategories: ExpenseCategory[] = await getExpenseCategories();
+    if (expenseCategories.length > 0) {
       const expense: Expense | undefined = await db
-          .collection("expenses")
-          .doc(expenseId)
-          .get()
-          .then(doc => {
-            if (doc.exists) {
-              return doc.data() as Expense;
-            } else return undefined;
-          });
+        .collection("expenses")
+        .doc(expenseId)
+        .get()
+        .then(doc => {
+          if (doc.exists) {
+            return doc.data() as Expense;
+          } else return undefined;
+        });
       if (expense) {
         return Promise.resolve(expense);
       } else {
-        return Promise.reject("No expense found.")
+        return Promise.reject("No expense found.");
       }
     } else {
-      return Promise.reject("No expense categories found.")
+      return Promise.reject("No expense categories found.");
     }
   } catch (error) {
     console.log(error);
-    return Promise.reject("An error occured.")
+    return Promise.reject("An error occured.");
   }
 };
 
-export const getExpenses = async (): Promise<ExpenseListItem[] | undefined> => {
+export const getExpenses = async (): Promise<ExpenseListItem[]> => {
   try {
-    const expenseCategories:
-      | ExpenseCategory[]
-      | undefined = await getExpenseCategories();
-    const users: AuthObject[] | string = await getEmployees();
-    if (expenseCategories && typeof users !== "string") {
-      const expenses: ExpenseListItem[] = [];
-      await db
-        .collection("expenses")
-        .get()
-        .then(documents => {
-          documents.forEach(document => {
-            let expenseListItem: ExpenseListItem = document.data() as ExpenseListItem;
-            const expenseCategoryName: string | undefined = _.find(
-              expenseCategories,
-              (category: ExpenseCategory) =>
-                category.id === expenseListItem.expenseCategoryId
-            )!.name;
-            if (expenseCategoryName) {
-              expenseListItem.expenseCategoryName = expenseCategoryName;
-            } else expenseListItem.expenseCategoryName = "Deleted Category";
-            const firstName: string | undefined = _.find(
-              users,
-              (user: AuthObject) => user.uid === expenseListItem.userId
-            )!.firstName;
-            const lastName: string | undefined = _.find(
-                users,
-                (user: AuthObject) => user.uid === expenseListItem.userId
-            )!.lastName;
-            if (firstName && lastName) {
-              expenseListItem.username = `${firstName} ${lastName}`;
-            } else expenseListItem.username = "Deleted User";
-            expenses.push(expenseListItem);
-          });
+    const expenseCategories: ExpenseCategory[] = await getExpenseCategories();
+    const users: AuthObject[] = await getEmployees();
+    const expenses: ExpenseListItem[] = [];
+    await db
+      .collection("expenses")
+      .get()
+      .then(documents => {
+        documents.forEach(document => {
+          let expenseListItem: ExpenseListItem = document.data() as ExpenseListItem;
+          const expenseCategoryName: string | undefined = _.find(
+            expenseCategories,
+            (category: ExpenseCategory) =>
+              category.id === expenseListItem.expenseCategoryId
+          )!.name;
+          if (expenseCategoryName) {
+            expenseListItem.expenseCategoryName = expenseCategoryName;
+          } else expenseListItem.expenseCategoryName = "Deleted Category";
+          const firstName: string | undefined = _.find(
+            users,
+            (user: AuthObject) => user.uid === expenseListItem.userId
+          )!.firstName;
+          const lastName: string | undefined = _.find(
+            users,
+            (user: AuthObject) => user.uid === expenseListItem.userId
+          )!.lastName;
+          if (firstName && lastName) {
+            expenseListItem.username = `${firstName} ${lastName}`;
+          } else expenseListItem.username = "Deleted User";
+          expenses.push(expenseListItem);
         });
-      return new Promise<ExpenseListItem[]>(resolve => resolve(expenses));
-    } else return new Promise<undefined>(reject => reject(undefined));
+      });
+    return Promise.resolve(expenses);
   } catch (error) {
     console.log(error);
-    return new Promise<undefined>(reject => reject(undefined));
+    return Promise.reject("Error retrieving expenses");
   }
 };

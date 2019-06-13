@@ -1,7 +1,7 @@
 import firebase from '../config/firebaseConfig';
 import {Activity} from "../types/types";
 
-export const getActivities = async (): Promise<Activity[] | string> => {
+export const getActivities = async (): Promise<Activity[]> => {
   try {
     const db = firebase.firestore();
     const activityList: Activity[] = [];
@@ -13,13 +13,13 @@ export const getActivities = async (): Promise<Activity[] | string> => {
           activityList.push(activity.data());
         })
       });
-    return new Promise<Activity[]>(resolve => resolve(activityList))
+    return Promise.resolve(activityList)
   } catch (error) {
-    return new Promise<Activity[] | string>(reject => reject("Error"))
+    return Promise.reject("Error retrieving activities")
   }
 };
 
-export const getActivityById = async (activityId: string): Promise<Activity | string> => {
+export const getActivityById = async (activityId: string): Promise<Activity> => {
   try {
     const db = firebase.firestore();
     const activityData: Activity | undefined = await db
@@ -32,10 +32,10 @@ export const getActivityById = async (activityId: string): Promise<Activity | st
           } else return undefined;
         });
     if (activityData) {
-      return new Promise<Activity>(resolve => resolve(activityData))
-    } else return new Promise<string>(reject => reject("Error retrieving data."))
+      return Promise.resolve(activityData);
+    } else return Promise.reject("No activity with that id")
   } catch (error) {
-    return new Promise<string>(reject => reject("Error retrieving data."))
+    return Promise.reject("Error retrieving data")
   }
 };
 
@@ -55,10 +55,10 @@ export const createActivity = async (activity: Activity): Promise<string> => {
           });
         return document.id;
       });
-    return new Promise<string>(resolve => resolve(activityId))
+    return Promise.resolve(activityId);
   } catch (error) {
     console.log(error);
-    return new Promise<string>(reject => reject("An error occured when creating the activity."));
+    return Promise.reject("An error occured when creating the activity");
   }
 };
 

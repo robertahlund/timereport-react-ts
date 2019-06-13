@@ -5,7 +5,7 @@ import {
   CompanySelectOptions
 } from "../types/types";
 
-export const getCompanies = async (): Promise<Company[] | string> => {
+export const getCompanies = async (): Promise<Company[]> => {
   try {
     const db = firebase.firestore();
     const companyList: Company[] = [];
@@ -17,18 +17,15 @@ export const getCompanies = async (): Promise<Company[] | string> => {
           companyList.push(company.data());
         });
       });
-    return new Promise<Company[]>(resolve => resolve(companyList));
+    return Promise.resolve(companyList);
   } catch (error) {
-    return new Promise<string>(reject => reject("Error"));
+    return Promise.reject("Error retrieving companies");
   }
 };
 
-export const getCompanyById = async (
-  companyId: string
-): Promise<Company | string> => {
+export const getCompanyById = async (companyId: string): Promise<Company> => {
   try {
     const db = firebase.firestore();
-    // @ts-ignore
     const companyData: Company | undefined = await db
       .collection("companies")
       .doc(companyId)
@@ -36,24 +33,21 @@ export const getCompanyById = async (
       .then(doc => {
         if (doc.exists) {
           console.log(doc.data());
-          return doc.data();
+          return doc.data() as Company;
         } else return undefined;
       });
     if (companyData) {
-      return new Promise<Company>(resolve => resolve(companyData));
-    } else
-      return new Promise<string>(reject => reject("Document does not exist."));
+      return Promise.resolve(companyData);
+    } else return Promise.reject("No company with that id exists");
   } catch (error) {
     console.log(error);
-    return new Promise<string>(reject =>
-      reject("Error, something went wrong.")
-    );
+    return Promise.reject("Error retrieving company");
   }
 };
 
 export const getCompanyActivitiesByCompanies = async (
   companies: CompanySelectOptions[]
-): Promise<ActivityCompanySelectOption[] | string> => {
+): Promise<ActivityCompanySelectOption[]> => {
   const db = firebase.firestore();
   const activities: ActivityCompanySelectOption[] = [];
   for (const company of companies) {
@@ -77,35 +71,28 @@ export const getCompanyActivitiesByCompanies = async (
           }
         });
     } catch (error) {
-      return new Promise<string>(reject => reject("Activity list is empty"));
+      return Promise.reject("Error retrieving companies");
     }
   }
   if (activities.length > 0) {
-    return new Promise<ActivityCompanySelectOption[]>(resolve =>
-      resolve(activities)
-    );
+    return Promise.resolve(activities);
   } else {
-    return new Promise<string>(reject => reject("Activity list is empty"));
+    return Promise.reject("Activity list is empty");
   }
 };
 
 export const getCompaniesByActivityId = async (
   activityId: string
-): Promise<Company[] | string> => {
+): Promise<Company[]> => {
   try {
     const companies = await getCompanies();
-    if (typeof companies !== "string") {
-      return new Promise<Company[]>(resolve =>
-        resolve(
+      return Promise.resolve(
           companies.filter((company: Company) =>
             company.activities!.some(activity => activity.value === activityId)
           )
-        )
-      );
-    }
-    return new Promise<string>(reject => reject("Error"));
+        );
   } catch (error) {
-    return new Promise<string>(reject => reject("Error"));
+    return Promise.reject("Error retrieving companies");
   }
 };
 
@@ -151,10 +138,10 @@ export const createCompany = async (company: Company): Promise<string> => {
           });
         return document.id;
       });
-    return new Promise<string>(resolve => resolve(companyId));
+    return Promise.resolve(companyId);
   } catch (error) {
     console.log(error);
-    return new Promise<string>(reject => reject("Error"));
+    return Promise.reject("Error creating company");
   }
 };
 

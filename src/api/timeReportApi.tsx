@@ -7,41 +7,31 @@ const db = firebase.firestore();
 
 export const createOrUpdateTimeReportRows = async (
   timeReports: TimeReport[]
-): Promise<TimeReport[] | string> => {
+): Promise<TimeReport[]> => {
   try {
     const allTimeReports: TimeReport[] = [];
     for (const timeReport of timeReports) {
       if (!timeReport.id) {
-        const createdTimeReport: TimeReport | string = await createTimeReports(
+        const createdTimeReport: TimeReport = await createTimeReports(
           timeReport
         );
-        if (typeof createdTimeReport === "string") {
-          return new Promise<string>(reject => reject("Error"));
-        } else {
-          allTimeReports.push(createdTimeReport);
-        }
+        allTimeReports.push(createdTimeReport);
       } else {
-        const updatedTimeReport: TimeReport | string = await updateTimeReports(
+        const updatedTimeReport: TimeReport = await updateTimeReports(
           timeReport
         );
-        if (typeof updatedTimeReport === "string") {
-          return new Promise<string>(reject => reject("Error"));
-        } else {
-          allTimeReports.push(updatedTimeReport);
-        }
+        allTimeReports.push(updatedTimeReport);
       }
     }
-    return new Promise<TimeReport[]>(resolve =>
-      resolve(allTimeReports)
-    );
+    return Promise.resolve(allTimeReports);
   } catch (error) {
-    return new Promise<string>(reject => reject("Error"));
+    return Promise.reject("Error creating/updating time report row");
   }
 };
 
 export const createTimeReports = async (
   timeReport: TimeReport
-): Promise<TimeReport | string> => {
+): Promise<TimeReport> => {
   try {
     timeReport = await db
       .collection("timeReports")
@@ -59,15 +49,15 @@ export const createTimeReports = async (
           id: document.id
         };
       });
-    return new Promise<TimeReport | string>(resolve => resolve(timeReport));
+    return Promise.resolve(timeReport);
   } catch (error) {
-    return new Promise<TimeReport | string>(reject => reject("Error"));
+    return Promise.reject("Error creating time report");
   }
 };
 
 export const updateTimeReports = async (
   timeReport: TimeReport
-): Promise<TimeReport | string> => {
+): Promise<TimeReport> => {
   try {
     timeReport = await db
       .collection("timeReports")
@@ -76,9 +66,9 @@ export const updateTimeReports = async (
       .then(() => {
         return timeReport;
       });
-    return new Promise<TimeReport | string>(resolve => resolve(timeReport));
+    return Promise.resolve(timeReport);
   } catch (error) {
-    return new Promise<TimeReport | string>(reject => reject("Error"));
+    return Promise.reject("Error updating time report");
   }
 };
 
@@ -90,16 +80,16 @@ export const deleteTimeReport = async (
       .collection("timeReports")
       .doc(timeReportId)
       .delete();
-    return new Promise<string>(resolve => resolve("Successfully deleted row."));
+    return Promise.resolve("Successfully deleted row.");
   } catch (error) {
-    return new Promise<string>(reject => reject("Error deleting row."));
+    return Promise.reject("Error deleting row.");
   }
 };
 
 export const getTimeReportsByDateAndUserId = async (
   startDate: string,
   userId: string
-): Promise<TimeReport[] | string> => {
+): Promise<TimeReport[]> => {
   const timeReports: TimeReport[] = [];
   try {
     await db
@@ -123,9 +113,9 @@ export const getTimeReportsByDateAndUserId = async (
           });
         });
       });
-    return new Promise<TimeReport[]>(resolve => resolve(timeReports));
+    return Promise.resolve(timeReports);
   } catch (error) {
-    return new Promise<string>(reject => reject("Error"));
+    return Promise.reject("Error");
   }
 };
 
@@ -133,7 +123,7 @@ export const getTimeReportsByDate = async (
   startDate: Date,
   endDate: Date,
   userId: string | undefined
-): Promise<TimeReport[] | string> => {
+): Promise<TimeReport[]> => {
   const timeReports: TimeReport[] = [];
   try {
     if (_.isNil(userId)) {
@@ -191,12 +181,10 @@ export const getTimeReportsByDate = async (
         );
       });
     });
-    return new Promise<TimeReport[]>(resolve =>
-      resolve(timeReports)
-    );
+    return Promise.resolve(timeReports);
   } catch (error) {
-    console.log(error)
-    return new Promise<string>(reject => reject("Error"));
+    console.log(error);
+    return Promise.reject("Error retrieving time reports");
   }
 };
 

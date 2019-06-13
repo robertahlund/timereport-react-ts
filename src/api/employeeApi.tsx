@@ -37,13 +37,11 @@ export const createEmployee = async (
       .doc(uid)
       .set(userDocument);
     console.log(userDocument, "account created");
-    return new Promise<string>(resolve => resolve("Account created."));
-  } else return new Promise<string>(reject => reject("Error"));
+    return Promise.resolve("Account created.");
+  } else return Promise.reject("Error");
 };
 
-export const getEmployeeById = async (
-  uid: string
-): Promise<AuthObject | string> => {
+export const getEmployeeById = async (uid: string): Promise<AuthObject> => {
   const db = firebase.firestore();
   try {
     const usersCollection = db.collection("users");
@@ -59,15 +57,15 @@ export const getEmployeeById = async (
             : false;
         }
       });
-    return new Promise<AuthObject>(resolve => resolve(userData));
+    if (usersCollection) {
+      return Promise.resolve(userData);
+    } else return Promise.reject("No user with that id exists");
   } catch (error) {
-    return new Promise<string>(reject => reject("Error"));
+    return Promise.reject("Error retrieving employee");
   }
 };
 
-export const getEmployeesForList = async (): Promise<
-  EmployeeRow[] | string
-> => {
+export const getEmployeesForList = async (): Promise<EmployeeRow[]> => {
   const db = firebase.firestore();
   try {
     let employeeList: EmployeeRow[] = [];
@@ -85,13 +83,13 @@ export const getEmployeesForList = async (): Promise<
           });
         });
       });
-    return new Promise<EmployeeRow[]>(resolve => resolve(employeeList));
+    return Promise.resolve(employeeList);
   } catch (error) {
-    return new Promise<string>(reject => reject("Error"));
+    return Promise.reject("Error retrieving employees");
   }
 };
 
-export const getEmployees = async (): Promise<AuthObject[] | string> => {
+export const getEmployees = async (): Promise<AuthObject[]> => {
   const db = firebase.firestore();
   try {
     const employeeList: AuthObject[] = [];
@@ -103,28 +101,27 @@ export const getEmployees = async (): Promise<AuthObject[] | string> => {
           employeeList.push(user.data());
         });
       });
-    return new Promise<AuthObject[]>(resolve => resolve(employeeList));
+    return Promise.resolve(employeeList);
   } catch (error) {
-    return new Promise<string>(reject => reject("Error"));
+    return Promise.reject("Error retrieving employees");
   }
 };
 
 export const getEmployeesByCompanyId = async (
   companyId: string
-): Promise<AuthObject[] | string> => {
-  const employees = await getEmployees();
-  if (typeof employees === "string") {
-    return new Promise(reject => reject("Error"));
-  } else {
-    return new Promise<AuthObject[]>(resolve =>
-      resolve(
-        employees.filter((user: AuthObject) => {
-          if (user.companies) {
-            user.companies.some(company => company.value === companyId);
-          }
-        })
-      )
+): Promise<AuthObject[]> => {
+  try {
+    const employees = await getEmployees();
+    return Promise.resolve(
+      employees.filter((user: AuthObject) => {
+        if (user.companies) {
+          user.companies.some(company => company.value === companyId);
+        }
+      })
     );
+  } catch (error) {
+    console.log(error);
+    return Promise.reject("Error retrieving employee");
   }
 };
 
@@ -158,7 +155,7 @@ export const updateEmployee = async (employee: AuthObject): Promise<void> => {
 
 export const getAllActivitiesAssignedToUser = async (
   uid: string
-): Promise<ActivityCompanySelectOption[] | string> => {
+): Promise<ActivityCompanySelectOption[]> => {
   const db = firebase.firestore();
   try {
     const userCompanies: CompanySelectOptions[] = await db
@@ -170,23 +167,18 @@ export const getAllActivitiesAssignedToUser = async (
           return doc.data()!.companies;
         }
       });
-    const userActivities:
-      | ActivityCompanySelectOption[]
-      | string = await getCompanyActivitiesByCompanies(userCompanies);
-    if (typeof userActivities === "string") {
-      return new Promise<string>(reject => reject("Error"));
-    }
-    return new Promise<ActivityCompanySelectOption[]>(resolve =>
-      resolve(userActivities)
+    const userActivities: ActivityCompanySelectOption[] = await getCompanyActivitiesByCompanies(
+      userCompanies
     );
+    return Promise.resolve(userActivities);
   } catch (error) {
-    return new Promise<string>(reject => reject("Error"));
+    return Promise.reject("Error retrieving activities");
   }
 };
 
 export const checkIfUserIsInactive = async (
   user: User
-): Promise<boolean | string> => {
+): Promise<boolean> => {
   try {
     const db = firebase.firestore();
     const usersCollection = db.collection("users");
@@ -198,15 +190,15 @@ export const checkIfUserIsInactive = async (
           return doc.data()!.inactive;
         } else return false;
       });
-    return new Promise<boolean>(resolve => resolve(inactive));
+    return Promise.resolve(inactive);
   } catch (error) {
-    return new Promise<string>(reject => reject("Error"));
+    return Promise.reject("Error retrieving user status");
   }
 };
 
 export const checkIfUserInformationHasChanged = async (
   user: User
-): Promise<boolean | string> => {
+): Promise<boolean> => {
   try {
     const db = firebase.firestore();
     const usersCollection = db.collection("users");
@@ -227,12 +219,12 @@ export const checkIfUserInformationHasChanged = async (
               displayName: `${userData.firstName} ${userData.lastName}`
             });
             await user.updateEmail(userData.email!);
-            return new Promise<boolean>(resolve => resolve(true));
-          } else return new Promise<boolean>(resolve => resolve(false));
+            return Promise.resolve(true);
+          } else return Promise.resolve(false);
         } else return false;
       });
-    return new Promise<boolean>(resolve => resolve(updateNeeded));
+    return Promise.resolve(updateNeeded);
   } catch (error) {
-    return new Promise<string>(reject => reject("Error"));
+    return Promise.reject("Error retrieving user update status");
   }
 };

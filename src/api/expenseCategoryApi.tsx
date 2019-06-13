@@ -20,12 +20,10 @@ export const createExpenseCategory = async (
           });
         return doc.id;
       });
-    return new Promise<string>(resolve => resolve(expenseCategoryId));
+    return Promise.resolve(expenseCategoryId);
   } catch (error) {
     console.log(error);
-    return new Promise<string>(reject =>
-      reject("Error creating expense category")
-    );
+    return Promise.reject("Error creating expense category");
   }
 };
 
@@ -57,31 +55,29 @@ export const deleteExpenseCategory = async (
 
 export const getExpenseCategoryById = async (
   expenseCategoryId: string
-): Promise<ExpenseCategory | undefined> => {
+): Promise<ExpenseCategory> => {
   try {
-    const expenseCategory: ExpenseCategory | undefined = await db
+    const expenseCategory: ExpenseCategory | null = await db
       .collection("expenseCategories")
       .doc(expenseCategoryId)
       .get()
       .then(doc => {
         if (doc.exists) {
           return doc.data() as ExpenseCategory;
-        } else return undefined;
+        } else return null;
       });
     if (expenseCategory) {
-      return new Promise<ExpenseCategory>(resolve => resolve(expenseCategory));
+      return Promise.resolve(expenseCategory);
     } else {
-      return new Promise<undefined>(reject => reject(undefined));
+      return Promise.reject("Could not find a expense category with that id");
     }
   } catch (error) {
     console.log(error);
-    return new Promise<undefined>(reject => reject(undefined));
+    return Promise.reject("Error retrieving expense category");
   }
 };
 
-export const getExpenseCategories = async (): Promise<
-  ExpenseCategory[] | undefined
-> => {
+export const getExpenseCategories = async (): Promise<ExpenseCategory[]> => {
   try {
     const expenseCategories: ExpenseCategory[] = [];
     await db
@@ -93,11 +89,9 @@ export const getExpenseCategories = async (): Promise<
           expenseCategories.push(document.data() as ExpenseCategory);
         });
       });
-    return new Promise<ExpenseCategory[]>(resolve =>
-      resolve(expenseCategories)
-    );
+    return Promise.resolve(expenseCategories);
   } catch (error) {
     console.log(error);
-    return new Promise<undefined>(reject => reject(undefined));
+    return Promise.reject("Error retrieving expense categories");
   }
 };
