@@ -11,6 +11,7 @@ import _ from "lodash";
 import { getEmployees } from "./employeeApi";
 import uuidv4 from "uuid";
 
+
 const db = firebase.firestore();
 
 export const createExpense = async (expense: Expense): Promise<string> => {
@@ -46,7 +47,7 @@ export const uploadExpenseFile = async (
     const storageRef = storageService.ref();
     let fileUrl: string = "";
     if (isUpdate && originalFilename) {
-      await storageRef.child(`receipts/${originalFilename}`).delete();
+      await deleteExpenseFile(originalFilename);
     }
     const filename: string =
       file.name.split(".")[0] + uuidv4() + "." + file.name.split(".")[1];
@@ -76,8 +77,19 @@ export const updateExpense = async (expense: Expense): Promise<void> => {
   }
 };
 
-export const deleteExpense = async (expenseId: string): Promise<void> => {
+export const deleteExpenseFile = async (filename: string): Promise<void> => {
   try {
+    const storageService = firebase.storage();
+    const storageRef = storageService.ref();
+    await storageRef.child(`receipts/${filename}`).delete();
+  } catch (error) {
+    console.log(error)
+  }
+};
+
+export const deleteExpense = async (expenseId: string, filename: string): Promise<void> => {
+  try {
+    await deleteExpenseFile(filename);
     await db
       .collection("expenses")
       .doc(expenseId)

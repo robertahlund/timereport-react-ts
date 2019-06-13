@@ -1,13 +1,28 @@
-import React, {ChangeEvent, Fragment, FunctionComponent, useEffect, useState} from "react";
+import React, {
+  ChangeEvent,
+  Fragment,
+  FunctionComponent,
+  useEffect,
+  useState
+} from "react";
 import styled from "styled-components";
 import Input from "../general/Input";
-import {PaddingRow} from "../authentication/LoginForm";
-import {initialEmployeeState, initialSortState} from "../../constants/employeeConstants";
-import {CompanySelectOptions, EmployeeColumn, EmployeeRow, EmployeeSort} from "../../types/types";
+import { PaddingRow } from "../authentication/LoginForm";
+import {
+  initialEmployeeState,
+  initialSortState
+} from "../../constants/employeeConstants";
+import {
+  CompanySelectOptions,
+  EmployeeColumn,
+  EmployeeRow,
+  EmployeeSort
+} from "../../types/types";
 import EmployeeModal from "./EmployeeModal";
-import {getEmployeesForList} from "../../api/employeeApi";
+import { getEmployeesForList } from "../../api/employeeApi";
 import ModalPortal from "../general/ModalPortal";
 import LoadingIcon from "../../icons/LoadingIcon";
+import _ from "lodash";
 
 const EmployeeList: FunctionComponent = () => {
   const [employeeList, setEmployeeList] = useState(initialEmployeeState);
@@ -21,19 +36,16 @@ const EmployeeList: FunctionComponent = () => {
   const [userUid, setUserUid] = useState("");
 
   useEffect(() => {
-    // noinspection JSIgnoredPromiseFromCall
     getAllEmployees();
   }, []);
 
   const getAllEmployees = async (): Promise<void> => {
     setLoading(true);
     try {
-      const employeeData: EmployeeRow[] | string = await getEmployeesForList();
-      if (typeof employeeData !== "string") {
-        setEmployeeList(employeeData);
-        setClonedEmployeeList(employeeData);
-        setLoading(false);
-      }
+      const employeeData: EmployeeRow[] = await getEmployeesForList();
+      setEmployeeList(employeeData);
+      setClonedEmployeeList(employeeData);
+      setLoading(false);
     } catch (error) {
       setLoading(false);
       console.log(error);
@@ -58,41 +70,45 @@ const EmployeeList: FunctionComponent = () => {
   };
 
   const sortAsc = (column: EmployeeColumn): void => {
-    const listToSort: EmployeeRow[] = JSON.parse(JSON.stringify(employeeList));
-    listToSort.sort((a: EmployeeRow, b: EmployeeRow): number => {
-      const propA = a[column].toLowerCase();
-      const propB = b[column].toLowerCase();
-      if (propA < propB) {
-        return -1;
+    const listToSort: EmployeeRow[] = _.cloneDeep(employeeList);
+    listToSort.sort(
+      (a: EmployeeRow, b: EmployeeRow): number => {
+        const propA = a[column].toLowerCase();
+        const propB = b[column].toLowerCase();
+        if (propA < propB) {
+          return -1;
+        }
+        if (propA > propB) {
+          return 1;
+        }
+        return 0;
       }
-      if (propA > propB) {
-        return 1;
-      }
-      return 0;
-    });
+    );
     setEmployeeList(listToSort);
     setClonedEmployeeList(listToSort);
   };
 
   const sortDesc = (column: EmployeeColumn): void => {
-    const listToSort: EmployeeRow[] = JSON.parse(JSON.stringify(employeeList));
-    listToSort.sort((a: EmployeeRow, b: EmployeeRow): number => {
-      const propA = a[column].toLowerCase();
-      const propB = b[column].toLowerCase();
-      if (propB < propA) {
-        return -1;
+    const listToSort: EmployeeRow[] = _.cloneDeep(employeeList);
+    listToSort.sort(
+      (a: EmployeeRow, b: EmployeeRow): number => {
+        const propA = a[column].toLowerCase();
+        const propB = b[column].toLowerCase();
+        if (propB < propA) {
+          return -1;
+        }
+        if (propB > propA) {
+          return 1;
+        }
+        return 0;
       }
-      if (propB > propA) {
-        return 1;
-      }
-      return 0;
-    });
+    );
     setEmployeeList(listToSort);
     setClonedEmployeeList(listToSort);
   };
 
   const handleSearchChange = (event: ChangeEvent<HTMLInputElement>): void => {
-    const {target} = event;
+    const { target } = event;
     setSearchValue(target.value);
     if (target.value === "") {
       setEmployeeList(clonedEmployeeList);
@@ -110,7 +126,7 @@ const EmployeeList: FunctionComponent = () => {
 
   const toggleEmployeeModal = (event?: React.MouseEvent): void => {
     if (event) {
-      const {target, currentTarget} = event;
+      const { target, currentTarget } = event;
       if (target === currentTarget) {
         setShowEmployeeModal(!showEmployeeModal);
       }
@@ -168,17 +184,21 @@ const EmployeeList: FunctionComponent = () => {
               <span>{employee.name}</span>
               <span>{employee.email}</span>
               <span>
-                {employee.companies.map((company: CompanySelectOptions, index: number) => {
-                  if (index !== employee.companies.length - 1) {
-                    return (
-                      <Fragment key={company.value}>{company.label}, </Fragment>
-                    );
-                  } else {
-                    return (
-                      <Fragment key={company.value}>{company.label}</Fragment>
-                    );
+                {employee.companies.map(
+                  (company: CompanySelectOptions, index: number) => {
+                    if (index !== employee.companies.length - 1) {
+                      return (
+                        <Fragment key={company.value}>
+                          {company.label},{" "}
+                        </Fragment>
+                      );
+                    } else {
+                      return (
+                        <Fragment key={company.value}>{company.label}</Fragment>
+                      );
+                    }
                   }
-                })}
+                )}
               </span>
               <span>{employee.roles}</span>
             </ListRow>
@@ -201,7 +221,11 @@ const EmployeeList: FunctionComponent = () => {
       )}
       {showEmployeeModal && (
         <ModalPortal>
-          <EmployeeModal uid={userUid} toggleModal={toggleEmployeeModal} getAllEmployees={getAllEmployees}/>
+          <EmployeeModal
+            uid={userUid}
+            toggleModal={toggleEmployeeModal}
+            getAllEmployees={getAllEmployees}
+          />
         </ModalPortal>
       )}
     </Fragment>

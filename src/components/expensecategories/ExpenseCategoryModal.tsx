@@ -36,7 +36,9 @@ interface ExpenseCategoryModalProps {
   getExpenseCategories: () => Promise<void>;
 }
 
-const ExpenseCategoryModal: FunctionComponent<ExpenseCategoryModalProps> = props => {
+const ExpenseCategoryModal: FunctionComponent<
+  ExpenseCategoryModalProps
+> = props => {
   const [loading, setLoading] = useState(false);
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [modalLoading, setModalLoading] = useState(true);
@@ -51,38 +53,41 @@ const ExpenseCategoryModal: FunctionComponent<ExpenseCategoryModalProps> = props
 
   useEffect(() => {
     if (!isNew) {
-      // noinspection JSIgnoredPromiseFromCall
       _getExpenseCategoryById();
     }
   }, []);
 
   const _getExpenseCategoryById = async (): Promise<void> => {
-    const { expenseCategoryId } = props;
-    const expenseCategoryData:
-      | ExpenseCategory
-      | undefined = await getExpenseCategoryById(expenseCategoryId);
-    setModalLoading(false);
-    if (!_.isNil(expenseCategoryId)) {
-      setExpenseCategory({
-        id: expenseCategoryData!.id,
-        valid: true,
-        name: {
+    try {
+      const { expenseCategoryId } = props;
+      const expenseCategoryData: ExpenseCategory = await getExpenseCategoryById(
+        expenseCategoryId
+      );
+      setModalLoading(false);
+      if (!_.isNil(expenseCategoryId)) {
+        setExpenseCategory({
+          id: expenseCategoryData!.id,
           valid: true,
-          validationMessage: "",
-          value: expenseCategoryData!.name
-        }
-      });
-      setOriginalExpenseCategory({
-        id: expenseCategoryData!.id,
-        valid: true,
-        name: {
+          name: {
+            valid: true,
+            validationMessage: "",
+            value: expenseCategoryData!.name
+          }
+        });
+        setOriginalExpenseCategory({
+          id: expenseCategoryData!.id,
           valid: true,
-          validationMessage: "",
-          value: expenseCategoryData!.name
-        }
-      });
-    } else {
-      toast.error("Error retrieving expense category.");
+          name: {
+            valid: true,
+            validationMessage: "",
+            value: expenseCategoryData!.name
+          }
+        });
+      } else {
+        toast.error("Error retrieving expense category.");
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -137,7 +142,6 @@ const ExpenseCategoryModal: FunctionComponent<ExpenseCategoryModalProps> = props
     } else {
       await _updateExpenseCategory();
     }
-    // noinspection JSIgnoredPromiseFromCall
     props.getExpenseCategories();
     setLoading(false);
   };

@@ -74,7 +74,6 @@ const ExpenseCategoriesList: FunctionComponent = () => {
   };
 
   useEffect(() => {
-    // noinspection JSIgnoredPromiseFromCall
     getAllExpenseCategories();
   }, []);
 

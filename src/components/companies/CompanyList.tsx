@@ -32,7 +32,6 @@ const CompanyList: FunctionComponent = () => {
   const [companyId, setCompanyId] = useState("");
 
   useEffect(() => {
-    // noinspection JSIgnoredPromiseFromCall
     getAllCompanies();
   }, []);
 
@@ -53,14 +52,15 @@ const CompanyList: FunctionComponent = () => {
   };
 
   const getAllCompanies = async (): Promise<void> => {
-    setLoading(true);
-    const companyData = await getCompanies();
-    if (typeof companyData !== "string") {
+    try {
+      setLoading(true);
+      const companyData: Company[] = await getCompanies();
       setCompanyList(companyData);
       setClonedCompanyList(companyData);
       setLoading(false);
-    } else {
-      toast.error("Error retrieving companies.");
+    } catch (error) {
+      setLoading(false);
+      toast.error(error);
     }
   };
 
@@ -83,34 +83,38 @@ const CompanyList: FunctionComponent = () => {
 
   const sortAsc = (column: CompanyColumn): void => {
     const listToSort: Company[] = _.cloneDeep(companyList);
-    listToSort.sort((a: Company, b: Company): number => {
-      const propA = a[column].toLowerCase();
-      const propB = b[column].toLowerCase();
-      if (propA < propB) {
-        return -1;
+    listToSort.sort(
+      (a: Company, b: Company): number => {
+        const propA = a[column].toLowerCase();
+        const propB = b[column].toLowerCase();
+        if (propA < propB) {
+          return -1;
+        }
+        if (propA > propB) {
+          return 1;
+        }
+        return 0;
       }
-      if (propA > propB) {
-        return 1;
-      }
-      return 0;
-    });
+    );
     setCompanyList(listToSort);
     setClonedCompanyList(listToSort);
   };
 
   const sortDesc = (column: CompanyColumn): void => {
     const listToSort: Company[] = _.cloneDeep(companyList);
-    listToSort.sort((a: Company, b: Company): number => {
-      const propA = a[column].toLowerCase();
-      const propB = b[column].toLowerCase();
-      if (propB < propA) {
-        return -1;
+    listToSort.sort(
+      (a: Company, b: Company): number => {
+        const propA = a[column].toLowerCase();
+        const propB = b[column].toLowerCase();
+        if (propB < propA) {
+          return -1;
+        }
+        if (propB > propA) {
+          return 1;
+        }
+        return 0;
       }
-      if (propB > propA) {
-        return 1;
-      }
-      return 0;
-    });
+    );
     setCompanyList(listToSort);
     setClonedCompanyList(listToSort);
   };

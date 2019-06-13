@@ -77,27 +77,25 @@ const ExpenseModal: FunctionComponent<ExpenseModalProps> = props => {
 
   useEffect(() => {
     if (!isNew) {
-      // noinspection JSIgnoredPromiseFromCall
       getInitialData();
     } else {
-      // noinspection JSIgnoredPromiseFromCall
       _getExpenseCategories();
     }
   }, []);
 
   const getInitialData = (): void => {
-    // noinspection JSIgnoredPromiseFromCall
     _getExpenseCategories();
-    // noinspection JSIgnoredPromiseFromCall
     _getExpenseById();
   };
 
   const _getExpenseCategories = async (): Promise<void> => {
-    const expenseCategories:
-      | ExpenseCategory[]
-      | undefined = await getExpenseCategories();
-    if (!_.isNil(expenseCategories)) {
-      createOptionList(expenseCategories);
+    try {
+      const expenseCategories: ExpenseCategory[] = await getExpenseCategories();
+      if (!_.isNil(expenseCategories)) {
+        createOptionList(expenseCategories);
+      }
+    } catch (error) {
+      toast.error(error);
     }
   };
 
@@ -122,46 +120,48 @@ const ExpenseModal: FunctionComponent<ExpenseModalProps> = props => {
 
   const _getExpenseById = async (): Promise<void> => {
     const { expenseId } = props;
-    const expenseData: Expense = await getExpenseById(expenseId);
-    if (!_.isNil(expenseId)) {
-      const expenseCategory:
-        | ExpenseCategory
-        | undefined = await getExpenseCategoryById(
-        expenseData.expenseCategoryId
-      );
-      if (expenseCategory) {
-        setSelectedExpenseCategory({
-          value: expenseCategory.id,
-          label: expenseCategory.name
+    try {
+      const expenseData: Expense = await getExpenseById(expenseId);
+      if (!_.isNil(expenseId)) {
+        const expenseCategory: ExpenseCategory = await getExpenseCategoryById(
+          expenseData.expenseCategoryId
+        );
+        if (expenseCategory) {
+          setSelectedExpenseCategory({
+            value: expenseCategory.id,
+            label: expenseCategory.name
+          });
+        }
+        setExpense({
+          id: expenseData.id,
+          userId: expenseData.userId,
+          expenseCategoryId: expenseData.expenseCategoryId,
+          valid: true,
+          amount: {
+            valid: true,
+            validationMessage: "",
+            value: String(expenseData.amount)
+          },
+          vat: {
+            valid: true,
+            validationMessage: "",
+            value: String(expenseData.vat)
+          },
+          note: {
+            valid: true,
+            validationMessage: "",
+            value: expenseData.note
+          },
+          filename: expenseData.filename,
+          receiptUrl: expenseData.receiptUrl
         });
+        setModalLoading(false);
+        setFilename(expenseData.filename);
+      } else {
+        toast.error("Error retrieving expense.");
       }
-      setExpense({
-        id: expenseData.id,
-        userId: expenseData.userId,
-        expenseCategoryId: expenseData.expenseCategoryId,
-        valid: true,
-        amount: {
-          valid: true,
-          validationMessage: "",
-          value: String(expenseData.amount)
-        },
-        vat: {
-          valid: true,
-          validationMessage: "",
-          value: String(expenseData.vat)
-        },
-        note: {
-          valid: true,
-          validationMessage: "",
-          value: expenseData.note
-        },
-        filename: expenseData.filename,
-        receiptUrl: expenseData.receiptUrl
-      });
-      setModalLoading(false);
-      setFilename(expenseData.filename);
-    } else {
-      toast.error("Error retrieving expense.");
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -185,8 +185,6 @@ const ExpenseModal: FunctionComponent<ExpenseModalProps> = props => {
   };
 
   const _updateExpense = async (): Promise<void> => {
-    //check if user has uploaded a new file
-    //if so, we should not generate a new uuid in upload expense file method
     try {
       if (
         !_.isNil(uploadInput.current) &&
@@ -222,6 +220,7 @@ const ExpenseModal: FunctionComponent<ExpenseModalProps> = props => {
           receiptUrl: expense.receiptUrl
         });
       }
+      toast.success("Successfully updated expense!")
     } catch (error) {
       console.log(error);
     }
@@ -233,11 +232,10 @@ const ExpenseModal: FunctionComponent<ExpenseModalProps> = props => {
         !_.isNil(uploadInput.current) &&
         !_.isNil(uploadInput.current.files)
       ) {
-        const uploadedFile:
-          | ExpenseFileUpload
-          | undefined = await uploadExpenseFile(uploadInput.current.files[0]);
+        const uploadedFile: ExpenseFileUpload = await uploadExpenseFile(
+          uploadInput.current.files[0]
+        );
         if (
-          uploadedFile &&
           !_.isNil(selectedExpenseCategory) &&
           typeof user === "object"
         ) {
@@ -276,17 +274,15 @@ const ExpenseModal: FunctionComponent<ExpenseModalProps> = props => {
     } else {
       await _updateExpense();
     }
-    // noinspection JSIgnoredPromiseFromCall
     props.getExpenses();
     setLoading(false);
   };
 
   const _deleteExpense = async (): Promise<void> => {
     setDeleteLoading(true);
-    await deleteExpense(expense.id);
+    await deleteExpense(expense.id, expense.filename);
     toast.success("Successfully deleted expense!");
     props.toggleModal();
-    // noinspection JSIgnoredPromiseFromCall
     props.getExpenses();
   };
 

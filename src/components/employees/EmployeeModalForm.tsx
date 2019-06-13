@@ -1,13 +1,22 @@
-import React, {ChangeEvent, Fragment, FunctionComponent, useContext} from "react";
+import React, {
+  ChangeEvent,
+  Fragment,
+  FunctionComponent,
+  useContext
+} from "react";
 import Input from "../general/Input";
-import {PaddingRow} from "../authentication/LoginForm";
-import {Row} from "../authentication/RegisterForm";
+import { PaddingRow } from "../authentication/LoginForm";
+import { Row } from "../authentication/RegisterForm";
 import Checkbox from "../general/Checkbox";
 import styled from "styled-components";
 import Select from "react-select";
-import {ValueType} from "react-select/lib/types";
-import {AuthObject, CompanySelectOptions, EmployeeFormValue} from "../../types/types";
-import {AuthContext} from "../../context/authentication/authenticationContext";
+import { ValueType } from "react-select/lib/types";
+import {
+  AuthObject,
+  CompanySelectOptions,
+  EmployeeFormValue
+} from "../../types/types";
+import { AuthContext } from "../../context/authentication/authenticationContext";
 
 interface EmployeeModalFormProps {
   form: EmployeeFormValue;
@@ -19,9 +28,9 @@ interface EmployeeModalFormProps {
 }
 
 const EmployeeModalForm: FunctionComponent<EmployeeModalFormProps> = props => {
-  const {firstName, lastName, email, uid} = props.form;
+  const { firstName, lastName, email, uid } = props.form;
   const currentUser: AuthObject | boolean = useContext(AuthContext);
-  const {inactive, selectOptions} = props;
+  const { inactive, selectOptions } = props;
   return (
     <Fragment>
       <form autoComplete="off">
@@ -60,13 +69,28 @@ const EmployeeModalForm: FunctionComponent<EmployeeModalFormProps> = props => {
               validationMessage={email.validationMessage}
             />
           </PaddingRow>
-          <Checkbox onChange={props.onInactiveChange} checked={inactive} id="inactive-checkbox"
-                    labelValue="Inactivate user" paddingTop="0" uid={uid} currentUserUid={typeof currentUser === "object" ? currentUser.uid : ""}/>
+          <Checkbox
+            onChange={props.onInactiveChange}
+            checked={inactive}
+            id="inactive-checkbox"
+            labelValue="Inactivate user"
+            paddingTop="0"
+            uid={uid}
+            currentUserUid={
+              typeof currentUser === "object" ? currentUser.uid : ""
+            }
+          />
         </Row>
         <Row direction="column">
           <SmallerHeading>Companies</SmallerHeading>
-          <Select onChange={props.handleSelectChange} options={selectOptions} placeholder="Select Companies"
-                  value={null} classNamePrefix="react-select" className="react-select"/>
+          <Select
+            onChange={props.handleSelectChange}
+            options={selectOptions}
+            placeholder="Select Companies"
+            value={null}
+            classNamePrefix="react-select"
+            className="react-select"
+          />
         </Row>
       </form>
     </Fragment>

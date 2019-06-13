@@ -51,15 +51,11 @@ const ExpenseList: FunctionComponent = () => {
   const _getExpenses = async (): Promise<void> => {
     setLoading(true);
     try {
-      const expenseData:
-        | ExpenseListItem[]
-        | undefined = await getExpenses();
-      if (expenseData) {
-        console.log(expenseData)
-        setExpenseList(expenseData);
-        setClonedExpenseList(expenseData);
-        setLoading(false);
-      }
+      const expenseData: ExpenseListItem[] = await getExpenses();
+      console.log(expenseData);
+      setExpenseList(expenseData);
+      setClonedExpenseList(expenseData);
+      setLoading(false);
     } catch (error) {
       setLoading(false);
       console.log(error);
@@ -67,7 +63,6 @@ const ExpenseList: FunctionComponent = () => {
   };
 
   useEffect(() => {
-    // noinspection JSIgnoredPromiseFromCall
     _getExpenses();
   }, []);
 
@@ -84,34 +79,38 @@ const ExpenseList: FunctionComponent = () => {
 
   const sortAsc = (column: "username"): void => {
     const listToSort: ExpenseListItem[] = _.cloneDeep(expenseList);
-    listToSort.sort((a: ExpenseListItem, b: ExpenseListItem): number => {
-      const propA = a[column].toLowerCase();
-      const propB = b[column].toLowerCase();
-      if (propA < propB) {
-        return -1;
+    listToSort.sort(
+      (a: ExpenseListItem, b: ExpenseListItem): number => {
+        const propA = a[column].toLowerCase();
+        const propB = b[column].toLowerCase();
+        if (propA < propB) {
+          return -1;
+        }
+        if (propA > propB) {
+          return 1;
+        }
+        return 0;
       }
-      if (propA > propB) {
-        return 1;
-      }
-      return 0;
-    });
+    );
     setExpenseList(listToSort);
     setClonedExpenseList(listToSort);
   };
 
   const sortDesc = (column: "username"): void => {
     const listToSort: ExpenseListItem[] = _.cloneDeep(expenseList);
-    listToSort.sort((a: ExpenseListItem, b: ExpenseListItem): number => {
-      const propA = a[column].toLowerCase();
-      const propB = b[column].toLowerCase();
-      if (propB < propA) {
-        return -1;
+    listToSort.sort(
+      (a: ExpenseListItem, b: ExpenseListItem): number => {
+        const propA = a[column].toLowerCase();
+        const propB = b[column].toLowerCase();
+        if (propB < propA) {
+          return -1;
+        }
+        if (propB > propA) {
+          return 1;
+        }
+        return 0;
       }
-      if (propB > propA) {
-        return 1;
-      }
-      return 0;
-    });
+    );
     setExpenseList(listToSort);
     setClonedExpenseList(listToSort);
   };
@@ -125,9 +124,9 @@ const ExpenseList: FunctionComponent = () => {
     } else setShowExpenseModal(!showExpenseModal);
   };
 
-  const selectExpense = (expenseId: string): void => {
+  const selectExpense = (expenseId: string, event?: React.MouseEvent): void => {
     setExpenseId(expenseId);
-    toggleExpenseModal();
+    toggleExpenseModal(event);
   };
 
   return (
@@ -160,12 +159,55 @@ const ExpenseList: FunctionComponent = () => {
         >
           Name
         </span>
+        <span>Category</span>
+        <span>Amount</span>
+        <span>VAT</span>
+        <span>Receipt</span>
       </ListHeader>
       {expenseList.length > 0 && !loading ? (
         expenseList.map((expense: ExpenseListItem) => {
           return (
-            <ListRow key={expense.id} onClick={() => selectExpense(expense.id)}>
-              <span>{expense.username}</span>
+            <ListRow
+              key={expense.id}
+              onClick={(event: React.MouseEvent) =>
+                selectExpense(expense.id, event)
+              }
+            >
+              <span
+                onClick={(event: React.MouseEvent) =>
+                  selectExpense(expense.id, event)
+                }
+              >
+                {expense.username}
+              </span>
+              <span
+                onClick={(event: React.MouseEvent) =>
+                  selectExpense(expense.id, event)
+                }
+              >
+                {expense.expenseCategoryName}
+              </span>
+              <span
+                onClick={(event: React.MouseEvent) =>
+                  selectExpense(expense.id, event)
+                }
+              >
+                {expense.amount}
+              </span>
+              <span
+                onClick={(event: React.MouseEvent) =>
+                  selectExpense(expense.id, event)
+                }
+              >
+                {expense.vat}
+              </span>
+              <span
+                onClick={(event: React.MouseEvent) =>
+                  selectExpense(expense.id, event)
+                }
+              >
+                <a href={expense.receiptUrl}>Receipt</a>
+              </span>
             </ListRow>
           );
         })

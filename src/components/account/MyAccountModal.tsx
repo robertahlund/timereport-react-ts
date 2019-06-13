@@ -10,7 +10,7 @@ import {RegisterFormValue} from "../../types/types";
 import {validateMyAccountForm} from "../../utilities/validations/validateMyAccountForm";
 import {updateEmployee} from "../../api/employeeApi";
 import {toast} from "react-toastify";
-import {animated, useSpring} from "react-spring";
+import {animated} from "react-spring";
 
 interface MyAccountModalProps {
   toggleModal: (event: React.MouseEvent) => void;
@@ -65,7 +65,7 @@ const MyAccountModal: FunctionComponent<MyAccountModalProps> = props => {
     const {firstName, lastName, email, password} = form;
     try {
       setLoading(true);
-      const user = await firebase.auth().currentUser;
+      const user: User | null = await firebase.auth().currentUser;
       if (user) {
         if (typeof authContext === "object") {
           await user.updateProfile({

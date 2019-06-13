@@ -1,17 +1,19 @@
-import React, {FunctionComponent} from 'react';
+import React, { FunctionComponent } from "react";
 import styled from "styled-components";
 import CloseIcon from "../../icons/CloseIcon";
-import {ValueType} from "react-select/lib/types";
+import { ValueType } from "react-select/lib/types";
 import ReactCSSTransitionGroup from "react-addons-css-transition-group";
-import {CompanySelectOptions} from "../../types/types";
+import { CompanySelectOptions } from "../../types/types";
 
 interface EmployeeModalCompanyListProps {
   companySelectOptions: CompanySelectOptions[];
   handleRemoveFromEmployeeCompanyList: (company: ValueType<any>) => void;
 }
 
-const EmployeeModalCompanyList: FunctionComponent<EmployeeModalCompanyListProps> = props => {
-  const {companySelectOptions} = props;
+const EmployeeModalCompanyList: FunctionComponent<
+  EmployeeModalCompanyListProps
+> = props => {
+  const { companySelectOptions } = props;
   return (
     <ListContainer>
       <ReactCSSTransitionGroup
@@ -23,15 +25,23 @@ const EmployeeModalCompanyList: FunctionComponent<EmployeeModalCompanyListProps>
           return (
             <Row key={company.value}>
               <span>{company.label}</span>
-              <CloseIcon color="#fff" backgroundColor="#FE9161" background={true} margin="0"
-                         onClick={() => props.handleRemoveFromEmployeeCompanyList(company)}
-                         height="16px"
-                         width="16px"/>
-            </Row>)
+              <CloseIcon
+                color="#fff"
+                backgroundColor="#FE9161"
+                background={true}
+                margin="0"
+                onClick={() =>
+                  props.handleRemoveFromEmployeeCompanyList(company)
+                }
+                height="16px"
+                width="16px"
+              />
+            </Row>
+          );
         })}
       </ReactCSSTransitionGroup>
     </ListContainer>
-  )
+  );
 };
 
 export default EmployeeModalCompanyList;
@@ -43,7 +53,7 @@ export const ListContainer = styled.div`
 
 export const Row = styled.div`
   padding: 5px 5px 5px 10px;
-  background: #F7F7F7;
+  background: #f7f7f7;
   border-radius: 3px;
   font-size: 15px;
   margin-bottom: 10px;

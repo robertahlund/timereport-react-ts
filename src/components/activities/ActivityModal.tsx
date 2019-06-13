@@ -27,12 +27,12 @@ import {
   getCompaniesByActivityId,
   updateCompanies
 } from "../../api/companyApi";
-import { ActivityFormValue, Company } from "../../types/types";
+import { ActivityFormValue, Company, Activity } from "../../types/types";
 import { updateTimeReportByActivityId } from "../../api/timeReportApi";
 import { initialActivityState } from "../../constants/activityConstants";
 import { validateActivityForm } from "../../utilities/validations/validateActivityForm";
-import {useSpring} from "react-spring";
-import {modalAnimation} from "../../constants/generalConstants";
+import { useSpring } from "react-spring";
+import { modalAnimation } from "../../constants/generalConstants";
 
 export interface ButtonRowProps {
   isNew: boolean;
@@ -57,37 +57,32 @@ const ActivityModal: FunctionComponent<ActivityModalProps> = props => {
 
   useEffect(() => {
     if (!isNew) {
-      // noinspection JSIgnoredPromiseFromCall
       _getActivityById();
     }
   }, []);
 
   const _getActivityById = async (): Promise<void> => {
     const { activityId } = props;
-    const activityData = await getActivityById(activityId);
+    const activityData: Activity = await getActivityById(activityId);
     setModalLoading(false);
-    if (typeof activityData !== "string") {
-      setActivity({
-        id: activityData.id,
+    setActivity({
+      id: activityData.id,
+      valid: true,
+      name: {
         valid: true,
-        name: {
-          valid: true,
-          validationMessage: "",
-          value: activityData.name
-        }
-      });
-      setOriginalActivity({
-        id: activityData.id,
+        validationMessage: "",
+        value: activityData.name
+      }
+    });
+    setOriginalActivity({
+      id: activityData.id,
+      valid: true,
+      name: {
         valid: true,
-        name: {
-          valid: true,
-          validationMessage: "",
-          value: activityData.name
-        }
-      });
-    } else {
-      toast.error(activityData);
-    }
+        validationMessage: "",
+        value: activityData.name
+      }
+    });
   };
 
   const onFormChange = (event: ChangeEvent<HTMLInputElement>): void => {
@@ -107,11 +102,10 @@ const ActivityModal: FunctionComponent<ActivityModalProps> = props => {
     newActivityName: string
   ): Company[] => {
     companiesList.forEach(company => {
-      company.activities!.forEach(
-        activity =>
-          activity.value === activityId
-            ? (activity.label = newActivityName)
-            : null
+      company.activities!.forEach(activity =>
+        activity.value === activityId
+          ? (activity.label = newActivityName)
+          : null
       );
     });
     return companiesList;
@@ -119,35 +113,27 @@ const ActivityModal: FunctionComponent<ActivityModalProps> = props => {
 
   const onUpdateActivity = async (): Promise<void> => {
     const companies = await getCompaniesByActivityId(activity.id);
-    if (typeof companies !== "string") {
-      const updatedCompaniesList = updateActivityNameOnCompanies(
-        companies,
-        activity.id,
-        activity.name.value
-      );
-      await updateCompanies(updatedCompaniesList);
-      await updateActivity({ id: activity.id, name: activity.name.value });
-      await updateTimeReportByActivityId(activity.id, activity.name.value);
-      setOriginalActivity(activity);
-    } else {
-      console.log(companies);
-    }
+    const updatedCompaniesList = updateActivityNameOnCompanies(
+      companies,
+      activity.id,
+      activity.name.value
+    );
+    await updateCompanies(updatedCompaniesList);
+    await updateActivity({ id: activity.id, name: activity.name.value });
+    await updateTimeReportByActivityId(activity.id, activity.name.value);
+    setOriginalActivity(activity);
   };
 
   const onCreateActivity = async (): Promise<void> => {
-      const activityId: string = await createActivity({
-        id: activity.id,
-        name: activity.name.value
-      });
-      if (activityId !== "Error") {
-        toast.success(`Successfully created ${activity.name.value}!`);
-        setActivity({ ...activity, id: activityId });
-        setOriginalActivity({ ...activity, id: activityId });
-        setIsNew(false);
-        setModalLoading(false);
-      } else {
-        toast.error(activityId)
-      }
+    const activityId: string = await createActivity({
+      id: activity.id,
+      name: activity.name.value
+    });
+    toast.success(`Successfully created ${activity.name.value}!`);
+    setActivity({ ...activity, id: activityId });
+    setOriginalActivity({ ...activity, id: activityId });
+    setIsNew(false);
+    setModalLoading(false);
   };
 
   const onSubmit = async (): Promise<void> => {
@@ -185,23 +171,18 @@ const ActivityModal: FunctionComponent<ActivityModalProps> = props => {
   };
 
   const onDeleteActivity = async (): Promise<void> => {
-      setDeleteLoading(true);
-      const companies = await getCompaniesByActivityId(activity.id);
-      if (typeof companies !== "string") {
-        const updatedCompaniesList = removeActivityFromCompaniesList(
-          companies,
-          activity.id
-        );
-        await updateCompanies(updatedCompaniesList);
-        await deleteActivity(activity.id);
-        toast.success(`Successfully deleted ${activity.name.value}.`);
-        props.toggleModal();
-        // noinspection JSIgnoredPromiseFromCall
-        props.getAllActivities();
-      } else {
-        toast.error(companies);
-        setDeleteLoading(false);
-      }
+    setDeleteLoading(true);
+    const companies: Company[] = await getCompaniesByActivityId(activity.id);
+    const updatedCompaniesList = removeActivityFromCompaniesList(
+      companies,
+      activity.id
+    );
+    await updateCompanies(updatedCompaniesList);
+    await deleteActivity(activity.id);
+    toast.success(`Successfully deleted ${activity.name.value}.`);
+    props.toggleModal();
+    // noinspection JSIgnoredPromiseFromCall
+    props.getAllActivities();
   };
 
   const animation = useSpring(modalAnimation);

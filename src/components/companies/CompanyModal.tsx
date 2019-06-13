@@ -41,8 +41,8 @@ import { stringCompare } from "../../utilities/compare/stringCompare";
 import { getActivities } from "../../api/activityApi";
 import { initialCompanyState } from "../../constants/companyConstants";
 import { validateCompanyForm } from "../../utilities/validations/validateCompanyForm";
-import {modalAnimation} from "../../constants/generalConstants";
-import {useSpring} from "react-spring";
+import { modalAnimation } from "../../constants/generalConstants";
+import { useSpring } from "react-spring";
 
 interface CompanyModalProps {
   toggleModal: (event?: React.MouseEvent) => void;
@@ -66,56 +66,42 @@ const CompanyModal: FunctionComponent<CompanyModalProps> = props => {
 
   useEffect(() => {
     if (!isNew) {
-      // noinspection JSIgnoredPromiseFromCall
       removeAddedActivitiesFromList();
     } else {
-      // noinspection JSIgnoredPromiseFromCall
       _getActivities();
     }
   }, []);
 
-  const _getCompanyById = async (): Promise<
-    ActivitySelectOptions[] | string
-  > => {
+  const _getCompanyById = async (): Promise<ActivitySelectOptions[]> => {
     const { companyId } = props;
-    const companyData: Company | string = await getCompanyById(companyId);
-    if (typeof companyData !== "string") {
-      const companyForm: CompanyFormValue = {
-        id: companyData.id,
+    const companyData: Company = await getCompanyById(companyId);
+    const companyForm: CompanyFormValue = {
+      id: companyData.id,
+      valid: true,
+      name: {
+        value: companyData.name,
         valid: true,
-        name: {
-          value: companyData.name,
-          valid: true,
-          validationMessage: ""
-        },
-        orgNumber: {
-          value: companyData.orgNumber,
-          valid: true,
-          validationMessage: ""
-        }
-      };
-      setModalLoading(false);
-      setCompany(companyForm);
-      setOriginalCompany(companyForm);
-      if (companyData.activities) {
-        setCompanyActivityList(companyData.activities);
-        return new Promise<ActivitySelectOptions[]>(resolve =>
-          resolve(companyData.activities)
-        );
-      } else
-        return new Promise<string>(reject => reject("Missing activity list."));
-    } else
-      return new Promise<string>(reject =>
-        reject("Error, something went wrong.")
-      );
+        validationMessage: ""
+      },
+      orgNumber: {
+        value: companyData.orgNumber,
+        valid: true,
+        validationMessage: ""
+      }
+    };
+    setModalLoading(false);
+    setCompany(companyForm);
+    setOriginalCompany(companyForm);
+    if (companyData.activities) {
+      setCompanyActivityList(companyData.activities);
+      return Promise.resolve(companyData.activities);
+    } else return Promise.reject("Missing activity list");
   };
 
-  const _getActivities = async (): Promise<
-    ActivitySelectOptions[] | string
-  > => {
-    const activityData: ActivitySelectOptions[] = [];
-    const activities: Activity[] | string = await getActivities();
-    if (typeof activities !== "string") {
+  const _getActivities = async (): Promise<ActivitySelectOptions[]> => {
+    try {
+      const activityData: ActivitySelectOptions[] = [];
+      const activities: Activity[] = await getActivities();
       activities.forEach((activity: Activity) => {
         activityData.push({
           value: activity.id,
@@ -123,33 +109,23 @@ const CompanyModal: FunctionComponent<CompanyModalProps> = props => {
         });
       });
       setActivityList(activityData);
-      return new Promise<ActivitySelectOptions[] | string>(resolve =>
-        resolve(activityData)
-      );
-    } else
-      return new Promise<ActivitySelectOptions[] | string>(reject =>
-        reject("Error")
-      );
+      return Promise.resolve(activityData);
+    } catch (error) {
+      return Promise.reject(error);
+    }
   };
 
   const removeAddedActivitiesFromList = async (): Promise<void> => {
-    let allActivities = await _getActivities();
-    const assignedActivities:
-      | ActivitySelectOptions[]
-      | string
-      | undefined = await _getCompanyById();
-    if (typeof assignedActivities !== "string") {
-      assignedActivities.forEach(assignedActivity => {
-        if (typeof allActivities !== "string") {
-          allActivities = [
-            ...allActivities.filter(
-              activity => activity.value !== assignedActivity.value
-            )
-          ];
-          setActivityList(allActivities);
-        }
-      });
-    }
+    let allActivities: ActivitySelectOptions[] = await _getActivities();
+    const assignedActivities: ActivitySelectOptions[] = await _getCompanyById();
+    assignedActivities.forEach(assignedActivity => {
+      allActivities = [
+        ...allActivities.filter(
+          activity => activity.value !== assignedActivity.value
+        )
+      ];
+      setActivityList(allActivities);
+    });
   };
 
   const onFormChange = (event: ChangeEvent<HTMLInputElement>): void => {
@@ -208,7 +184,7 @@ const CompanyModal: FunctionComponent<CompanyModalProps> = props => {
         orgNumber: company.orgNumber.value,
         activities: [...companyActivityList]
       };
-      const companyId = await createCompany(companyData);
+      const companyId: string = await createCompany(companyData);
       toast.success(`Successfully created ${company.name.value}!`);
       setCompany({ ...company, id: companyId });
       setOriginalCompany({ ...company, id: companyId });
@@ -236,39 +212,37 @@ const CompanyModal: FunctionComponent<CompanyModalProps> = props => {
 
   const onUpdateCompany = async (): Promise<void> => {
     try {
-      const employees = await getEmployeesByCompanyId(company.id);
-      if (typeof employees !== "string") {
-        const updatedEmployeeList = updateCompanyNameOnEmployees(
-          employees,
-          company.id,
-          company.name.value
-        );
-        await updateEmployees(updatedEmployeeList);
-        await updateCompany({
-          id: company.id,
-          name: company.name.value,
-          orgNumber: company.orgNumber.value,
-          activities: [...companyActivityList]
-        });
-        if (stringCompare(company.name.value, originalCompany.name.value)) {
-          await updateTimeReportByCompanyId(company.id, company.name.value);
-        }
-        setOriginalCompany({
-          id: company.id,
-          valid: true,
-          name: {
-            value: company.name.value,
-            valid: true,
-            validationMessage: ""
-          },
-          orgNumber: {
-            value: company.orgNumber.value,
-            valid: true,
-            validationMessage: ""
-          }
-        });
-        toast.success(`Successfully updated ${company.name.value}!`);
+      const employees: AuthObject[] = await getEmployeesByCompanyId(company.id);
+      const updatedEmployeeList: AuthObject[] = updateCompanyNameOnEmployees(
+        employees,
+        company.id,
+        company.name.value
+      );
+      await updateEmployees(updatedEmployeeList);
+      await updateCompany({
+        id: company.id,
+        name: company.name.value,
+        orgNumber: company.orgNumber.value,
+        activities: [...companyActivityList]
+      });
+      if (stringCompare(company.name.value, originalCompany.name.value)) {
+        await updateTimeReportByCompanyId(company.id, company.name.value);
       }
+      setOriginalCompany({
+        id: company.id,
+        valid: true,
+        name: {
+          value: company.name.value,
+          valid: true,
+          validationMessage: ""
+        },
+        orgNumber: {
+          value: company.orgNumber.value,
+          valid: true,
+          validationMessage: ""
+        }
+      });
+      toast.success(`Successfully updated ${company.name.value}!`);
     } catch (error) {
       console.log(error);
     }
@@ -301,7 +275,7 @@ const CompanyModal: FunctionComponent<CompanyModalProps> = props => {
     employeeList: AuthObject[],
     companyId: string
   ): AuthObject[] => {
-    let updatedEmployeeList: AuthObject[] = [];
+    const updatedEmployeeList: AuthObject[] = [];
     employeeList.forEach(employee => {
       if (employee.companies) {
         employee.companies = employee.companies.filter(
@@ -316,19 +290,16 @@ const CompanyModal: FunctionComponent<CompanyModalProps> = props => {
   const onDeleteCompany = async (): Promise<void> => {
     setDeleteLoading(true);
     try {
-      const employees = await getEmployeesByCompanyId(company.id);
-      if (typeof employees !== "string") {
-        const updatedEmployeeList = removeCompanyFromEmployeeList(
-          employees,
-          company.id
-        );
-        await updateEmployees(updatedEmployeeList);
-        await deleteCompany(company.id);
-        toast.success(`Successfully deleted ${company.name.value}!`);
-        props.toggleModal();
-        // noinspection JSIgnoredPromiseFromCall
-        props.getAllCompanies();
-      }
+      const employees: AuthObject[] = await getEmployeesByCompanyId(company.id);
+      const updatedEmployeeList: AuthObject[] = removeCompanyFromEmployeeList(
+        employees,
+        company.id
+      );
+      await updateEmployees(updatedEmployeeList);
+      await deleteCompany(company.id);
+      toast.success(`Successfully deleted ${company.name.value}!`);
+      props.toggleModal();
+      props.getAllCompanies();
     } catch (error) {
       console.log(error);
       setDeleteLoading(false);

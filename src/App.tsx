@@ -1,4 +1,4 @@
-import React, {Component} from "react";
+import React, { Component } from "react";
 import "./styles/App.css";
 import "./styles/modal-transition.css";
 import "./styles/react-select.css";
@@ -6,16 +6,20 @@ import Menu from "./components/menu/Menu";
 import Routes from "./components/routes/Routes";
 import firebase from "./config/firebaseConfig";
 import MyAccountModal from "./components/account/MyAccountModal";
-import {User} from "firebase";
-import {toast, ToastContainer} from "react-toastify";
+import { User } from "firebase";
+import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.min.css";
 import ToastCloseIcon from "./icons/ToastCloseIcon";
 import AuthLoading from "./components/authentication/AuthLoading";
-import {AuthContextProvider} from "./context/authentication/authenticationContext";
-import {checkIfUserInformationHasChanged, checkIfUserIsInactive, getEmployeeById} from "./api/employeeApi";
-import {AuthObject} from "./types/types";
+import { AuthContextProvider } from "./context/authentication/authenticationContext";
+import {
+  checkIfUserInformationHasChanged,
+  checkIfUserIsInactive,
+  getEmployeeById
+} from "./api/employeeApi";
+import { AuthObject } from "./types/types";
 import ModalPortal from "./components/general/ModalPortal";
-import {withRouter} from "react-router";
+import { withRouter } from "react-router";
 
 interface AppState {
   auth: AuthObject | boolean;
@@ -31,7 +35,6 @@ class App extends Component<{}, AppState> {
   };
 
   componentDidMount(): void {
-    // noinspection JSIgnoredPromiseFromCall
     this.authObserver();
   }
 
@@ -54,12 +57,14 @@ class App extends Component<{}, AppState> {
   };
 
   checkIfUserAccountNeedsToBeUpdated = async (user: User): Promise<void> => {
-    const updateNeeded: boolean | string = await checkIfUserInformationHasChanged(user);
-    if (updateNeeded && typeof updateNeeded === "boolean") {
-      console.log("Data was changed, and need to be updated in the collection.");
+    const updateNeeded: boolean = await checkIfUserInformationHasChanged(user);
+    if (updateNeeded) {
+      console.log(
+        "Data was changed, and need to be updated in the collection."
+      );
       toast.success(
         "An administrator has updated your information. This might mean that the email you log in with has changed. Verify under 'My account' that it has not changed.",
-        {autoClose: false}
+        { autoClose: false }
       );
     }
   };
@@ -67,25 +72,25 @@ class App extends Component<{}, AppState> {
   setUserInfo = async (user: User, displayToast: boolean): Promise<void> => {
     console.log("Logged in");
     if (await checkIfUserIsInactive(user)) {
-      toast.error("This account is inactive.", {autoClose: false});
+      toast.error("This account is inactive.", { autoClose: false });
       await firebase.auth().signOut();
       return;
     }
     await this.checkIfUserAccountNeedsToBeUpdated(user);
-    let userData: AuthObject | string = await getEmployeeById(user.uid);
-    if (typeof userData !== "string") {
-      userData.email = user.email !== null ? user.email : "";
-      this.setState({
-        auth: userData,
-        authHasLoaded: true
-      });
-      console.log(userData)
-      displayToast && userData.firstName ? toast.success(`Welcome back ${userData.firstName}.`) : null;
-    }
+    let userData: AuthObject = await getEmployeeById(user.uid);
+    userData.email = user.email !== null ? user.email : "";
+    this.setState({
+      auth: userData,
+      authHasLoaded: true
+    });
+    console.log(userData);
+    displayToast && userData.firstName
+      ? toast.success(`Welcome back ${userData.firstName}.`)
+      : null;
   };
 
   toggleMyAccountModal = (event: React.MouseEvent): void => {
-    const {target, currentTarget} = event;
+    const { target, currentTarget } = event;
     if (target === currentTarget) {
       this.setState(prevState => ({
         showMyAccountModal: !prevState.showMyAccountModal
@@ -94,11 +99,11 @@ class App extends Component<{}, AppState> {
   };
 
   render() {
-    const {auth, showMyAccountModal, authHasLoaded} = this.state;
+    const { auth, showMyAccountModal, authHasLoaded } = this.state;
     return (
       <div className="App">
         <AuthContextProvider value={auth}>
-          <Menu toggleModal={this.toggleMyAccountModal}/>
+          <Menu toggleModal={this.toggleMyAccountModal} />
           {showMyAccountModal && (
             <ModalPortal>
               <MyAccountModal
@@ -108,11 +113,7 @@ class App extends Component<{}, AppState> {
               />
             </ModalPortal>
           )}
-          {authHasLoaded ? (
-            <Routes/>
-          ) : (
-            <AuthLoading/>
-          )}
+          {authHasLoaded ? <Routes /> : <AuthLoading />}
         </AuthContextProvider>
         <ToastContainer
           position="top-right"
@@ -121,7 +122,7 @@ class App extends Component<{}, AppState> {
           closeOnClick
           toastClassName="toast-global"
           closeButton={
-            <ToastCloseIcon color="#fff" height="16px" width="16px"/>
+            <ToastCloseIcon color="#fff" height="16px" width="16px" />
           }
         />
       </div>

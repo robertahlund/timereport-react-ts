@@ -10,7 +10,6 @@ interface DetailedRowContainerProps {
 
 const DetailedRowContainer: FunctionComponent<DetailedRowContainerProps> = props => {
   useEffect(() => {
-    console.log("effect")
     props.rowDetails.sort((a, b) => {
       if (a.formattedDate > b.formattedDate) {
         return 1;

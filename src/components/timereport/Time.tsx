@@ -170,25 +170,20 @@ const Time: FunctionComponent = () => {
   };
 
   const getAllAssignedActivities = async (): Promise<
-    ActivityCompanySelectOption[] | string
+    ActivityCompanySelectOption[]
   > => {
     if (typeof authContext === "boolean" || authContext.uid === undefined) {
-      return new Promise<ActivityCompanySelectOption[] | string>(reject =>
-        reject("Authentication error.")
-      );
+      return Promise.reject("Authentication error");
     }
-    const userActivities:
-      | ActivityCompanySelectOption[]
-      | string = await getAllActivitiesAssignedToUser(authContext.uid);
-    if (typeof userActivities !== "string") {
+    try {
+      const userActivities: ActivityCompanySelectOption[] = await getAllActivitiesAssignedToUser(
+        authContext.uid
+      );
       createOptionList(userActivities);
-      return new Promise<ActivityCompanySelectOption[] | string>(resolve =>
-        resolve(userActivities)
-      );
-    } else
-      return new Promise<ActivityCompanySelectOption[] | string>(reject =>
-        reject("Error")
-      );
+      return Promise.resolve(userActivities);
+    } catch (error) {
+      return Promise.reject("Error retrieving activities");
+    }
   };
 
   const handleSelectChange = (option: ValueType<any>): void => {
@@ -286,7 +281,7 @@ const Time: FunctionComponent = () => {
     }
   };
 
-  const calculateTotals = (timeReportRows: TimeReport[]) => {
+  const calculateTotals = (timeReportRows: TimeReport[]): void => {
     let total: TimeReportSummary = _.cloneDeep(initialTotal);
     timeReportRows.forEach(timeReport => {
       timeReport.timeReportRows.forEach((row, index) => {
@@ -298,12 +293,10 @@ const Time: FunctionComponent = () => {
   };
 
   const deleteRow = async (timeReport: TimeReport): Promise<void> => {
-    let response: string = "";
-    if (timeReport.id !== "") {
-      response = await deleteTimeReport(timeReport.id);
-    }
-    if (response !== "Error deleting row.") {
-      //TODO set up error constants for all errors
+    try {
+      if (timeReport.id !== "") {
+        await deleteTimeReport(timeReport.id);
+      }
       const newTimeReportRows: TimeReport[] = _.cloneDeep(timeReportRows);
       _.remove(newTimeReportRows, (timeReportItem: TimeReport) => {
         return (
@@ -321,24 +314,18 @@ const Time: FunctionComponent = () => {
           companyName: timeReport.companyName
         });
       }
-      if (response !== "") {
-        toast.success(response);
-      }
-    } else {
-      toast.error(response);
+    } catch (error) {
+      toast.error(error);
     }
   };
 
   const saveRows = async (): Promise<void> => {
     try {
-      const savedRows:
-        | TimeReport[]
-        | string = await createOrUpdateTimeReportRows(timeReportRows);
-      if (typeof savedRows !== "string") {
-        setTimeReportRows(savedRows);
-        setLastSaved(format(new Date(), timeStampFormat));
-      }
-      console.log(savedRows);
+      const savedRows: TimeReport[] = await createOrUpdateTimeReportRows(
+        timeReportRows
+      );
+      setTimeReportRows(savedRows);
+      setLastSaved(format(new Date(), timeStampFormat));
     } catch (error) {
       console.log(error);
     }
@@ -350,28 +337,23 @@ const Time: FunctionComponent = () => {
   ): Promise<void> => {
     if (timeReportRowIndex !== undefined && timeReportIndex !== undefined) {
       const timeReport: TimeReport = timeReportRows[timeReportIndex];
-      console.log(timeReport);
       try {
         if (checkIfAllCellsOnRowAreZero(timeReport) || !rowIsSaved) {
           return;
         } else {
           setRowIsSaved(false);
-          const savedRows:
-            | TimeReport[]
-            | string = await createOrUpdateTimeReportRows([timeReport]);
-          if (typeof savedRows !== "string") {
-            if (timeReport.id === "") {
-              setTimeReportRows(
-                produce(timeReportRows, draft => {
-                  draft[timeReportIndex].id = savedRows[0].id;
-                })
-              );
-            }
-            setLastSaved(format(new Date(), timeStampFormat));
-            setRowIsSaved(true);
-          } else {
-            toast.error(savedRows);
+          const savedRows: TimeReport[] = await createOrUpdateTimeReportRows([
+            timeReport
+          ]);
+          if (timeReport.id === "") {
+            setTimeReportRows(
+              produce(timeReportRows, draft => {
+                draft[timeReportIndex].id = savedRows[0].id;
+              })
+            );
           }
+          setLastSaved(format(new Date(), timeStampFormat));
+          setRowIsSaved(true);
         }
       } catch (error) {
         console.log(error);
@@ -438,27 +420,19 @@ const Time: FunctionComponent = () => {
       subDays(selectedDate, 7),
       timeReportDateFormat
     );
-    let lastWeekRows:
-      | TimeReport[]
-      | string = await getTimeReportsByDateAndUserId(
+    let lastWeekRows: TimeReport[] = await getTimeReportsByDateAndUserId(
       previousWeekStartDate,
       authContext.uid
     );
-    if (typeof lastWeekRows !== "string") {
-      lastWeekRows = clearAllTimeReportHours(lastWeekRows);
-      setTimeReportRows(lastWeekRows);
-      const userActivities:
-        | ActivityCompanySelectOption[]
-        | string = await getAllAssignedActivities();
-      if (typeof userActivities !== "string") {
-        removeActivityFromCombobox(
-          undefined,
-          undefined,
-          lastWeekRows,
-          userActivities
-        );
-      }
-    }
+    lastWeekRows = clearAllTimeReportHours(lastWeekRows);
+    setTimeReportRows(lastWeekRows);
+    const userActivities: ActivityCompanySelectOption[] = await getAllAssignedActivities();
+    removeActivityFromCombobox(
+      undefined,
+      undefined,
+      lastWeekRows,
+      userActivities
+    );
     setPreviousWeekRowLoading(false);
   };
 

@@ -5,17 +5,17 @@ import React, {
   useEffect,
   useState
 } from "react";
-import {PaddingRow} from "../authentication/LoginForm";
+import { PaddingRow } from "../authentication/LoginForm";
 import Input from "../general/Input";
 import Button from "../general/Button";
-import {ListHeader, ListRow} from "../employees/EmployeeList";
+import { ListHeader, ListRow } from "../employees/EmployeeList";
 import LoadingIcon from "../../icons/LoadingIcon";
-import {FlexContainer} from "../companies/CompanyList";
-import {Activity, Order} from "../../types/types";
+import { FlexContainer } from "../companies/CompanyList";
+import { Activity, Order } from "../../types/types";
 import ActivityModal from "./ActivityModal";
-import {getActivities} from "../../api/activityApi";
+import { getActivities } from "../../api/activityApi";
 import ModalPortal from "../general/ModalPortal";
-
+import _ from "lodash";
 
 type Column = "name";
 
@@ -41,7 +41,7 @@ const ActivitiesList: FunctionComponent = () => {
   const [activityId, setActivityId] = useState("");
 
   const handleSearchChange = (event: ChangeEvent<HTMLInputElement>): void => {
-    const {target} = event;
+    const { target } = event;
     setSearchValue(target.value);
     if (target.value === "") {
       setActivityList(clonedActivityList);
@@ -58,12 +58,10 @@ const ActivitiesList: FunctionComponent = () => {
   const getAllActivities = async (): Promise<void> => {
     setLoading(true);
     try {
-      const activityData = await getActivities();
-      if (typeof activityData !== "string") {
-        setActivityList(activityData);
-        setClonedActivityList(activityData);
-        setLoading(false);
-      }
+      const activityData: Activity[] = await getActivities();
+      setActivityList(activityData);
+      setClonedActivityList(activityData);
+      setLoading(false);
     } catch (error) {
       setLoading(false);
       console.log(error);
@@ -71,7 +69,6 @@ const ActivitiesList: FunctionComponent = () => {
   };
 
   useEffect(() => {
-    // noinspection JSIgnoredPromiseFromCall
     getAllActivities();
   }, []);
 
@@ -87,42 +84,46 @@ const ActivitiesList: FunctionComponent = () => {
   };
 
   const sortAsc = (column: Column): void => {
-    const listToSort: Activity[] = JSON.parse(JSON.stringify(activityList));
-    listToSort.sort((a: Activity, b: Activity): number => {
-      const propA = a[column].toLowerCase();
-      const propB = b[column].toLowerCase();
-      if (propA < propB) {
-        return -1;
+    const listToSort: Activity[] = _.cloneDeep(activityList);
+    listToSort.sort(
+      (a: Activity, b: Activity): number => {
+        const propA = a[column].toLowerCase();
+        const propB = b[column].toLowerCase();
+        if (propA < propB) {
+          return -1;
+        }
+        if (propA > propB) {
+          return 1;
+        }
+        return 0;
       }
-      if (propA > propB) {
-        return 1;
-      }
-      return 0;
-    });
+    );
     setActivityList(listToSort);
     setClonedActivityList(listToSort);
   };
 
   const sortDesc = (column: Column): void => {
-    const listToSort: Activity[] = JSON.parse(JSON.stringify(activityList));
-    listToSort.sort((a: Activity, b: Activity): number => {
-      const propA = a[column].toLowerCase();
-      const propB = b[column].toLowerCase();
-      if (propB < propA) {
-        return -1;
+    const listToSort: Activity[] = _.cloneDeep(activityList);
+    listToSort.sort(
+      (a: Activity, b: Activity): number => {
+        const propA = a[column].toLowerCase();
+        const propB = b[column].toLowerCase();
+        if (propB < propA) {
+          return -1;
+        }
+        if (propB > propA) {
+          return 1;
+        }
+        return 0;
       }
-      if (propB > propA) {
-        return 1;
-      }
-      return 0;
-    });
+    );
     setActivityList(listToSort);
     setClonedActivityList(listToSort);
   };
 
   const toggleActivityModal = (event?: React.MouseEvent): void => {
     if (event) {
-      const {target, currentTarget} = event;
+      const { target, currentTarget } = event;
       if (target === currentTarget) {
         setShowActivityModal(!showActivityModal);
       }

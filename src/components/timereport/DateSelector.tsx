@@ -5,7 +5,6 @@ import ArrowRight from "../../icons/ArrowRight";
 import {DateSelectorValue} from "../../types/types";
 import DatePicker, {registerLocale} from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-// @ts-ignore
 import enGB from "date-fns/locale/en-GB"
 
 registerLocale('enGB', enGB);
