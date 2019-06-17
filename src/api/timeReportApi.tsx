@@ -99,18 +99,7 @@ export const getTimeReportsByDateAndUserId = async (
       .get()
       .then(documents => {
         documents.forEach(doc => {
-          timeReports.push({
-            id: doc.data().id,
-            userId: doc.data().userId,
-            username: doc.data().username,
-            activityId: doc.data().activityId,
-            activityName: doc.data().activityName,
-            companyId: doc.data().companyId,
-            companyName: doc.data().companyName,
-            date: doc.data().date,
-            prettyDate: doc.data().prettyDate,
-            timeReportRows: doc.data().timeReportRows
-          });
+          timeReports.push(doc.data() as TimeReport);
         });
       });
     return Promise.resolve(timeReports);
@@ -134,18 +123,7 @@ export const getTimeReportsByDate = async (
         .get()
         .then(documents => {
           documents.forEach(doc => {
-            timeReports.push({
-              id: doc.data().id,
-              userId: doc.data().userId,
-              username: doc.data().username,
-              activityId: doc.data().activityId,
-              activityName: doc.data().activityName,
-              companyId: doc.data().companyId,
-              companyName: doc.data().companyName,
-              date: doc.data().date,
-              prettyDate: doc.data().prettyDate,
-              timeReportRows: doc.data().timeReportRows
-            });
+            timeReports.push(doc.data() as TimeReport);
           });
         });
     } else {
@@ -157,18 +135,7 @@ export const getTimeReportsByDate = async (
         .get()
         .then(documents => {
           documents.forEach(doc => {
-            timeReports.push({
-              id: doc.data().id,
-              userId: doc.data().userId,
-              username: doc.data().username,
-              activityId: doc.data().activityId,
-              activityName: doc.data().activityName,
-              companyId: doc.data().companyId,
-              companyName: doc.data().companyName,
-              date: doc.data().date,
-              prettyDate: doc.data().prettyDate,
-              timeReportRows: doc.data().timeReportRows
-            });
+            timeReports.push(doc.data() as TimeReport);
           });
         });
     }

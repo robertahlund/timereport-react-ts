@@ -16,6 +16,8 @@ import ExpenseModal from "./ExpenseModal";
 import ModalPortal from "../general/ModalPortal";
 import _ from "lodash";
 import { getExpenses } from "../../api/expenseApi";
+import AttachmentIcon from "../../icons/AttachmentIcon";
+import styled from "styled-components";
 
 const ExpenseList: FunctionComponent = () => {
   const [searchValue, setSearchValue] = useState("");
@@ -173,41 +175,43 @@ const ExpenseList: FunctionComponent = () => {
                 selectExpense(expense.id, event)
               }
             >
-              <span
+              <VerticalCenterSpan
                 onClick={(event: React.MouseEvent) =>
                   selectExpense(expense.id, event)
                 }
               >
                 {expense.username}
-              </span>
-              <span
+              </VerticalCenterSpan>
+              <VerticalCenterSpan
                 onClick={(event: React.MouseEvent) =>
                   selectExpense(expense.id, event)
                 }
               >
                 {expense.expenseCategoryName}
-              </span>
-              <span
+              </VerticalCenterSpan>
+              <VerticalCenterSpan
                 onClick={(event: React.MouseEvent) =>
                   selectExpense(expense.id, event)
                 }
               >
                 {expense.amount}
-              </span>
-              <span
+              </VerticalCenterSpan>
+              <VerticalCenterSpan
                 onClick={(event: React.MouseEvent) =>
                   selectExpense(expense.id, event)
                 }
               >
                 {expense.vat}
-              </span>
-              <span
+              </VerticalCenterSpan>
+              <VerticalCenterSpan
                 onClick={(event: React.MouseEvent) =>
                   selectExpense(expense.id, event)
                 }
               >
-                <a href={expense.receiptUrl}>Receipt</a>
-              </span>
+                <a href={expense.receiptUrl} rel="noopener noreferrer" target="_blank">
+                  <AttachmentIcon height="24px" width="24px" color="#fff" backgroundColor="#fec861"/>
+                </a>
+              </VerticalCenterSpan>
             </ListRow>
           );
         })
@@ -240,3 +244,11 @@ const ExpenseList: FunctionComponent = () => {
 };
 
 export default ExpenseList;
+
+const VerticalCenterSpan = styled.span`
+  display: flex;
+  align-items: center;
+  &:last-child {
+    justify-content: flex-end;
+  }
+`;
