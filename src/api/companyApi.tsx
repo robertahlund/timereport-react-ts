@@ -12,9 +12,9 @@ export const getCompanies = async (): Promise<Company[]> => {
     await db
       .collection("companies")
       .get()
-      .then((userDocuments: any) => {
-        userDocuments.forEach((company: any) => {
-          companyList.push(company.data());
+      .then(userDocuments => {
+        userDocuments.forEach(company => {
+          companyList.push(company.data() as Company);
         });
       });
     return Promise.resolve(companyList);
@@ -86,11 +86,11 @@ export const getCompaniesByActivityId = async (
 ): Promise<Company[]> => {
   try {
     const companies = await getCompanies();
-      return Promise.resolve(
-          companies.filter((company: Company) =>
-            company.activities!.some(activity => activity.value === activityId)
-          )
-        );
+    return Promise.resolve(
+      companies.filter((company: Company) =>
+        company.activities!.some(activity => activity.value === activityId)
+      )
+    );
   } catch (error) {
     return Promise.reject("Error retrieving companies");
   }

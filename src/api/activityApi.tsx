@@ -8,9 +8,9 @@ export const getActivities = async (): Promise<Activity[]> => {
     await db
       .collection("activities")
       .get()
-      .then((doc: any) => {
-        doc.forEach((activity: any) => {
-          activityList.push(activity.data());
+      .then(doc => {
+        doc.forEach(activity => {
+          activityList.push(activity.data() as Activity);
         })
       });
     return Promise.resolve(activityList)

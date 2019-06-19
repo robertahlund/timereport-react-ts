@@ -7,6 +7,7 @@ import {
   CompanySelectOptions,
   EmployeeRow
 } from "../types/types";
+import _ from "lodash";
 
 export const createEmployee = async (
   firstName: string,
@@ -96,9 +97,9 @@ export const getEmployees = async (): Promise<AuthObject[]> => {
     await db
       .collection("users")
       .get()
-      .then((userDocuments: any) => {
-        userDocuments.forEach((user: any) => {
-          employeeList.push(user.data());
+      .then(userDocuments => {
+        userDocuments.forEach(user => {
+          employeeList.push(user.data() as AuthObject);
         });
       });
     return Promise.resolve(employeeList);
@@ -111,7 +112,7 @@ export const getEmployeesByCompanyId = async (
   companyId: string
 ): Promise<AuthObject[]> => {
   try {
-    const employees = await getEmployees();
+    const employees: AuthObject[]  = await getEmployees();
     return Promise.resolve(
       employees.filter((user: AuthObject) => {
         if (user.companies) {
@@ -158,19 +159,21 @@ export const getAllActivitiesAssignedToUser = async (
 ): Promise<ActivityCompanySelectOption[]> => {
   const db = firebase.firestore();
   try {
-    const userCompanies: CompanySelectOptions[] = await db
+    const userCompanies: CompanySelectOptions[] | null = await db
       .collection("users")
       .doc(uid)
       .get()
       .then(doc => {
         if (doc.exists) {
-          return doc.data()!.companies;
-        }
+          return doc.data()!.companies as CompanySelectOptions[];
+        } else return null;
       });
-    const userActivities: ActivityCompanySelectOption[] = await getCompanyActivitiesByCompanies(
-      userCompanies
-    );
-    return Promise.resolve(userActivities);
+      if (!_.isNil(userCompanies)) {
+        const userActivities: ActivityCompanySelectOption[] = await getCompanyActivitiesByCompanies(
+          userCompanies
+        );
+        return Promise.resolve(userActivities);
+      } else return Promise.resolve([]);
   } catch (error) {
     return Promise.reject("Error retrieving activities");
   }
