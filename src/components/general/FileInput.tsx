@@ -9,7 +9,6 @@ interface FileInputProps {
 
 const FileInput: FunctionComponent<FileInputProps> = props => {
   const { uploadInput, filename, onFileChange } = props;
-  console.log(filename);
   return (
     <>
       <Label htmlFor="file">{filename || "Upload File"}</Label>
@@ -42,4 +41,5 @@ const Label = styled.label`
   padding: 20px 0 20px 20px;
   border: 1px solid #f1f1f1;
   width: calc(400px - 22px);
+  margin-top: 3px;
 `;

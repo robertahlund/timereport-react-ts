@@ -44,6 +44,15 @@
   font-size: 15px;
 }
 
+.react-select-time .react-select-time__option--is-selected {
+  background-color: #fff;
+  cursor: pointer;
+  padding: 10px 13px;
+  font-size: 15px;
+  background-color: #fec861;
+  color: #393E41;
+}
+
 .react-select-time .react-select-time__option:hover {
   background-color: #fec861;
   cursor: pointer;

@@ -51,6 +51,7 @@ import {
 } from "../../api/expenseCategoryApi";
 import { AuthContext } from "../../context/authentication/authenticationContext";
 
+
 interface ExpenseModalProps {
   toggleModal: (event?: React.MouseEvent) => void;
   expenseId: string;
@@ -184,7 +185,7 @@ const ExpenseModal: FunctionComponent<ExpenseModalProps> = props => {
     }
   };
 
-  const _updateExpense = async (): Promise<void> => {
+  const _updateExpense = async (): Promise<boolean> => {
     try {
       if (
         !_.isNil(uploadInput.current) &&
@@ -220,17 +221,20 @@ const ExpenseModal: FunctionComponent<ExpenseModalProps> = props => {
           receiptUrl: expense.receiptUrl
         });
       }
+      return Promise.resolve(true)
       toast.success("Successfully updated expense!")
     } catch (error) {
+      return Promise.reject(false)
       console.log(error);
     }
   };
 
-  const _createExpense = async (): Promise<void> => {
+  const _createExpense = async (): Promise<boolean> => {
     try {
       if (
         !_.isNil(uploadInput.current) &&
-        !_.isNil(uploadInput.current.files)
+        !_.isNil(uploadInput.current.files) &&
+        !_.isNil(uploadInput.current.files[0])
       ) {
         const uploadedFile: ExpenseFileUpload = await uploadExpenseFile(
           uploadInput.current.files[0]
@@ -253,9 +257,15 @@ const ExpenseModal: FunctionComponent<ExpenseModalProps> = props => {
           setExpense({ ...expense, id: expenseId });
           setIsNew(false);
           setModalLoading(false);
+          return Promise.resolve(true)
+        } else {
+          return Promise.reject(false)
         }
+      } else {
+        return Promise.reject(false)
       }
     } catch (error) {
+      return Promise.reject(false);
       console.log(error);
     }
   };
@@ -268,14 +278,19 @@ const ExpenseModal: FunctionComponent<ExpenseModalProps> = props => {
       setExpense(validatedForm);
       return;
     }
-    setLoading(true);
-    if (isNew) {
-      await _createExpense();
-    } else {
-      await _updateExpense();
+    try {
+      setLoading(true);
+      if (isNew) {
+        await _createExpense();
+      } else {
+        await _updateExpense();
+      }
+      props.getExpenses();
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      console.log(error);
     }
-    props.getExpenses();
-    setLoading(false);
   };
 
   const _deleteExpense = async (): Promise<void> => {

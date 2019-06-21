@@ -37,7 +37,9 @@ const ExpenseForm: FunctionComponent<ExpenseFormProps> = props => {
     <Fragment>
       <form autoComplete="off">
         <PaddingRow>
+          <Label>Attachment
           <FileInput uploadInput={uploadInput} filename={filename} onFileChange={onFileChange}/>
+          </Label>
         </PaddingRow>
         <PaddingRow>
           <Row direction="row">
@@ -74,6 +76,7 @@ const ExpenseForm: FunctionComponent<ExpenseFormProps> = props => {
               width="378px"
               valid={note.valid}
               validationMessage={note.validationMessage}
+              height="100px"
             />
           </PaddingRow>
           <PaddingRow>

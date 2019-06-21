@@ -14,6 +14,7 @@ interface TextAreaProps {
   fontWeight?: string;
   valid?: boolean;
   validationMessage?: string;
+  height?: string;
 }
 
 interface TextAreaFieldProps {
@@ -21,6 +22,7 @@ interface TextAreaFieldProps {
   textAlign?: string;
   fontWeight?: string;
   valid?: boolean;
+  height?: string;
 }
 
 const TextArea: FunctionComponent<TextAreaProps> = props => {
@@ -39,6 +41,7 @@ const TextArea: FunctionComponent<TextAreaProps> = props => {
         autoComplete="off"
         textAlign={props.textAlign}
         fontWeight={props.fontWeight}
+        height={props.height}
       />
       {!props.valid &&
       props.valid !== undefined && (
@@ -62,10 +65,11 @@ const TextAreaField = styled.textarea`
   background-color: #fbfbfb;
   border-radius: 3px;
   border: ${(props: TextAreaFieldProps) =>
-  props.valid ? "1px solid #f1f1f1;" : "1px solid #FE9161;"}
+  props.valid ? "1px solid #f1f1f1;" : "1px solid #FE9161;"};
   padding: 10px;
   font-size: 15px;
   width: ${(props: TextAreaFieldProps) => props.width};
+  height: ${(props: TextAreaFieldProps) => props.height};
   text-align: ${(props: TextAreaFieldProps) =>
   props.textAlign ? props.textAlign : "left"};
   font-weight: ${(props: TextAreaFieldProps) =>

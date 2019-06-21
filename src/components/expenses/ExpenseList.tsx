@@ -150,7 +150,7 @@ const ExpenseList: FunctionComponent = () => {
           />
         </FlexContainer>
       </PaddingRow>
-      <ListHeader>
+      <ExpenseListHeader>
         <span
           onClick={() =>
             sortData({
@@ -165,11 +165,11 @@ const ExpenseList: FunctionComponent = () => {
         <span>Amount</span>
         <span>VAT</span>
         <span>Receipt</span>
-      </ListHeader>
+      </ExpenseListHeader>
       {expenseList.length > 0 && !loading ? (
         expenseList.map((expense: ExpenseListItem) => {
           return (
-            <ListRow
+            <ExpenseListRow
               key={expense.id}
               onClick={(event: React.MouseEvent) =>
                 selectExpense(expense.id, event)
@@ -208,15 +208,24 @@ const ExpenseList: FunctionComponent = () => {
                   selectExpense(expense.id, event)
                 }
               >
-                <a href={expense.receiptUrl} rel="noopener noreferrer" target="_blank">
-                  <AttachmentIcon height="24px" width="24px" color="#fff" backgroundColor="#fec861"/>
+                <a
+                  href={expense.receiptUrl}
+                  rel="noopener noreferrer"
+                  target="_blank"
+                >
+                  <AttachmentIcon
+                    height="24px"
+                    width="24px"
+                    color="#fff"
+                    backgroundColor="#fec861"
+                  />
                 </a>
               </VerticalCenterSpan>
-            </ListRow>
+            </ExpenseListRow>
           );
         })
       ) : loading ? (
-        <ListRow>
+        <ExpenseListRow>
           <LoadingIcon
             position="relative"
             left="0"
@@ -224,11 +233,11 @@ const ExpenseList: FunctionComponent = () => {
             width="30px"
             color="#393e41"
           />
-        </ListRow>
+        </ExpenseListRow>
       ) : (
-        <ListRow>
+        <ExpenseListRow>
           <span>No expenses.</span>
-        </ListRow>
+        </ExpenseListRow>
       )}
       {showExpenseModal && (
         <ModalPortal>
@@ -250,5 +259,31 @@ const VerticalCenterSpan = styled.span`
   align-items: center;
   &:last-child {
     justify-content: flex-end;
+  }
+`;
+
+const ExpenseListRow = styled(ListRow)`
+  span {
+    cursor: pointer;
+    width: 25%;
+  }
+  span:first-child {
+    width: 40%;
+  }
+  span:last-child:not(:first-child) {
+    text-align: right;
+  }
+`;
+
+const ExpenseListHeader = styled(ListHeader)`
+  span {
+    cursor: pointer;
+    width: 25%;
+  }
+  span:first-child {
+    width: 40%;
+  }
+  span:last-child:not(:first-child) {
+    text-align: right;
   }
 `;

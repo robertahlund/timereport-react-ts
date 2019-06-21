@@ -35,9 +35,12 @@ export const ButtonItem = styled.button`
     color: #393E41;
     cursor: pointer;
     display: flex;
-    transition: background-color .2s;
+    transition: background-color .35s;
     position: relative;
     &.active {
       cursor: not-allowed;
+    }
+    &:hover {
+      background-color: ${(props: ButtonStyleProps) => props.buttonType === "Delete" ? '#fe8049' : '#ffc14b'};
     }
 `;
