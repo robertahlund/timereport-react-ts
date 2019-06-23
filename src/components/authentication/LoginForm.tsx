@@ -1,4 +1,4 @@
-import React, { ChangeEvent, FunctionComponent } from "react";
+import React, {ChangeEvent, FunctionComponent} from "react";
 import Input from "../general/Input";
 import styled from "styled-components";
 import {LoginFormValue} from "../../types/types";

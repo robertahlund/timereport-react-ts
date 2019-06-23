@@ -10,8 +10,8 @@ import {validateLoginForm} from "../../utilities/validations/validateLoginForm";
 import {LoginFormValue} from "../../types/types";
 
 const Login: FunctionComponent = () => {
-  const [loginForm, setLoginForm] = useState(initialLoginFormState);
-  const [loading, setLoading] = useState(false);
+  const [loginForm, setLoginForm] = useState<LoginFormValue>(initialLoginFormState);
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     document.title = "Login"
@@ -52,8 +52,8 @@ const Login: FunctionComponent = () => {
     <Wrapper>
       <Section>
         <h3>Login</h3>
-        <LoginForm form={loginForm} onFormChange={onLoginFormChange} />
-        <LoginLinks />
+        <LoginForm form={loginForm} onFormChange={onLoginFormChange}/>
+        <LoginLinks/>
         <Button
           type="button"
           text="Login"

@@ -5,38 +5,39 @@ import React, {
   useEffect,
   useState
 } from "react";
-import { PaddingRow } from "../authentication/LoginForm";
+import {PaddingRow} from "../authentication/LoginForm";
 import Input from "../general/Input";
 import LoadingIcon from "../../icons/LoadingIcon";
-import { ListHeader, ListRow } from "../employees/EmployeeList";
+import {ListHeader, ListRow} from "../employees/EmployeeList";
 import Button from "../general/Button";
 import styled from "styled-components";
 import _ from "lodash";
-import { CompanyColumn, Company, CompanySort } from "../../types/types";
+import {CompanyColumn, Company, CompanySort} from "../../types/types";
 import CompanyModal from "./CompanyModal";
-import { getCompanies } from "../../api/companyApi";
+import {getCompanies} from "../../api/companyApi";
 import ModalPortal from "../general/ModalPortal";
-import { initialSortState } from "../../constants/companyConstants";
-import { toast } from "react-toastify";
+import {initialSortState} from "../../constants/companyConstants";
+import {toast} from "react-toastify";
 
 const CompanyList: FunctionComponent = () => {
-  const [searchValue, setSearchValue] = useState("");
-  const [sortMethod, setSortMethod] = useState(initialSortState);
-  const [loading, setLoading] = useState(false);
+  const [searchValue, setSearchValue] = useState<string>("");
+  const [sortMethod, setSortMethod] = useState<CompanySort>(initialSortState);
+  const [loading, setLoading] = useState<boolean>(false);
   const initialCompanyListState: Company[] = [];
-  const [companyList, setCompanyList] = useState(initialCompanyListState);
-  const [clonedCompanyList, setClonedCompanyList] = useState(
+  const [companyList, setCompanyList] = useState<Company[]>(initialCompanyListState);
+  const [clonedCompanyList, setClonedCompanyList] = useState<Company[]>(
     initialCompanyListState
   );
-  const [showCompanyModal, setShowCompanyModal] = useState(false);
-  const [companyId, setCompanyId] = useState("");
+  const [showCompanyModal, setShowCompanyModal] = useState<boolean>(false);
+  const [companyId, setCompanyId] = useState<string>("");
 
   useEffect(() => {
+    // noinspection JSIgnoredPromiseFromCall
     getAllCompanies();
   }, []);
 
   const handleSearchChange = (event: ChangeEvent<HTMLInputElement>): void => {
-    const { target } = event;
+    const {target} = event;
     setSearchValue(target.value);
     if (target.value === "") {
       setCompanyList(clonedCompanyList);
@@ -121,7 +122,7 @@ const CompanyList: FunctionComponent = () => {
 
   const toggleCompanyModal = (event?: React.MouseEvent): void => {
     if (event) {
-      const { target, currentTarget } = event;
+      const {target, currentTarget} = event;
       if (target === currentTarget) {
         setShowCompanyModal(!showCompanyModal);
       }

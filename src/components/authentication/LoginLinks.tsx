@@ -3,12 +3,12 @@ import {NavLink} from "react-router-dom";
 import styled from "styled-components";
 
 const LoginLinks: FunctionComponent = () => {
-    return (
-        <LinkWrapper>
-            <NavLink to="/forgot-password">Forgot your password?</NavLink>
-            <NavLink to="/create-account">Create new account</NavLink>
-        </LinkWrapper>
-    )
+  return (
+    <LinkWrapper>
+      <NavLink to="/forgot-password">Forgot your password?</NavLink>
+      <NavLink to="/create-account">Create new account</NavLink>
+    </LinkWrapper>
+  )
 };
 
 export default LoginLinks;

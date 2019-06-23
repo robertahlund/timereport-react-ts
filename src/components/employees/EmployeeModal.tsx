@@ -35,23 +35,24 @@ interface EmployeeModalProps {
 }
 
 const EmployeeModal: FunctionComponent<EmployeeModalProps> = props => {
-  const [userInactive, setUserInactive] = useState(false);
-  const [form, setForm] = useState(initialEmployeeFormState);
-  const [loading, setLoading] = useState(false);
-  const [modalLoading, setModalLoading] = useState(true);
-  const [selectedUser, setSelectedUser] = useState();
+  const [userInactive, setUserInactive] = useState<boolean>(false);
+  const [form, setForm] = useState<EmployeeFormValue>(initialEmployeeFormState);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [modalLoading, setModalLoading] = useState<boolean>(true);
+  const [selectedUser, setSelectedUser] = useState<AuthObject | null>(null);
   const initialCompanyListState: CompanySelectOptions[] = [];
-  const [companyList, setCompanyList] = useState(initialCompanyListState);
+  const [companyList, setCompanyList] = useState<CompanySelectOptions[]>(initialCompanyListState);
   const initialEmployeeCompanyList: EmployeeCompanyList = [];
-  const [employeeCompanyList, setEmployeeCompanyList] = useState(
+  const [employeeCompanyList, setEmployeeCompanyList] = useState<EmployeeCompanyList>(
     initialEmployeeCompanyList
   );
   const [
     originalEmployeeCompanyList,
     setOriginalEmployeeCompanyList
-  ] = useState(initialEmployeeCompanyList);
+  ] = useState<EmployeeCompanyList>(initialEmployeeCompanyList);
 
   useEffect(() => {
+    // noinspection JSIgnoredPromiseFromCall
     removeAddedCompaniesFromList();
   }, []);
 
@@ -194,7 +195,9 @@ const EmployeeModal: FunctionComponent<EmployeeModalProps> = props => {
             console.log("Updated email in collection");
           }
         }
+        // noinspection JSIgnoredPromiseFromCall
         getUserInformation();
+        // noinspection JSIgnoredPromiseFromCall
         props.getAllEmployees();
         setLoading(false);
       }
@@ -255,9 +258,9 @@ const EmployeeModal: FunctionComponent<EmployeeModalProps> = props => {
         <ModalContent style={animation}>
           <ModalHeader>
             <ModalTitle>
-              {typeof selectedUser === "object" ? (
+              {typeof selectedUser !== null ? (
                 <Fragment>
-                  {selectedUser.firstName} {selectedUser.lastName}
+                  {selectedUser!.firstName} {selectedUser!.lastName}
                 </Fragment>
               ) : null}
             </ModalTitle>

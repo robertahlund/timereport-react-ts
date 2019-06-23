@@ -1,13 +1,13 @@
-import React, { ChangeEvent, Fragment, FunctionComponent } from "react";
-import { ListHeader } from "../employees/EmployeeList";
+import React, {ChangeEvent, Fragment, FunctionComponent} from "react";
+import {ListHeader} from "../employees/EmployeeList";
 import DateSelector from "./DateSelector";
 import styled from "styled-components";
-import WeekDateRow, { Row } from "./WeekDateRow";
-import { FieldWrapper, Row as SummaryRowWhite } from "./WeekRow";
-import WeekRow, { TextWrapper } from "./WeekRow";
+import WeekDateRow, {Row} from "./WeekDateRow";
+import {FieldWrapper, Row as SummaryRowWhite} from "./WeekRow";
+import WeekRow, {TextWrapper} from "./WeekRow";
 import Select from "react-select";
-import { ValueType } from "react-select/lib/types";
-import Button, { ButtonItem } from "../general/Button";
+import {ValueType} from "react-select/lib/types";
+import Button, {ButtonItem} from "../general/Button";
 import TimeReportLoading from "./TimeReportLoading";
 import LoadingIcon from "../../icons/LoadingIcon";
 import {
@@ -78,9 +78,9 @@ const TimeReportWrapper: FunctionComponent<TimeReportWrapperProps> = props => {
           showMonths={false}
         />
       </TimeReportListHeader>
-      <WeekDateRow selectedDate={props.selectedDate} />
+      <WeekDateRow selectedDate={props.selectedDate}/>
       {timeReportLoading ? (
-        <TimeReportLoading />
+        <TimeReportLoading/>
       ) : (
         <Fragment>
           {timeReportRows.length > 0 ? (
@@ -176,7 +176,7 @@ const ActivityRow = styled(Row)`
   padding-right: 0;
   padding-left: 0;
   justify-content: ${(props: ActivityRowProps) =>
-    props.lastSaved ? "space-between" : "flex-end"};
+  props.lastSaved ? "space-between" : "flex-end"};
   button${ButtonItem} {
     margin: 0;
   }

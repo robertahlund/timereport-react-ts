@@ -61,13 +61,13 @@ export const getCompanyActivitiesByCompanies = async (
             doc
               .data()!
               .activities.forEach((activity: ActivityCompanySelectOption) => {
-                activities.push({
-                  label: activity.label,
-                  value: activity.value,
-                  companyId: company.value,
-                  companyName: company.label
-                });
+              activities.push({
+                label: activity.label,
+                value: activity.value,
+                companyId: company.value,
+                companyName: company.label
               });
+            });
           }
         });
     } catch (error) {

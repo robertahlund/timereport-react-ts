@@ -28,10 +28,11 @@ const WeekRow: FunctionComponent<WeekRowProps> = props => {
   const [showDeleteIcon, setShowDeleteIcon] = useState(false);
 
   const onRowHover = (): void => {
-    setShowDeleteIcon(true);
+    const rowCanBeDeleted: boolean = timeReport.timeReportRows.every(timeReportCell => timeReportCell.locked === false || timeReportCell.locked === undefined);
+    setShowDeleteIcon(rowCanBeDeleted);
   };
 
-  const { timeReport, timeReportIndex, onTimeReportRowChange } = props;
+  const {timeReport, timeReportIndex, onTimeReportRowChange} = props;
   return (
     <Row onMouseOver={onRowHover} onMouseLeave={() => setShowDeleteIcon(false)}>
       <TextWrapper>

@@ -1,7 +1,7 @@
 import React, {FunctionComponent} from 'react';
 import styled from "styled-components";
-import ArrowLeft from "../../icons/ArrowLeft";
-import ArrowRight from "../../icons/ArrowRight";
+import ArrowLeftIcon from "../../icons/ArrowLeftIcon";
+import ArrowRightIcon from "../../icons/ArrowRightIcon";
 import {DateSelectorValue} from "../../types/types";
 import DatePicker, {registerLocale} from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -21,15 +21,16 @@ const DateSelector: FunctionComponent<DateSelectorProps> = props => {
   return (
     <DateSelectorWrapper>
       <DateSelectorButton onClick={() => props.handleWeekChange("prev")} type="button">
-        <ArrowLeft width="24px" height="24px" color="#393e41"/>
+        <ArrowLeftIcon width="24px" height="24px" color="#393e41"/>
       </DateSelectorButton>
       <DatePickerWrapper>
         <DatePicker onChange={props.onDateSelect} customInput={
           <DateSelectorValueContainer>{props.dateSelectorValue.from}{props.dateSelectorValue.to}</DateSelectorValueContainer>
-        } todayButton={"Today"} selected={props.selectedDate} showWeekNumbers locale="enGB" showMonthYearPicker={props.showMonths}/>
+        } todayButton={"Today"} selected={props.selectedDate} showWeekNumbers locale="enGB"
+                    showMonthYearPicker={props.showMonths}/>
       </DatePickerWrapper>
       <DateSelectorButton onClick={() => props.handleWeekChange("next")} type="button">
-        <ArrowRight width="24px" height="24px" color="#393e41"/>
+        <ArrowRightIcon width="24px" height="24px" color="#393e41"/>
       </DateSelectorButton>
     </DateSelectorWrapper>
   );

@@ -5,12 +5,12 @@ import React, {
   useEffect,
   useState
 } from "react";
-import { ContentSection } from "../employees/Employees";
+import {ContentSection} from "../employees/Employees";
 import TimeReportWrapper from "./TimeReportWrapper";
-import { addDays, endOfWeek, format, startOfWeek, subDays } from "date-fns";
+import {addDays, endOfWeek, format, startOfWeek, subDays} from "date-fns";
 import produce from "immer";
-import { getAllActivitiesAssignedToUser } from "../../api/employeeApi";
-import { ValueType } from "react-select/lib/types";
+import {getAllActivitiesAssignedToUser} from "../../api/employeeApi";
+import {ValueType} from "react-select/lib/types";
 import {
   createOrUpdateTimeReportRows,
   deleteTimeReport,
@@ -18,7 +18,7 @@ import {
 } from "../../api/timeReportApi";
 import "../../styles/time-react-select.css";
 import "../../styles/close-button-transition.css";
-import { validateNumberInput } from "../../utilities/validations/validateNumberInput";
+import {validateNumberInput} from "../../utilities/validations/validateNumberInput";
 import {
   dateSelectorEndValueFormat,
   dateSelectorStartValueFormat,
@@ -29,9 +29,9 @@ import {
   timeReportDateFormat,
   timeStampFormat
 } from "../../constants/timeReportConstants";
-import { AuthContext } from "../../context/authentication/authenticationContext";
+import {AuthContext} from "../../context/authentication/authenticationContext";
 import {
-  ActivityCompanySelectOption,
+  ActivityCompanySelectOption, AuthObject,
   DateSelectorValue,
   GroupedActivityOptions,
   TimeReport,
@@ -39,25 +39,25 @@ import {
   TimeReportSummary
 } from "../../types/types";
 import _ from "lodash";
-import { toast } from "react-toastify";
+import {toast} from "react-toastify";
 
 const Time: FunctionComponent = () => {
-  const authContext = useContext(AuthContext);
-  const [selectedDate, setSelectedDate] = useState(
-    startOfWeek(new Date(), { weekStartsOn: 1 })
+  const authContext: AuthObject | boolean = useContext(AuthContext);
+  const [selectedDate, setSelectedDate] = useState<Date>(
+    startOfWeek(new Date(), {weekStartsOn: 1})
   );
-  const [dateSelectorValue, setDateSelectorValue] = useState(
+  const [dateSelectorValue, setDateSelectorValue] = useState<DateSelectorValue>(
     initialDateSelectorValue
   );
-  const [timeReportRows, setTimeReportRows] = useState(initialTimeReportRows);
-  const [activitySelectOptions, setActivitySelectOptions] = useState(
+  const [timeReportRows, setTimeReportRows] = useState<TimeReport[]>(initialTimeReportRows);
+  const [activitySelectOptions, setActivitySelectOptions] = useState<GroupedActivityOptions[]>(
     initialActivitySelect
   );
-  const [total, setTotal] = useState(initialTotal);
-  const [lastSaved, setLastSaved] = useState("");
-  const [timeReportLoading, setTimeReportLoading] = useState(false);
-  const [rowIsSaved, setRowIsSaved] = useState(true);
-  const [previousWeekRowLoading, setPreviousWeekRowLoading] = useState(false);
+  const [total, setTotal] = useState<TimeReportSummary>(initialTotal);
+  const [lastSaved, setLastSaved] = useState<string>("");
+  const [timeReportLoading, setTimeReportLoading] = useState<boolean>(false);
+  const [rowIsSaved, setRowIsSaved] = useState<boolean>(true);
+  const [previousWeekRowLoading, setPreviousWeekRowLoading] = useState<boolean>(false);
 
   useEffect(() => {
     document.title = "Report Time";
@@ -69,11 +69,11 @@ const Time: FunctionComponent = () => {
   const getFirstAndLastDayOfWeek = (date: Date) => {
     const dateSelectorValue: DateSelectorValue = {
       from: format(
-        startOfWeek(date, { weekStartsOn: 1 }),
+        startOfWeek(date, {weekStartsOn: 1}),
         dateSelectorStartValueFormat
       ),
       to: format(
-        endOfWeek(date, { weekStartsOn: 1 }),
+        endOfWeek(date, {weekStartsOn: 1}),
         dateSelectorEndValueFormat
       )
     };
@@ -89,21 +89,18 @@ const Time: FunctionComponent = () => {
       format(date, timeReportDateFormat),
       authContext.uid
     );
-    if (typeof timeReports !== "string") {
-      setTimeReportRows(timeReports);
-      const userActivities:
-        | ActivityCompanySelectOption[]
-        | string = await getAllAssignedActivities();
-      if (typeof userActivities !== "string") {
-        removeActivityFromCombobox(
-          undefined,
-          undefined,
-          timeReports,
-          userActivities
-        );
-      }
-      calculateTotals(timeReports);
-    }
+    setTimeReportRows(timeReports);
+    const userActivities:
+      | ActivityCompanySelectOption[]
+      | string = await getAllAssignedActivities();
+
+    removeActivityFromCombobox(
+      undefined,
+      undefined,
+      timeReports,
+      userActivities
+    );
+    calculateTotals(timeReports);
     setTimeReportLoading(false);
   };
 
@@ -144,7 +141,7 @@ const Time: FunctionComponent = () => {
       return;
     }
 
-    let { value } = event.target;
+    let {value} = event.target;
     //if the value is a decimal we can round it to 2 decimal points
     if (value.indexOf(".") > -1 && value.indexOf(".") !== value.length - 1) {
       value = String(Math.round(Number(event.target.value) * 100) / 100);
@@ -156,22 +153,20 @@ const Time: FunctionComponent = () => {
         produce(timeReportRows, draft => {
           draft[timeReportIndex].timeReportRows[
             timeReportRowIndex
-          ].hours = value;
+            ].hours = value;
         })
       );
       calculateTotals(
         produce(timeReportRows, draft => {
           draft[timeReportIndex].timeReportRows[
             timeReportRowIndex
-          ].hours = value;
+            ].hours = value;
         })
       );
     }
   };
 
-  const getAllAssignedActivities = async (): Promise<
-    ActivityCompanySelectOption[]
-  > => {
+  const getAllAssignedActivities = async (): Promise<ActivityCompanySelectOption[]> => {
     if (typeof authContext === "boolean" || authContext.uid === undefined) {
       return Promise.reject("Authentication error");
     }
@@ -401,6 +396,7 @@ const Time: FunctionComponent = () => {
       timeReportRow.prettyDate = format(selectedDate, timeReportDateFormat);
       _.forEach(timeReportRow.timeReportRows, (timeReportCell, index) => {
         timeReportCell.hours = "";
+        timeReportCell.locked = false;
         timeReportCell.date = addDays(selectedDate, index);
         timeReportCell.prettyDate = format(
           addDays(selectedDate, index),

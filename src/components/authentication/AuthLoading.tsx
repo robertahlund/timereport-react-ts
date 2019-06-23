@@ -1,11 +1,11 @@
-import React, { FunctionComponent } from "react";
+import React, {FunctionComponent} from "react";
 import styled from "styled-components";
 import LoadingIcon from "../../icons/LoadingIcon";
 
 const AuthLoading: FunctionComponent = () => {
   return (
     <LoadingMessageContainer>
-      <LoadingIcon height="64px" width="64px" color="#fec861" />
+      <LoadingIcon height="64px" width="64px" color="#fec861"/>
       <LoadingMessage>Logging in...</LoadingMessage>
     </LoadingMessageContainer>
   );

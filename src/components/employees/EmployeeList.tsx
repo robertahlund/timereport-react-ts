@@ -25,17 +25,18 @@ import LoadingIcon from "../../icons/LoadingIcon";
 import _ from "lodash";
 
 const EmployeeList: FunctionComponent = () => {
-  const [employeeList, setEmployeeList] = useState(initialEmployeeState);
-  const [clonedEmployeeList, setClonedEmployeeList] = useState(
+  const [employeeList, setEmployeeList] = useState<EmployeeRow[]>(initialEmployeeState);
+  const [clonedEmployeeList, setClonedEmployeeList] = useState<EmployeeRow[]>(
     initialEmployeeState
   );
-  const [loading, setLoading] = useState(false);
-  const [sortMethod, setSortMethod] = useState(initialSortState);
-  const [searchValue, setSearchValue] = useState("");
-  const [showEmployeeModal, setShowEmployeeModal] = useState(false);
-  const [userUid, setUserUid] = useState("");
+  const [loading, setLoading] = useState<boolean>(false);
+  const [sortMethod, setSortMethod] = useState<EmployeeSort>(initialSortState);
+  const [searchValue, setSearchValue] = useState<string>("");
+  const [showEmployeeModal, setShowEmployeeModal] = useState<boolean>(false);
+  const [userUid, setUserUid] = useState<string>("");
 
   useEffect(() => {
+    // noinspection JSIgnoredPromiseFromCall
     getAllEmployees();
   }, []);
 

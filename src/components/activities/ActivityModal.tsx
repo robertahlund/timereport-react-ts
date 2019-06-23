@@ -45,18 +45,19 @@ interface ActivityModalProps {
 }
 
 const ActivityModal: FunctionComponent<ActivityModalProps> = props => {
-  const [loading, setLoading] = useState(false);
-  const [deleteLoading, setDeleteLoading] = useState(false);
-  const [modalLoading, setModalLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [deleteLoading, setDeleteLoading] = useState<boolean>(false);
+  const [modalLoading, setModalLoading] = useState<boolean>(true);
 
-  const [activity, setActivity] = useState(initialActivityState);
-  const [originalActivity, setOriginalActivity] = useState(
+  const [activity, setActivity] = useState<ActivityFormValue>(initialActivityState);
+  const [originalActivity, setOriginalActivity] = useState<ActivityFormValue>(
     initialActivityState
   );
-  const [isNew, setIsNew] = useState(props.activityId === "");
+  const [isNew, setIsNew] = useState<boolean>(props.activityId === "");
 
   useEffect(() => {
     if (!isNew) {
+      // noinspection JSIgnoredPromiseFromCall
       _getActivityById();
     }
   }, []);

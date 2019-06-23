@@ -1,5 +1,5 @@
 import React, { FunctionComponent, Fragment, ChangeEvent } from "react";
-import Input, { Label } from "../general/Input";
+import Input, {ErrorMessage, Label} from "../general/Input";
 import { RowProps } from "../authentication/RegisterForm";
 import {
   ExpenseCategorySelectOptions,
@@ -20,6 +20,8 @@ interface ExpenseFormProps {
   selectedValue: ExpenseCategorySelectOptions | null;
   filename: string;
   onFileChange: (files: FileList | null) => void;
+  fileValidationMessage: null | string;
+  expenseCategoryValidationMessage: null | string;
 }
 
 const ExpenseForm: FunctionComponent<ExpenseFormProps> = props => {
@@ -29,7 +31,9 @@ const ExpenseForm: FunctionComponent<ExpenseFormProps> = props => {
     handleSelectChange,
     selectedValue,
     filename,
-    onFileChange
+    onFileChange,
+    fileValidationMessage,
+    expenseCategoryValidationMessage
   } = props;
   const { amount, vat, note } = props.form;
 
@@ -38,8 +42,9 @@ const ExpenseForm: FunctionComponent<ExpenseFormProps> = props => {
       <form autoComplete="off">
         <PaddingRow>
           <Label>Attachment
-          <FileInput uploadInput={uploadInput} filename={filename} onFileChange={onFileChange}/>
+          <FileInput uploadInput={uploadInput} filename={filename} onFileChange={onFileChange} hasError={fileValidationMessage !== null}/>
           </Label>
+          {fileValidationMessage !== null && <ErrorMessage>{fileValidationMessage}</ErrorMessage>}
         </PaddingRow>
         <PaddingRow>
           <Row direction="row">
@@ -86,9 +91,10 @@ const ExpenseForm: FunctionComponent<ExpenseFormProps> = props => {
               options={selectOptions}
               placeholder="Select Category"
               value={selectedValue}
-              classNamePrefix="react-select-time"
-              className="react-select-time"
+              classNamePrefix={expenseCategoryValidationMessage !== null ? "react-select-time-error" : "react-select-time"}
+              className={expenseCategoryValidationMessage !== null ? "react-select-time-error" : "react-select-time"}
             />
+            {expenseCategoryValidationMessage !== null && <ErrorMessage>{expenseCategoryValidationMessage}</ErrorMessage>}
           </PaddingRow>
         </Row>
       </form>

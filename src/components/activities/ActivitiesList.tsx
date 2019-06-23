@@ -25,20 +25,20 @@ interface Sort {
 }
 
 const ActivitiesList: FunctionComponent = () => {
-  const [searchValue, setSearchValue] = useState("");
+  const [searchValue, setSearchValue] = useState<string>("");
   const initialSortState: Sort = {
     column: "name",
     order: "asc"
   };
-  const [sortMethod, setSortMethod] = useState(initialSortState);
-  const [loading, setLoading] = useState(false);
+  const [sortMethod, setSortMethod] = useState<Sort>(initialSortState);
+  const [loading, setLoading] = useState<boolean>(false);
   const initialActivityListState: Activity[] = [];
-  const [activityList, setActivityList] = useState(initialActivityListState);
-  const [clonedActivityList, setClonedActivityList] = useState(
+  const [activityList, setActivityList] = useState<Activity[]>(initialActivityListState);
+  const [clonedActivityList, setClonedActivityList] = useState<Activity[]>(
     initialActivityListState
   );
-  const [showActivityModal, setShowActivityModal] = useState(false);
-  const [activityId, setActivityId] = useState("");
+  const [showActivityModal, setShowActivityModal] = useState<boolean>(false);
+  const [activityId, setActivityId] = useState<string>("");
 
   const handleSearchChange = (event: ChangeEvent<HTMLInputElement>): void => {
     const { target } = event;
@@ -69,6 +69,7 @@ const ActivitiesList: FunctionComponent = () => {
   };
 
   useEffect(() => {
+    // noinspection JSIgnoredPromiseFromCall
     getAllActivities();
   }, []);
 

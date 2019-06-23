@@ -1,5 +1,5 @@
-import React, { Fragment, FunctionComponent, useEffect } from "react";
-import { ContentSection } from "../employees/Employees";
+import React, {Fragment, FunctionComponent, useEffect} from "react";
+import {ContentSection} from "../employees/Employees";
 import CompanyList from "./CompanyList";
 
 const Companies: FunctionComponent = () => {

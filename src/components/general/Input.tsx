@@ -1,4 +1,4 @@
-import React, { ChangeEvent, FunctionComponent } from "react";
+import React, {ChangeEvent, FunctionComponent} from "react";
 import styled from "styled-components";
 
 interface InputProps {
@@ -22,6 +22,7 @@ interface InputProps {
   ) => Promise<void>;
   valid?: boolean;
   validationMessage?: string;
+  disabled?: boolean;
 }
 
 interface InputFieldProps {
@@ -38,6 +39,7 @@ const Input: FunctionComponent<InputProps> = props => {
         <Label htmlFor={props.name}>{props.labelValue}</Label>
       )}
       <InputField
+        disabled={props.disabled}
         width={props.width}
         id={props.name}
         name={props.name}
@@ -57,16 +59,16 @@ const Input: FunctionComponent<InputProps> = props => {
         onBlur={() =>
           props.saveSingleRow
             ? props.saveSingleRow(
-                props.timeReportIndex,
-                props.timeReportRowIndex
-              )
+            props.timeReportIndex,
+            props.timeReportRowIndex
+            )
             : null
         }
       />
       {!props.valid &&
-        props.valid !== undefined && (
-          <ErrorMessage>{props.validationMessage}</ErrorMessage>
-        )}
+      props.valid !== undefined && (
+        <ErrorMessage>{props.validationMessage}</ErrorMessage>
+      )}
     </RelativeContainer>
   );
 };
@@ -85,22 +87,26 @@ const InputField = styled.input`
   background-color: #fbfbfb;
   border-radius: 3px;
   border: ${(props: InputFieldProps) =>
-    props.valid ? "1px solid #f1f1f1;" : "1px solid #FE9161;"}
+  props.valid ? "1px solid #f1f1f1;" : "1px solid #FE9161;"}
   padding: 10px;
   font-size: 15px;
   width: ${(props: InputFieldProps) => props.width};
   text-align: ${(props: InputFieldProps) =>
-    props.textAlign ? props.textAlign : "left"};
+  props.textAlign ? props.textAlign : "left"};
   font-weight: ${(props: InputFieldProps) =>
-    props.fontWeight ? props.fontWeight : 400};
+  props.fontWeight ? props.fontWeight : 400};
   font-family: 'Roboto', sans-serif;
+  &:disabled {
+    background-color: #f7f7f7;
+    border: 1px solid #f1f1f1;
+  }
 `;
 
 const RelativeContainer = styled.div`
   position: relative;
 `;
 
-const ErrorMessage = styled.span`
+export const ErrorMessage = styled.span`
   color: #fe9161;
   font-size: 12px;
   display: block;

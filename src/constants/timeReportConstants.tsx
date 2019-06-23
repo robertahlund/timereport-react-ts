@@ -1,6 +1,5 @@
 import {format} from "date-fns";
 import {
-  ActivityCompanySelectOption,
   DateSelectorEndValueFormatType,
   DateSelectorStartValueFormatType, DateSelectorValue, GroupedActivityOptions, TimeReport,
   TimeReportDateFormat, TimeReportSummary,
@@ -13,22 +12,22 @@ export const timeStampFormat: TimeStampFormat = "HH':'mm':'ss";
 export const timeReportDateFormat: TimeReportDateFormat = "y-MM-dd";
 export const initialTimeReportRows: TimeReport[] = [];
 export const initialTotal: TimeReportSummary = {
-    total: 0,
-    rowTotals: [
-        {total: 0},
-        {total: 0},
-        {total: 0},
-        {total: 0},
-        {total: 0},
-        {total: 0},
-        {total: 0}
-    ]
+  total: 0,
+  rowTotals: [
+    {total: 0},
+    {total: 0},
+    {total: 0},
+    {total: 0},
+    {total: 0},
+    {total: 0},
+    {total: 0}
+  ]
 };
 export const initialActivitySelect: GroupedActivityOptions[] = [];
 export const awareOfUnicodeTokens = {
   awareOfUnicodeTokens: true
 };
 export const initialDateSelectorValue: DateSelectorValue = {
-    from: format(new Date(), dateSelectorStartValueFormat),
-    to: format(new Date(), dateSelectorEndValueFormat)
+  from: format(new Date(), dateSelectorStartValueFormat),
+  to: format(new Date(), dateSelectorEndValueFormat)
 };

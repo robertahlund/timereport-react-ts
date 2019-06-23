@@ -7,6 +7,7 @@ export interface TimeReportRow {
   date: Date;
   prettyDate: string;
   hours: string;
+  locked?: boolean;
 }
 
 export interface TimeReport {

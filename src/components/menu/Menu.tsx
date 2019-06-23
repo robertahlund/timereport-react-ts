@@ -4,7 +4,7 @@ import {MenuItem} from "./MenuItem";
 import Logo from "../Logo";
 import {NavLink} from "react-router-dom";
 import firebase from '../../config/firebaseConfig';
-import {AuthContext, AuthContextConsumer} from "../../context/authentication/authenticationContext";
+import {AuthContextConsumer} from "../../context/authentication/authenticationContext";
 
 interface MenuProps {
   toggleModal: (event: React.MouseEvent) => void;

@@ -16,9 +16,9 @@ import {
 import LoadingIcon from "../../icons/LoadingIcon";
 import CompanyForm from "./CompanyForm";
 import CompanyModalActivityList from "./CompanyModalActivityList";
-import { ValueType } from "react-select/lib/types";
-import { toast } from "react-toastify";
-import { ButtonRow } from "../activities/ActivityModal";
+import {ValueType} from "react-select/lib/types";
+import {toast} from "react-toastify";
+import {ButtonRow} from "../activities/ActivityModal";
 import {
   getEmployeesByCompanyId,
   updateEmployees
@@ -36,13 +36,13 @@ import {
   Company,
   CompanyFormValue
 } from "../../types/types";
-import { updateTimeReportByCompanyId } from "../../api/timeReportApi";
-import { stringCompare } from "../../utilities/compare/stringCompare";
-import { getActivities } from "../../api/activityApi";
-import { initialCompanyState } from "../../constants/companyConstants";
-import { validateCompanyForm } from "../../utilities/validations/validateCompanyForm";
-import { modalAnimation } from "../../constants/generalConstants";
-import { useSpring } from "react-spring";
+import {updateTimeReportByCompanyId} from "../../api/timeReportApi";
+import {stringCompare} from "../../utilities/compare/stringCompare";
+import {getActivities} from "../../api/activityApi";
+import {initialCompanyState} from "../../constants/companyConstants";
+import {validateCompanyForm} from "../../utilities/validations/validateCompanyForm";
+import {modalAnimation} from "../../constants/generalConstants";
+import {useSpring} from "react-spring";
 
 interface CompanyModalProps {
   toggleModal: (event?: React.MouseEvent) => void;
@@ -51,29 +51,31 @@ interface CompanyModalProps {
 }
 
 const CompanyModal: FunctionComponent<CompanyModalProps> = props => {
-  const [loading, setLoading] = useState(false);
-  const [deleteLoading, setDeleteLoading] = useState(false);
-  const [modalLoading, setModalLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [deleteLoading, setDeleteLoading] = useState<boolean>(false);
+  const [modalLoading, setModalLoading] = useState<boolean>(true);
   const initialActivityListState: ActivitySelectOptions[] = [];
-  const [activityList, setActivityList] = useState(initialActivityListState);
+  const [activityList, setActivityList] = useState<ActivitySelectOptions[]>(initialActivityListState);
   const initialCompanyActivityList: ActivitySelectOptions[] = [];
-  const [companyActivityList, setCompanyActivityList] = useState(
+  const [companyActivityList, setCompanyActivityList] = useState<ActivitySelectOptions[]>(
     initialCompanyActivityList
   );
-  const [company, setCompany] = useState(initialCompanyState);
-  const [originalCompany, setOriginalCompany] = useState(initialCompanyState);
-  const [isNew, setIsNew] = useState(props.companyId === "");
+  const [company, setCompany] = useState<CompanyFormValue>(initialCompanyState);
+  const [originalCompany, setOriginalCompany] = useState<CompanyFormValue>(initialCompanyState);
+  const [isNew, setIsNew] = useState<boolean>(props.companyId === "");
 
   useEffect(() => {
     if (!isNew) {
+      // noinspection JSIgnoredPromiseFromCall
       removeAddedActivitiesFromList();
     } else {
+      // noinspection JSIgnoredPromiseFromCall
       _getActivities();
     }
   }, []);
 
   const _getCompanyById = async (): Promise<ActivitySelectOptions[]> => {
-    const { companyId } = props;
+    const {companyId} = props;
     const companyData: Company = await getCompanyById(companyId);
     const companyForm: CompanyFormValue = {
       id: companyData.id,
@@ -172,7 +174,7 @@ const CompanyModal: FunctionComponent<CompanyModalProps> = props => {
   const addActivityToComboboxList = (activity: ValueType<any>): void => {
     setActivityList([
       ...activityList,
-      { value: activity.value, label: activity.label }
+      {value: activity.value, label: activity.label}
     ]);
   };
 
@@ -186,8 +188,8 @@ const CompanyModal: FunctionComponent<CompanyModalProps> = props => {
       };
       const companyId: string = await createCompany(companyData);
       toast.success(`Successfully created ${company.name.value}!`);
-      setCompany({ ...company, id: companyId });
-      setOriginalCompany({ ...company, id: companyId });
+      setCompany({...company, id: companyId});
+      setOriginalCompany({...company, id: companyId});
       setIsNew(false);
       setModalLoading(false);
     } catch (error) {
@@ -249,7 +251,7 @@ const CompanyModal: FunctionComponent<CompanyModalProps> = props => {
   };
 
   const onSubmit = async (): Promise<void> => {
-    const validatedForm: CompanyFormValue = { ...validateCompanyForm(company) };
+    const validatedForm: CompanyFormValue = {...validateCompanyForm(company)};
     if (!validatedForm.valid) {
       console.log(validatedForm);
       setCompany(validatedForm);
@@ -264,6 +266,7 @@ const CompanyModal: FunctionComponent<CompanyModalProps> = props => {
         await onUpdateCompany();
         setLoading(false);
       }
+      // noinspection JSIgnoredPromiseFromCall
       props.getAllCompanies();
     } catch (error) {
       console.log(error);
@@ -299,6 +302,7 @@ const CompanyModal: FunctionComponent<CompanyModalProps> = props => {
       await deleteCompany(company.id);
       toast.success(`Successfully deleted ${company.name.value}!`);
       props.toggleModal();
+      // noinspection JSIgnoredPromiseFromCall
       props.getAllCompanies();
     } catch (error) {
       console.log(error);

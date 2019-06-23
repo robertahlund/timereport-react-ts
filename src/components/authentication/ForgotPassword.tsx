@@ -1,11 +1,11 @@
 import React, {ChangeEvent, useEffect, useState} from "react";
-import { Section, Wrapper } from "./Login";
+import {Section, Wrapper} from "./Login";
 import ForgotPasswordForm from "./ForgotPasswordForm";
 import Button from "../general/Button";
 import styled from "styled-components";
 
 const ForgotPassword = () => {
-  const [emailInput, setEmailInput] = useState("");
+  const [emailInput, setEmailInput] = useState<string>("");
 
   useEffect(() => {
     document.title = "Forgot Password?"
@@ -26,7 +26,7 @@ const ForgotPassword = () => {
         <Text>
           Enter your email below and a link to reset your password will be sent.
         </Text>
-        <ForgotPasswordForm email={emailInput} onEmailChange={onFormChange} />
+        <ForgotPasswordForm email={emailInput} onEmailChange={onFormChange}/>
         <Button
           type="button"
           text="Send"

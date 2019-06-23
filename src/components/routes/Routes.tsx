@@ -1,5 +1,5 @@
-import React, { FunctionComponent, ReactNode, useContext } from "react";
-import { Route, Redirect, Switch } from "react-router-dom";
+import React, {FunctionComponent, ReactNode, useContext} from "react";
+import {Route, Redirect, Switch} from "react-router-dom";
 import Login from "../authentication/Login";
 import Time from "../timereport/Time";
 import Companies from "../companies/Companies";
@@ -7,7 +7,7 @@ import Employees from "../employees/Employees";
 import ForgotPassword from "../authentication/ForgotPassword";
 import Register from "../authentication/Register";
 import Activities from "../activities/Activities";
-import { AuthContext } from "../../context/authentication/authenticationContext";
+import {AuthContext} from "../../context/authentication/authenticationContext";
 import TimeSummary from "../summary/TimeSummary";
 import ExpenseCategories from "../expensecategories/ExpenseCategories";
 import Expenses from "../expenses/Expenses";
@@ -20,18 +20,18 @@ const Routes: FunctionComponent = () => {
         exact
         path="/"
         render={(): ReactNode =>
-          authContext ? <Redirect to="/time" /> : <Redirect to="/login" />
+          authContext ? <Redirect to="/time"/> : <Redirect to="/login"/>
         }
       />
       <Route
         exact
         path="/time"
-        render={(): ReactNode => (authContext ? <Time /> : <Redirect to="/" />)}
+        render={(): ReactNode => (authContext ? <Time/> : <Redirect to="/"/>)}
       />
       <Route
         exact
         path="/expenses"
-        render={(): ReactNode => (authContext ? <Expenses /> : <Redirect to="/" />)}
+        render={(): ReactNode => (authContext ? <Expenses/> : <Redirect to="/"/>)}
       />
       <Route
         exact
@@ -40,9 +40,9 @@ const Routes: FunctionComponent = () => {
           authContext &&
           typeof authContext === "object" &&
           authContext.isAdmin ? (
-            <Companies />
+            <Companies/>
           ) : (
-            <Redirect to="/" />
+            <Redirect to="/"/>
           )
         }
       />
@@ -53,9 +53,9 @@ const Routes: FunctionComponent = () => {
           authContext &&
           typeof authContext === "object" &&
           authContext.isAdmin ? (
-            <TimeSummary />
+            <TimeSummary/>
           ) : (
-            <Redirect to="/" />
+            <Redirect to="/"/>
           )
         }
       />
@@ -66,9 +66,9 @@ const Routes: FunctionComponent = () => {
           authContext &&
           typeof authContext === "object" &&
           authContext.isAdmin ? (
-            <ExpenseCategories />
+            <ExpenseCategories/>
           ) : (
-            <Redirect to="/" />
+            <Redirect to="/"/>
           )
         }
       />
@@ -79,9 +79,9 @@ const Routes: FunctionComponent = () => {
           authContext &&
           typeof authContext === "object" &&
           authContext.isAdmin ? (
-            <Activities />
+            <Activities/>
           ) : (
-            <Redirect to="/" />
+            <Redirect to="/"/>
           )
         }
       />
@@ -92,9 +92,9 @@ const Routes: FunctionComponent = () => {
           authContext &&
           typeof authContext === "object" &&
           authContext.isAdmin ? (
-            <Employees />
+            <Employees/>
           ) : (
-            <Redirect to="/" />
+            <Redirect to="/"/>
           )
         }
       />
@@ -102,24 +102,24 @@ const Routes: FunctionComponent = () => {
         exact
         path="/login"
         render={(): ReactNode =>
-          authContext ? <Redirect to="/" /> : <Login />
+          authContext ? <Redirect to="/"/> : <Login/>
         }
       />
       <Route
         exact
         path="/forgot-password"
         render={(): ReactNode =>
-          authContext ? <Redirect to="/" /> : <ForgotPassword />
+          authContext ? <Redirect to="/"/> : <ForgotPassword/>
         }
       />
       <Route
         exact
         path="/create-account"
         render={(): ReactNode =>
-          authContext ? <Redirect to="/" /> : <Register />
+          authContext ? <Redirect to="/"/> : <Register/>
         }
       />
-      <Route render={() => <p>TODO: 404</p>} />
+      <Route render={() => <p>TODO: 404</p>}/>
     </Switch>
   );
 };

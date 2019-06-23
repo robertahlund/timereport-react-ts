@@ -5,12 +5,12 @@ import React, {
   useState,
   Fragment
 } from "react";
-import { ContentSection } from "../employees/Employees";
+import {ContentSection} from "../employees/Employees";
 import TimeSummarySearch from "./TimeSummarySearch";
 import DateSelector from "../timereport/DateSelector";
-import { TimeReportListHeader } from "../timereport/TimeReportWrapper";
-import { addDays, addMonths, format, subMonths } from "date-fns";
-import { getFirstAndLastDateOfMonth } from "../../utilities/date/dateUtilities";
+import {TimeReportListHeader} from "../timereport/TimeReportWrapper";
+import {addMonths, format, subMonths} from "date-fns";
+import {getFirstAndLastDateOfMonth} from "../../utilities/date/dateUtilities";
 import {
   dateSelectorEndValueFormat,
   dateSelectorStartValueFormat,
@@ -26,10 +26,12 @@ import {
 import TimeCardContainer from "./TimeCardContainer";
 import styled from "styled-components";
 import DetailedRowContainer from "./DetailedRowContainer";
-import ArrowLeft from "../../icons/ArrowLeft";
-import { getTimeReportsByDate } from "../../api/timeReportApi";
-import { toast } from "react-toastify";
-import { Dictionary } from "lodash";
+import ArrowLeftIcon from "../../icons/ArrowLeftIcon";
+import {
+  getTimeReportsByDate,
+  getUnfilteredTimeReportsByDate, updateTimeReport
+} from "../../api/timeReportApi";
+import {Dictionary} from "lodash";
 import _ from "lodash";
 import {
   initialDetailedRowData,
@@ -37,33 +39,38 @@ import {
   initialTimeReportOverviewData
 } from "../../constants/summaryConstants";
 import LoadingIcon from "../../icons/LoadingIcon";
+import LockedIcon from "../../icons/LockedIcon";
+import UnlockedIcon from "../../icons/UnlockedIcon";
+import {toast} from "react-toastify";
 
 interface TimeSummaryListHeaderProps {
   showDetailView: boolean;
 }
 
 const TimeSummary: FunctionComponent = () => {
-  const [searchValue, setSearchValue] = useState("");
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [showDetailView, setShowDetailView] = useState(false);
-  const [timeReportOverviewData, setTimeReportOverviewData] = useState(
+  const [searchValue, setSearchValue] = useState<string>("");
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [showDetailView, setShowDetailView] = useState<boolean>(false);
+  const [timeReportOverviewData, setTimeReportOverviewData] = useState<TimeReportSummaryOverview[]>(
     initialTimeReportOverviewData
   );
   const [
     clonedTimeReportOverviewData,
     setClonedTimeReportOverviewData
-  ] = useState(initialTimeReportOverviewData);
-  const [detailedRowData, setDetailedRowData] = useState(
+  ] = useState<TimeReportSummaryOverview[]>(initialTimeReportOverviewData);
+  const [detailedRowData, setDetailedRowData] = useState<TimeReportRowSummaryDetail[]>(
     initialDetailedRowData
   );
-  const [dateSelectorValue, setDateSelectorValue] = useState(
+  const [dateSelectorValue, setDateSelectorValue] = useState<DateSelectorValue>(
     initialDateSelectorValue
   );
-  const [selectedUserId, setSelectedUserId] = useState(initialSelectedUserId);
-  const [loading, setLoading] = useState(false);
+  const [selectedUserId, setSelectedUserId] = useState<string | undefined>(initialSelectedUserId);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [timeReportIsLocked, setTimeReportIsLocked] = useState<boolean>(false);
 
   useEffect(() => {
     document.title = "Time Summary";
+    // noinspection JSIgnoredPromiseFromCall
     onDateSelect(new Date());
   }, []);
 
@@ -197,6 +204,9 @@ const TimeSummary: FunctionComponent = () => {
       userId
     );
     if (isDetailViewToggled) {
+      setTimeReportIsLocked(timeReports.every((timeReportRow: TimeReport) =>
+        timeReportRow.timeReportRows.every((timeReportCell: TimeReportRow) =>
+          timeReportCell.locked === true)));
       const formattedTimeReports: Dictionary<TimeReport[]> = _.groupBy(
         timeReports,
         report => {
@@ -296,6 +306,47 @@ const TimeSummary: FunctionComponent = () => {
     }
   };
 
+  const lockRows = async (): Promise<void> => {
+    //get all timereports for this month
+    const firstDayOfMonth: Date = getFirstAndLastDateOfMonth(selectedDate)
+      .first;
+    const lastDayOfMonth: Date = getFirstAndLastDateOfMonth(selectedDate)
+      .last;
+    if (selectedUserId) {
+      const timeReports: TimeReport[] = await getUnfilteredTimeReportsByDate(
+        firstDayOfMonth,
+        lastDayOfMonth,
+        selectedUserId
+      );
+      console.log(timeReports);
+      _.forEach(timeReports, (timeReport: TimeReport) => {
+        _.forEach(timeReport.timeReportRows, (timeReportRow: TimeReportRow) => {
+          const timeReportRowDate: Date = new Date(timeReportRow.prettyDate);
+          if (timeReportRowDate <= lastDayOfMonth && timeReportRowDate >= firstDayOfMonth) {
+            console.log(timeReportRow);
+            timeReportRow.locked = !timeReportIsLocked;
+          }
+        });
+      });
+      console.log(timeReports);
+
+      try {
+        _.forEach(timeReports, async (timeReport: TimeReport) => {
+          await updateTimeReport(timeReport)
+        });
+        setTimeReportIsLocked(!timeReportIsLocked);
+        toast.success(`Successfully ${timeReportIsLocked ? "unlocked" : "locked"} the time report!`)
+      } catch (error) {
+        if (typeof error === "string") {
+          toast.error(error);
+        } else {
+          console.log(error);
+          toast.error("Something went wrong when updating time reports")
+        }
+      }
+    } else return;
+  };
+
   return (
     <TimeSummarySection showDetailView={showDetailView}>
       {!showDetailView && (
@@ -306,10 +357,17 @@ const TimeSummary: FunctionComponent = () => {
       )}
       <TimeSummaryListHeader showDetailView={showDetailView}>
         {showDetailView && (
-          <Back onClick={() => toggleDetailView()}>
-            <ArrowLeft width="24px" height="24px" />
-            <span>Go back</span>
-          </Back>
+          <ButtonContainer>
+            <Back onClick={() => toggleDetailView()}>
+              <ArrowLeftIcon width="24px" height="24px"/>
+              <span>Go back</span>
+            </Back>
+            <LockRowsButton onClick={() => lockRows()}>
+              {timeReportIsLocked ? (<LockedIcon width="18px" height="18px"/>) : (
+                <UnlockedIcon width="18px" height="18px"/>)}
+              <span>{timeReportIsLocked ? "Unlock report" : "Lock report"}</span>
+            </LockRowsButton>
+          </ButtonContainer>
         )}
         <DateSelector
           handleWeekChange={handleWeekChange}
@@ -322,7 +380,7 @@ const TimeSummary: FunctionComponent = () => {
       <Wrapper>
         {loading ? (
           <LoadingIconWrapper>
-            <LoadingIcon height="30px" width="30px" color="#393e41" />
+            <LoadingIcon height="30px" width="30px" color="#393e41"/>
           </LoadingIconWrapper>
         ) : (
           <Fragment>
@@ -332,7 +390,7 @@ const TimeSummary: FunctionComponent = () => {
               timeReportOverviewData={timeReportOverviewData}
             />
             {showDetailView && (
-              <DetailedRowContainer rowDetails={detailedRowData} />
+              <DetailedRowContainer rowDetails={detailedRowData}/>
             )}
           </Fragment>
         )}
@@ -345,7 +403,7 @@ export default TimeSummary;
 
 const TimeSummarySection = styled(ContentSection)`
   margin: ${(props: TimeSummaryListHeaderProps) =>
-    props.showDetailView ? "175px auto 100px auto" : "100px auto 100px auto"};
+  props.showDetailView ? "175px auto 100px auto" : "100px auto 100px auto"};
 `;
 
 const Wrapper = styled.section`
@@ -357,7 +415,12 @@ const Wrapper = styled.section`
 
 const TimeSummaryListHeader = styled(TimeReportListHeader)`
   justify-content: ${(props: TimeSummaryListHeaderProps) =>
-    props.showDetailView ? "space-between" : "flex-end"};
+  props.showDetailView ? "space-between" : "flex-end"};
+`;
+
+const ButtonContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
 `;
 
 const Back = styled.div`
@@ -372,6 +435,10 @@ const Back = styled.div`
     text-align: left;
     padding: 0 10px 0 5px;
   }
+`;
+
+const LockRowsButton = styled(Back)`
+  margin-left: 20px;
 `;
 
 const LoadingIconWrapper = styled.div`

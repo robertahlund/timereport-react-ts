@@ -5,19 +5,19 @@ import React, {
   useState
 } from "react";
 import Button from "../general/Button";
-import { Section, Wrapper } from "./Login";
+import {Section, Wrapper} from "./Login";
 import RegisterForm from "./RegisterForm";
-import { createEmployee } from "../../api/employeeApi";
-import { toast } from "react-toastify";
+import {createEmployee} from "../../api/employeeApi";
+import {toast} from "react-toastify";
 import {validateRegisterForm} from "../../utilities/validations/validateRegisterForm";
 import {RegisterFormValue} from "../../types/types";
 import {initialRegisterForm} from "../../constants/registerConstants";
 import _ from "lodash";
 
 const Register: FunctionComponent = () => {
-  const [form, setForm] = useState(initialRegisterForm);
-  const [loading, setLoading] = useState(false);
-  const [checkbox, setCheckbox] = useState(false);
+  const [form, setForm] = useState<RegisterFormValue>(initialRegisterForm);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [checkbox, setCheckbox] = useState<boolean>(false);
 
   useEffect(() => {
     document.title = "Register";
@@ -41,7 +41,7 @@ const Register: FunctionComponent = () => {
       setForm(validatedForm);
       return;
     }
-    const { firstName, lastName, email, password } = form;
+    const {firstName, lastName, email, password} = form;
     try {
       setLoading(true);
       const success: string = await createEmployee(

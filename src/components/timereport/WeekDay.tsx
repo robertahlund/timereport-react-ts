@@ -42,6 +42,7 @@ const WeekDay: FunctionComponent<WeekDayProps> = props => {
         timeReportIndex={timeReportIndex}
         fontWeight="300"
         saveSingleRow={props.saveSingleRow}
+        disabled={timeReportRow.locked}
       />
     </InputWrapper>
   );

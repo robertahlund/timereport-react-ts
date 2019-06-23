@@ -20,20 +20,20 @@ import AttachmentIcon from "../../icons/AttachmentIcon";
 import styled from "styled-components";
 
 const ExpenseList: FunctionComponent = () => {
-  const [searchValue, setSearchValue] = useState("");
+  const [searchValue, setSearchValue] = useState<string>("");
   const initialSortState: ExpenseSort = {
     column: "username",
     order: "asc"
   };
-  const [sortMethod, setSortMethod] = useState(initialSortState);
-  const [loading, setLoading] = useState(false);
+  const [sortMethod, setSortMethod] = useState<ExpenseSort>(initialSortState);
+  const [loading, setLoading] = useState<boolean>(false);
   const initialExpenseListState: ExpenseListItem[] = [];
-  const [expenseList, setExpenseList] = useState(initialExpenseListState);
-  const [clonedExpenseList, setClonedExpenseList] = useState(
+  const [expenseList, setExpenseList] = useState<ExpenseListItem[]>(initialExpenseListState);
+  const [clonedExpenseList, setClonedExpenseList] = useState<ExpenseListItem[]>(
     initialExpenseListState
   );
-  const [showExpenseModal, setShowExpenseModal] = useState(false);
-  const [expenseId, setExpenseId] = useState("");
+  const [showExpenseModal, setShowExpenseModal] = useState<boolean>(false);
+  const [expenseId, setExpenseId] = useState<string>("");
 
   const handleSearchChange = (event: ChangeEvent<HTMLInputElement>): void => {
     const { target } = event;
@@ -65,6 +65,7 @@ const ExpenseList: FunctionComponent = () => {
   };
 
   useEffect(() => {
+    // noinspection JSIgnoredPromiseFromCall
     _getExpenses();
   }, []);
 

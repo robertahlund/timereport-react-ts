@@ -19,7 +19,6 @@ import {
 } from "./api/employeeApi";
 import { AuthObject } from "./types/types";
 import ModalPortal from "./components/general/ModalPortal";
-import { withRouter } from "react-router";
 
 interface AppState {
   auth: AuthObject | boolean;
@@ -35,6 +34,7 @@ class App extends Component<{}, AppState> {
   };
 
   componentDidMount(): void {
+    // noinspection JSIgnoredPromiseFromCall
     this.authObserver();
   }
 

@@ -1,4 +1,4 @@
-import { Company, CompanyFormValue, CompanySort } from "../types/types";
+import {CompanyFormValue, CompanySort} from "../types/types";
 
 export const initialSortState: CompanySort = {
   column: "name",

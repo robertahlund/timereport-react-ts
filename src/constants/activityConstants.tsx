@@ -1,11 +1,11 @@
 import {ActivityFormValue} from "../types/types";
 
 export const initialActivityState: ActivityFormValue = {
-    id: "",
+  id: "",
+  valid: true,
+  name: {
     valid: true,
-    name: {
-        valid: true,
-        validationMessage: "",
-        value: ""
-    }
+    validationMessage: "",
+    value: ""
+  }
 };

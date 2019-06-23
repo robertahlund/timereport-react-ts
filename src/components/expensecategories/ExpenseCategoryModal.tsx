@@ -15,19 +15,19 @@ import {
 } from "../account/MyAccountModal";
 import LoadingIcon from "../../icons/LoadingIcon";
 import ExpenseCategoryForm from "./ExpenseCategoryForm";
-import { toast } from "react-toastify";
-import { ExpenseCategory, ExpenseCategoryFormValue } from "../../types/types";
-import { useSpring } from "react-spring";
-import { modalAnimation } from "../../constants/generalConstants";
-import { initialExpenseCategoryForm } from "../../constants/expenseConstants";
+import {toast} from "react-toastify";
+import {ExpenseCategory, ExpenseCategoryFormValue} from "../../types/types";
+import {useSpring} from "react-spring";
+import {modalAnimation} from "../../constants/generalConstants";
+import {initialExpenseCategoryForm} from "../../constants/expenseConstants";
 import {
   createExpenseCategory,
   deleteExpenseCategory,
   getExpenseCategoryById,
   updateExpenseCategory
 } from "../../api/expenseCategoryApi";
-import { validateExpenseCategoryForm } from "../../utilities/validations/validateExpenseCategoryForm";
-import { ButtonRow } from "../activities/ActivityModal";
+import {validateExpenseCategoryForm} from "../../utilities/validations/validateExpenseCategoryForm";
+import {ButtonRow} from "../activities/ActivityModal";
 import _ from "lodash";
 
 interface ExpenseCategoryModalProps {
@@ -36,30 +36,29 @@ interface ExpenseCategoryModalProps {
   getExpenseCategories: () => Promise<void>;
 }
 
-const ExpenseCategoryModal: FunctionComponent<
-  ExpenseCategoryModalProps
-> = props => {
-  const [loading, setLoading] = useState(false);
-  const [deleteLoading, setDeleteLoading] = useState(false);
-  const [modalLoading, setModalLoading] = useState(true);
+const ExpenseCategoryModal: FunctionComponent<ExpenseCategoryModalProps> = props => {
+  const [loading, setLoading] = useState<boolean>(false);
+  const [deleteLoading, setDeleteLoading] = useState<boolean>(false);
+  const [modalLoading, setModalLoading] = useState<boolean>(true);
 
-  const [expenseCategory, setExpenseCategory] = useState(
+  const [expenseCategory, setExpenseCategory] = useState<ExpenseCategoryFormValue>(
     initialExpenseCategoryForm
   );
-  const [originalExpenseCategory, setOriginalExpenseCategory] = useState(
+  const [originalExpenseCategory, setOriginalExpenseCategory] = useState<ExpenseCategoryFormValue>(
     initialExpenseCategoryForm
   );
-  const [isNew, setIsNew] = useState(props.expenseCategoryId === "");
+  const [isNew, setIsNew] = useState<boolean>(props.expenseCategoryId === "");
 
   useEffect(() => {
     if (!isNew) {
+      // noinspection JSIgnoredPromiseFromCall
       _getExpenseCategoryById();
     }
   }, []);
 
   const _getExpenseCategoryById = async (): Promise<void> => {
     try {
-      const { expenseCategoryId } = props;
+      const {expenseCategoryId} = props;
       const expenseCategoryData: ExpenseCategory = await getExpenseCategoryById(
         expenseCategoryId
       );
@@ -122,8 +121,8 @@ const ExpenseCategoryModal: FunctionComponent<
       name: expenseCategory.name.value
     });
     toast.success(`Successfully created ${expenseCategory.name.value}!`);
-    setExpenseCategory({ ...expenseCategory, id: expenseCategoryId });
-    setOriginalExpenseCategory({ ...expenseCategory, id: expenseCategoryId });
+    setExpenseCategory({...expenseCategory, id: expenseCategoryId});
+    setOriginalExpenseCategory({...expenseCategory, id: expenseCategoryId});
     setIsNew(false);
     setModalLoading(false);
   };
@@ -142,6 +141,7 @@ const ExpenseCategoryModal: FunctionComponent<
     } else {
       await _updateExpenseCategory();
     }
+    // noinspection JSIgnoredPromiseFromCall
     props.getExpenseCategories();
     setLoading(false);
   };

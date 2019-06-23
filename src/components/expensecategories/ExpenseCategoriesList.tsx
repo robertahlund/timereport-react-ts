@@ -5,43 +5,43 @@ import React, {
   useEffect,
   useState
 } from "react";
-import { PaddingRow } from "../authentication/LoginForm";
+import {PaddingRow} from "../authentication/LoginForm";
 import Input from "../general/Input";
 import Button from "../general/Button";
-import { ListHeader, ListRow } from "../employees/EmployeeList";
+import {ListHeader, ListRow} from "../employees/EmployeeList";
 import LoadingIcon from "../../icons/LoadingIcon";
-import { FlexContainer } from "../companies/CompanyList";
+import {FlexContainer} from "../companies/CompanyList";
 import {
   ExpenseCategory,
   ExpenseCategorySort
 } from "../../types/types";
 import ExpenseCategoryModal from "./ExpenseCategoryModal";
 import ModalPortal from "../general/ModalPortal";
-import { getExpenseCategories } from "../../api/expenseCategoryApi";
+import {getExpenseCategories} from "../../api/expenseCategoryApi";
 import _ from "lodash";
 
 const ExpenseCategoriesList: FunctionComponent = () => {
-  const [searchValue, setSearchValue] = useState("");
+  const [searchValue, setSearchValue] = useState<string>("");
   const initialSortState: ExpenseCategorySort = {
     column: "name",
     order: "asc"
   };
-  const [sortMethod, setSortMethod] = useState(initialSortState);
-  const [loading, setLoading] = useState(false);
+  const [sortMethod, setSortMethod] = useState<ExpenseCategorySort>(initialSortState);
+  const [loading, setLoading] = useState<boolean>(false);
   const initialExpenseCategoryListState: ExpenseCategory[] = [];
-  const [expenseCategoryList, setExpenseCategoryList] = useState(
+  const [expenseCategoryList, setExpenseCategoryList] = useState<ExpenseCategory[]>(
     initialExpenseCategoryListState
   );
-  const [clonedExpenseCategoryList, setClonedExpenseCategoryList] = useState(
+  const [clonedExpenseCategoryList, setClonedExpenseCategoryList] = useState<ExpenseCategory[]>(
     initialExpenseCategoryListState
   );
-  const [showExpenseCategoryModal, setShowExpenseCategoryModal] = useState(
+  const [showExpenseCategoryModal, setShowExpenseCategoryModal] = useState<boolean>(
     false
   );
-  const [expenseCategoryId, setExpenseCategoryId] = useState("");
+  const [expenseCategoryId, setExpenseCategoryId] = useState<string>("");
 
   const handleSearchChange = (event: ChangeEvent<HTMLInputElement>): void => {
-    const { target } = event;
+    const {target} = event;
     setSearchValue(target.value);
     if (target.value === "") {
       setExpenseCategoryList(clonedExpenseCategoryList);
@@ -74,6 +74,7 @@ const ExpenseCategoriesList: FunctionComponent = () => {
   };
 
   useEffect(() => {
+    // noinspection JSIgnoredPromiseFromCall
     getAllExpenseCategories();
   }, []);
 
@@ -124,7 +125,7 @@ const ExpenseCategoriesList: FunctionComponent = () => {
 
   const toggleExpenseCategoryModal = (event?: React.MouseEvent): void => {
     if (event) {
-      const { target, currentTarget } = event;
+      const {target, currentTarget} = event;
       if (target === currentTarget) {
         setShowExpenseCategoryModal(!showExpenseCategoryModal);
       }

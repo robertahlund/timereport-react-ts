@@ -1,7 +1,7 @@
-import React, { ChangeEvent, FunctionComponent } from "react";
+import React, {ChangeEvent, FunctionComponent} from "react";
 import Input from "../general/Input";
 import styled from "styled-components";
-import { PaddingRow } from "./LoginForm";
+import {PaddingRow} from "./LoginForm";
 import Checkbox from "../general/Checkbox";
 import {RegisterFormValue} from "../../types/types";
 
@@ -17,7 +17,7 @@ export interface RowProps {
 }
 
 const RegisterForm: FunctionComponent<RegisterFormProps> = props => {
-  const { firstName, lastName, email, password } = props.form;
+  const {firstName, lastName, email, password} = props.form;
   const {checked} = props;
   return (
     <form autoComplete="off">
@@ -68,7 +68,8 @@ const RegisterForm: FunctionComponent<RegisterFormProps> = props => {
         />
       </Row>
       <Row direction="column">
-        <Checkbox onChange={props.onCheckboxChange} checked={checked} id="admin-checkbox" labelValue="Create admin account" paddingTop="15px"/>
+        <Checkbox onChange={props.onCheckboxChange} checked={checked} id="admin-checkbox"
+                  labelValue="Create admin account" paddingTop="15px"/>
       </Row>
     </form>
   );

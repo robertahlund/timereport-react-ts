@@ -45,7 +45,6 @@
 }
 
 .react-select-time .react-select-time__option--is-selected {
-  background-color: #fff;
   cursor: pointer;
   padding: 10px 13px;
   font-size: 15px;
@@ -54,6 +53,67 @@
 }
 
 .react-select-time .react-select-time__option:hover {
+  background-color: #fec861;
+  cursor: pointer;
+}
+
+/* Error styles */
+
+.react-select-time-error .react-select-time-error__control {
+  background-color: #fff;
+  border: 1px solid #fe9161;
+  cursor: pointer;
+  box-shadow: none;
+  min-width: 350px;
+}
+
+.react-select-time-error .react-select-time-error__control:hover {
+  border-color: #fe9161;
+}
+
+.react-select-time-error .react-select-time-error__placeholder {
+  color: #393E41;
+  font-size: 15px;
+}
+
+.react-select-time-error .react-select-time-error__dropdown-indicator, .react-select-time-error .react-select-time-error__dropdown-indicator:hover {
+  color: #393E41;
+}
+
+.react-select-time-error .react-select-time-error__indicator-separator {
+  background-color: #f1f1f1;
+}
+
+.react-select-time-error .react-select-time-error__menu-list {
+  margin: 0;
+  padding: 0;
+}
+.react-select-time-error .react-select-time-error__option:first-child {
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+
+.react-select-time-error .react-select-time-error__option:last-child {
+  border-bottom-left-radius: 3px;
+  border-bottom-right-radius: 3px;
+}
+
+.react-select-time-error .react-select-time-error__option {
+  background-color: #fff;
+  cursor: pointer;
+  padding: 10px 13px;
+  font-size: 15px;
+}
+
+.react-select-time-error .react-select-time-error__option--is-selected {
+  cursor: pointer;
+  padding: 10px 13px;
+  font-size: 15px;
+  background-color: #fec861;
+  color: #393E41;
+}
+
+.react-select-time-error .react-select-time-error__option:hover {
   background-color: #fec861;
   cursor: pointer;
 }

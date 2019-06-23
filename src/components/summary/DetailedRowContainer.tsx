@@ -1,4 +1,4 @@
-import React, {FunctionComponent, ReactNode, Fragment, useEffect} from "react";
+import React, {FunctionComponent, Fragment, useEffect} from "react";
 import DetailedRow from "./DetailedRow";
 import styled from "styled-components";
 import {CardHeader} from "./TimeCard";
@@ -9,6 +9,7 @@ interface DetailedRowContainerProps {
 }
 
 const DetailedRowContainer: FunctionComponent<DetailedRowContainerProps> = props => {
+
   useEffect(() => {
     props.rowDetails.sort((a, b) => {
       if (a.formattedDate > b.formattedDate) {
@@ -19,6 +20,7 @@ const DetailedRowContainer: FunctionComponent<DetailedRowContainerProps> = props
       return 1;
     })
   }, [props.rowDetails]);
+
   const {rowDetails} = props;
 
   return (

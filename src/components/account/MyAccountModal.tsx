@@ -6,7 +6,7 @@ import Button from "../general/Button";
 import firebase from "../../config/firebaseConfig";
 import {User} from "firebase";
 import {AuthContext, AuthContextConsumer} from "../../context/authentication/authenticationContext";
-import {RegisterFormValue} from "../../types/types";
+import {AuthObject, RegisterFormValue} from "../../types/types";
 import {validateMyAccountForm} from "../../utilities/validations/validateMyAccountForm";
 import {updateEmployee} from "../../api/employeeApi";
 import {toast} from "react-toastify";
@@ -18,8 +18,8 @@ interface MyAccountModalProps {
 }
 
 const MyAccountModal: FunctionComponent<MyAccountModalProps> = props => {
-  const authContext = useContext(AuthContext);
-  const [showPassword, setShowPassword] = useState(false);
+  const authContext: AuthObject | boolean = useContext(AuthContext);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
   const [form, setForm] = useState({
     valid: true,
     firstName: {
@@ -43,7 +43,7 @@ const MyAccountModal: FunctionComponent<MyAccountModalProps> = props => {
       validationMessage: ""
     }
   });
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handleFormChange = (event: ChangeEvent<HTMLInputElement>): void => {
     setForm({

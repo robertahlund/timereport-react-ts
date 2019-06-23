@@ -1,7 +1,7 @@
 import firebase from "../config/firebaseConfig";
-import { TimeReport, TimeReportRow } from "../types/types";
-import { addDays, subDays } from "date-fns";
-import _, { Dictionary } from "lodash";
+import {TimeReport, TimeReportRow} from "../types/types";
+import {addDays, subDays} from "date-fns";
+import _ from "lodash";
 
 const db = firebase.firestore();
 
@@ -17,7 +17,7 @@ export const createOrUpdateTimeReportRows = async (
         );
         allTimeReports.push(createdTimeReport);
       } else {
-        const updatedTimeReport: TimeReport = await updateTimeReports(
+        const updatedTimeReport: TimeReport = await updateTimeReport(
           timeReport
         );
         allTimeReports.push(updatedTimeReport);
@@ -55,7 +55,7 @@ export const createTimeReports = async (
   }
 };
 
-export const updateTimeReports = async (
+export const updateTimeReport = async (
   timeReport: TimeReport
 ): Promise<TimeReport> => {
   try {
@@ -148,6 +148,31 @@ export const getTimeReportsByDate = async (
         );
       });
     });
+    return Promise.resolve(timeReports);
+  } catch (error) {
+    console.log(error);
+    return Promise.reject("Error retrieving time reports");
+  }
+};
+
+export const getUnfilteredTimeReportsByDate = async (
+  startDate: Date,
+  endDate: Date,
+  userId: string
+): Promise<TimeReport[]> => {
+  const timeReports: TimeReport[] = [];
+  try {
+    await db
+      .collection("timeReports")
+      .where("date", ">=", subDays(startDate, 7))
+      .where("date", "<=", addDays(endDate, 7))
+      .where("userId", "==", userId)
+      .get()
+      .then(documents => {
+        documents.forEach(doc => {
+          timeReports.push(doc.data() as TimeReport);
+        });
+      });
     return Promise.resolve(timeReports);
   } catch (error) {
     console.log(error);

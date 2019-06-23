@@ -16,25 +16,23 @@ import {
 } from "../account/MyAccountModal";
 import LoadingIcon from "../../icons/LoadingIcon";
 import ExpenseForm from "./ExpenseForm";
-import { toast } from "react-toastify";
+import {toast} from "react-toastify";
 import {
-  ActivityCompanySelectOption,
   AuthObject,
   Expense,
   ExpenseCategory,
   ExpenseCategorySelectOptions,
   ExpenseFileUpload,
   ExpenseFormValue,
-  GroupedActivityOptions
 } from "../../types/types";
-import { useSpring } from "react-spring";
-import { modalAnimation } from "../../constants/generalConstants";
+import {useSpring} from "react-spring";
+import {modalAnimation} from "../../constants/generalConstants";
 import {
   initialExpenseCategoryOptions,
   initialExpenseForm,
   initialSelectedExpenseCategory
 } from "../../constants/expenseConstants";
-import { ButtonRow } from "../activities/ActivityModal";
+import {ButtonRow} from "../activities/ActivityModal";
 import _ from "lodash";
 import {
   createExpense,
@@ -43,13 +41,13 @@ import {
   updateExpense,
   uploadExpenseFile
 } from "../../api/expenseApi";
-import { validateExpenseForm } from "../../utilities/validations/validateExpenseForm";
-import { ValueType } from "react-select/lib/types";
+import {validateExpenseForm} from "../../utilities/validations/validateExpenseForm";
+import {ValueType} from "react-select/lib/types";
 import {
   getExpenseCategories,
   getExpenseCategoryById
 } from "../../api/expenseCategoryApi";
-import { AuthContext } from "../../context/authentication/authenticationContext";
+import {AuthContext} from "../../context/authentication/authenticationContext";
 
 
 interface ExpenseModalProps {
@@ -59,33 +57,38 @@ interface ExpenseModalProps {
 }
 
 const ExpenseModal: FunctionComponent<ExpenseModalProps> = props => {
-  const [loading, setLoading] = useState(false);
-  const [deleteLoading, setDeleteLoading] = useState(false);
-  const [modalLoading, setModalLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [deleteLoading, setDeleteLoading] = useState<boolean>(false);
+  const [modalLoading, setModalLoading] = useState<boolean>(true);
   const [
     expenseCategorySelectOptions,
     setExpenseCategorySelectOptions
-  ] = useState(initialExpenseCategoryOptions);
-  const [expense, setExpense] = useState(initialExpenseForm);
-  const [isNew, setIsNew] = useState(props.expenseId === "");
-  const [selectedExpenseCategory, setSelectedExpenseCategory] = useState(
+  ] = useState<ExpenseCategorySelectOptions[]>(initialExpenseCategoryOptions);
+  const [expense, setExpense] = useState<ExpenseFormValue>(initialExpenseForm);
+  const [isNew, setIsNew] = useState<boolean>(props.expenseId === "");
+  const [selectedExpenseCategory, setSelectedExpenseCategory] = useState<ExpenseCategorySelectOptions | null>(
     initialSelectedExpenseCategory
   );
-  const [filename, setFilename] = useState("");
+  const [expenseCategoryValidationMessage, setExpenseCategoryValidationMessage] = useState<null | string>(null);
+  const [filename, setFilename] = useState<string>("");
+  const [fileValidationMessage, setFileValidationMessage] = useState<null | string>(null);
   const uploadInput: React.RefObject<HTMLInputElement> = React.createRef();
 
-  const user = useContext(AuthContext);
+  const user: AuthObject | boolean = useContext(AuthContext);
 
   useEffect(() => {
     if (!isNew) {
       getInitialData();
     } else {
+      // noinspection JSIgnoredPromiseFromCall
       _getExpenseCategories();
     }
   }, []);
 
   const getInitialData = (): void => {
+    // noinspection JSIgnoredPromiseFromCall
     _getExpenseCategories();
+    // noinspection JSIgnoredPromiseFromCall
     _getExpenseById();
   };
 
@@ -112,6 +115,7 @@ const ExpenseModal: FunctionComponent<ExpenseModalProps> = props => {
   };
 
   const handleSelectChange = (option: ValueType<any>): void => {
+    setExpenseCategoryValidationMessage(null);
     setSelectedExpenseCategory(option);
     setExpense({
       ...expense,
@@ -120,7 +124,7 @@ const ExpenseModal: FunctionComponent<ExpenseModalProps> = props => {
   };
 
   const _getExpenseById = async (): Promise<void> => {
-    const { expenseId } = props;
+    const {expenseId} = props;
     try {
       const expenseData: Expense = await getExpenseById(expenseId);
       if (!_.isNil(expenseId)) {
@@ -157,7 +161,7 @@ const ExpenseModal: FunctionComponent<ExpenseModalProps> = props => {
           receiptUrl: expenseData.receiptUrl
         });
         setModalLoading(false);
-        setFilename(expenseData.filename);
+        setFilename(expenseData.filename)
       } else {
         toast.error("Error retrieving expense.");
       }
@@ -183,6 +187,7 @@ const ExpenseModal: FunctionComponent<ExpenseModalProps> = props => {
     } else {
       setFilename("");
     }
+    setFileValidationMessage(null);
   };
 
   const _updateExpense = async (): Promise<boolean> => {
@@ -221,21 +226,19 @@ const ExpenseModal: FunctionComponent<ExpenseModalProps> = props => {
           receiptUrl: expense.receiptUrl
         });
       }
-      return Promise.resolve(true)
-      toast.success("Successfully updated expense!")
+      toast.success("Successfully updated expense!");
+      return Promise.resolve(true);
     } catch (error) {
-      return Promise.reject(false)
       console.log(error);
+      return Promise.reject(false);
     }
   };
 
   const _createExpense = async (): Promise<boolean> => {
     try {
-      if (
-        !_.isNil(uploadInput.current) &&
+      if (validateUploadedFile() && !_.isNil(uploadInput.current) &&
         !_.isNil(uploadInput.current.files) &&
-        !_.isNil(uploadInput.current.files[0])
-      ) {
+        !_.isNil(uploadInput.current.files[0])) {
         const uploadedFile: ExpenseFileUpload = await uploadExpenseFile(
           uploadInput.current.files[0]
         );
@@ -254,27 +257,49 @@ const ExpenseModal: FunctionComponent<ExpenseModalProps> = props => {
             receiptUrl: uploadedFile.url
           });
           toast.success("Successfully created expense!");
-          setExpense({ ...expense, id: expenseId });
+          setExpense({...expense, id: expenseId});
           setIsNew(false);
           setModalLoading(false);
-          return Promise.resolve(true)
+          return Promise.resolve(true);
         } else {
-          return Promise.reject(false)
+          return Promise.reject(false);
         }
       } else {
-        return Promise.reject(false)
+        setFileValidationMessage("File is mandatory");
+        return Promise.reject(false);
       }
     } catch (error) {
-      return Promise.reject(false);
       console.log(error);
+      return Promise.reject(false);
     }
   };
 
+  const validateUploadedFile = (): boolean => {
+    return !_.isNil(uploadInput.current) &&
+      !_.isNil(uploadInput.current.files) &&
+      !_.isNil(uploadInput.current.files[0]);
+  };
+
+  const validateExpenseCategory = (): boolean => {
+    return !_.isNil(selectedExpenseCategory);
+
+  };
+
   const onSubmit = async (): Promise<void> => {
+    if (isNew) {
+      const fileUploaded = validateUploadedFile();
+      if (!fileUploaded) {
+        setFileValidationMessage("File is mandatory.");
+      }
+    }
+    const validatedExpenseCategory = validateExpenseCategory();
+    if (!validatedExpenseCategory) {
+      setExpenseCategoryValidationMessage("Category is mandatory.");
+    }
     const validatedForm: ExpenseFormValue = {
       ...validateExpenseForm(expense)
     };
-    if (!validatedForm.valid) {
+    if (!validatedForm.valid || !_.isNil(fileValidationMessage) || !_.isNil(expenseCategoryValidationMessage)) {
       setExpense(validatedForm);
       return;
     }
@@ -285,6 +310,7 @@ const ExpenseModal: FunctionComponent<ExpenseModalProps> = props => {
       } else {
         await _updateExpense();
       }
+      // noinspection JSIgnoredPromiseFromCall
       props.getExpenses();
       setLoading(false);
     } catch (error) {
@@ -298,6 +324,7 @@ const ExpenseModal: FunctionComponent<ExpenseModalProps> = props => {
     await deleteExpense(expense.id, expense.filename);
     toast.success("Successfully deleted expense!");
     props.toggleModal();
+    // noinspection JSIgnoredPromiseFromCall
     props.getExpenses();
   };
 
@@ -339,6 +366,8 @@ const ExpenseModal: FunctionComponent<ExpenseModalProps> = props => {
               selectedValue={selectedExpenseCategory}
               filename={filename}
               onFileChange={onFileChange}
+              fileValidationMessage={fileValidationMessage}
+              expenseCategoryValidationMessage={expenseCategoryValidationMessage}
             />
             <ButtonRow isNew={isNew}>
               {!isNew && (

@@ -1,4 +1,4 @@
-import React, { ChangeEvent, FunctionComponent } from "react";
+import React, {ChangeEvent, FunctionComponent} from "react";
 import styled from "styled-components";
 
 interface TextAreaProps {

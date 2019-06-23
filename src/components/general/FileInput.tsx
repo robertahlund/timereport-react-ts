@@ -1,17 +1,22 @@
-import React, { ChangeEvent, FunctionComponent } from "react";
+import React, {ChangeEvent, FunctionComponent} from "react";
 import styled from "styled-components";
 
 interface FileInputProps {
   uploadInput: React.RefObject<HTMLInputElement>;
   filename: string;
+  hasError: boolean;
   onFileChange: (files: FileList | null) => void;
 }
 
+interface LabelProps {
+  hasError: boolean;
+}
+
 const FileInput: FunctionComponent<FileInputProps> = props => {
-  const { uploadInput, filename, onFileChange } = props;
+  const {uploadInput, filename, onFileChange, hasError} = props;
   return (
     <>
-      <Label htmlFor="file">{filename || "Upload File"}</Label>
+      <Label htmlFor="file" hasError={hasError}>{filename || "Upload File"}</Label>
       <Input id="file" type="file" ref={uploadInput} onChange={(event) => onFileChange(event.target.files)}/>
     </>
   );
@@ -42,4 +47,5 @@ const Label = styled.label`
   border: 1px solid #f1f1f1;
   width: calc(400px - 22px);
   margin-top: 3px;
+  border-color: ${(props: LabelProps) => props.hasError ? "#fe9161" : "#f1f1f1"}
 `;
