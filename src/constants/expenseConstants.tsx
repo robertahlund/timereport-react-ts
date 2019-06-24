@@ -34,6 +34,11 @@ export const initialExpenseForm: ExpenseFormValue = {
     value: "",
     valid: true
   },
+  date: {
+    validationMessage: "",
+    value: "",
+    valid: true
+  },
   filename: "",
   receiptUrl: ""
 };

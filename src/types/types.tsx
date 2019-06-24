@@ -202,6 +202,7 @@ export interface Expense {
   note: string;
   filename: string;
   receiptUrl: string;
+  date: string;
 }
 
 export interface ExpenseListItem extends Expense {
@@ -223,6 +224,7 @@ export interface ExpenseFormValue {
   amount: FormValue;
   vat: FormValue;
   note: FormValue;
+  date: FormValue;
   filename: string;
   receiptUrl: string;
 }

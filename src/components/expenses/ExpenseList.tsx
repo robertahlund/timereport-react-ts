@@ -162,6 +162,7 @@ const ExpenseList: FunctionComponent = () => {
         >
           Name
         </span>
+        <span>Date</span>
         <span>Category</span>
         <span>Amount</span>
         <span>VAT</span>
@@ -182,6 +183,13 @@ const ExpenseList: FunctionComponent = () => {
                 }
               >
                 {expense.username}
+              </VerticalCenterSpan>
+              <VerticalCenterSpan
+                onClick={(event: React.MouseEvent) =>
+                  selectExpense(expense.id, event)
+                }
+              >
+                {expense.date}
               </VerticalCenterSpan>
               <VerticalCenterSpan
                 onClick={(event: React.MouseEvent) =>

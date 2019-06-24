@@ -48,6 +48,8 @@ import {
   getExpenseCategoryById
 } from "../../api/expenseCategoryApi";
 import {AuthContext} from "../../context/authentication/authenticationContext";
+import {format} from "date-fns";
+import {timeReportDateFormat} from "../../constants/timeReportConstants";
 
 
 interface ExpenseModalProps {
@@ -72,6 +74,7 @@ const ExpenseModal: FunctionComponent<ExpenseModalProps> = props => {
   const [expenseCategoryValidationMessage, setExpenseCategoryValidationMessage] = useState<null | string>(null);
   const [filename, setFilename] = useState<string>("");
   const [fileValidationMessage, setFileValidationMessage] = useState<null | string>(null);
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const uploadInput: React.RefObject<HTMLInputElement> = React.createRef();
 
   const user: AuthObject | boolean = useContext(AuthContext);
@@ -157,9 +160,18 @@ const ExpenseModal: FunctionComponent<ExpenseModalProps> = props => {
             validationMessage: "",
             value: expenseData.note
           },
+          date: {
+            valid: true,
+            validationMessage: "",
+            value: expenseData.date
+          },
           filename: expenseData.filename,
           receiptUrl: expenseData.receiptUrl
         });
+        console.log(expenseData.date);
+        if (!_.isNil(expenseData.date)) {
+          setSelectedDate(new Date(expenseData.date));
+        } else setSelectedDate(new Date());
         setModalLoading(false);
         setFilename(expenseData.filename)
       } else {
@@ -211,6 +223,7 @@ const ExpenseModal: FunctionComponent<ExpenseModalProps> = props => {
             vat: Number(expense.vat.value),
             note: expense.note.value,
             filename: uploadedFile.filename,
+            date: expense.date.value,
             receiptUrl: uploadedFile.url
           });
         }
@@ -223,6 +236,7 @@ const ExpenseModal: FunctionComponent<ExpenseModalProps> = props => {
           vat: Number(expense.vat.value),
           note: expense.note.value,
           filename: expense.filename,
+          date: expense.date.value,
           receiptUrl: expense.receiptUrl
         });
       }
@@ -254,6 +268,7 @@ const ExpenseModal: FunctionComponent<ExpenseModalProps> = props => {
             vat: Number(expense.vat.value),
             note: expense.note.value,
             filename: uploadedFile.filename,
+            date: expense.date.value,
             receiptUrl: uploadedFile.url
           });
           toast.success("Successfully created expense!");
@@ -282,7 +297,6 @@ const ExpenseModal: FunctionComponent<ExpenseModalProps> = props => {
 
   const validateExpenseCategory = (): boolean => {
     return !_.isNil(selectedExpenseCategory);
-
   };
 
   const onSubmit = async (): Promise<void> => {
@@ -328,6 +342,18 @@ const ExpenseModal: FunctionComponent<ExpenseModalProps> = props => {
     props.getExpenses();
   };
 
+  const onDateSelect = async (date: Date): Promise<void> => {
+    setSelectedDate(date);
+    setExpense({
+      ...expense,
+      date: {
+        valid: true,
+        validationMessage: "",
+        value: format(date, timeReportDateFormat)
+      }
+    });
+  };
+
   const animation = useSpring(modalAnimation);
 
   return (
@@ -368,6 +394,8 @@ const ExpenseModal: FunctionComponent<ExpenseModalProps> = props => {
               onFileChange={onFileChange}
               fileValidationMessage={fileValidationMessage}
               expenseCategoryValidationMessage={expenseCategoryValidationMessage}
+              onDateSelect={onDateSelect}
+              selectedDate={selectedDate}
             />
             <ButtonRow isNew={isNew}>
               {!isNew && (

@@ -1,6 +1,6 @@
-import React, { FunctionComponent, Fragment, ChangeEvent } from "react";
+import React, {FunctionComponent, Fragment, ChangeEvent} from "react";
 import Input, {ErrorMessage, Label} from "../general/Input";
-import { RowProps } from "../authentication/RegisterForm";
+import {RowProps} from "../authentication/RegisterForm";
 import {
   ExpenseCategorySelectOptions,
   ExpenseFormValue
@@ -8,8 +8,10 @@ import {
 import TextArea from "../general/TextArea";
 import FileInput from "../general/FileInput";
 import Select from "react-select";
-import { ValueType } from "react-select/lib/types";
+import {ValueType} from "react-select/lib/types";
 import styled from "styled-components";
+import DatePicker from "react-datepicker";
+import {DatePickerWrapper} from "../timereport/DateSelector";
 
 interface ExpenseFormProps {
   form: ExpenseFormValue;
@@ -22,6 +24,8 @@ interface ExpenseFormProps {
   onFileChange: (files: FileList | null) => void;
   fileValidationMessage: null | string;
   expenseCategoryValidationMessage: null | string;
+  onDateSelect: (date: Date) => void;
+  selectedDate: Date;
 }
 
 const ExpenseForm: FunctionComponent<ExpenseFormProps> = props => {
@@ -33,16 +37,19 @@ const ExpenseForm: FunctionComponent<ExpenseFormProps> = props => {
     filename,
     onFileChange,
     fileValidationMessage,
-    expenseCategoryValidationMessage
+    expenseCategoryValidationMessage,
+    onDateSelect,
+    selectedDate
   } = props;
-  const { amount, vat, note } = props.form;
+  const {amount, vat, note, date} = props.form;
 
   return (
     <Fragment>
       <form autoComplete="off">
         <PaddingRow>
           <Label>Attachment
-          <FileInput uploadInput={uploadInput} filename={filename} onFileChange={onFileChange} hasError={fileValidationMessage !== null}/>
+            <FileInput uploadInput={uploadInput} filename={filename} onFileChange={onFileChange}
+                       hasError={fileValidationMessage !== null}/>
           </Label>
           {fileValidationMessage !== null && <ErrorMessage>{fileValidationMessage}</ErrorMessage>}
         </PaddingRow>
@@ -85,6 +92,23 @@ const ExpenseForm: FunctionComponent<ExpenseFormProps> = props => {
             />
           </PaddingRow>
           <PaddingRow>
+            <DatePickerWrapper>
+              <DatePicker onChange={onDateSelect} customInput={
+                <div>
+                  <Input
+                    value={date.value}
+                    labelValue="Date"
+                    type="text"
+                    name="date"
+                    onFormChange={props.onFormChange}
+                    width="378px"
+                    valid={date.valid}
+                    validationMessage={date.validationMessage}
+                  /></div>
+              } todayButton={"Today"} selected={selectedDate} showWeekNumbers locale="enGB"/>
+            </DatePickerWrapper>
+          </PaddingRow>
+          <PaddingRow>
             <Label>Select Category</Label>
             <Select
               onChange={handleSelectChange}
@@ -94,7 +118,8 @@ const ExpenseForm: FunctionComponent<ExpenseFormProps> = props => {
               classNamePrefix={expenseCategoryValidationMessage !== null ? "react-select-time-error" : "react-select-time"}
               className={expenseCategoryValidationMessage !== null ? "react-select-time-error" : "react-select-time"}
             />
-            {expenseCategoryValidationMessage !== null && <ErrorMessage>{expenseCategoryValidationMessage}</ErrorMessage>}
+            {expenseCategoryValidationMessage !== null &&
+            <ErrorMessage>{expenseCategoryValidationMessage}</ErrorMessage>}
           </PaddingRow>
         </Row>
       </form>
