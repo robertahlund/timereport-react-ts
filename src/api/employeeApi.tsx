@@ -168,7 +168,7 @@ export const getAllActivitiesAssignedToUser = async (
           return doc.data()!.companies as CompanySelectOptions[];
         } else return null;
       });
-      if (!_.isNil(userCompanies)) {
+      if (userCompanies && userCompanies.length > 0) {
         const userActivities: ActivityCompanySelectOption[] = await getCompanyActivitiesByCompanies(
           userCompanies
         );

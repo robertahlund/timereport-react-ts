@@ -74,11 +74,7 @@ export const getCompanyActivitiesByCompanies = async (
       return Promise.reject("Error retrieving companies");
     }
   }
-  if (activities.length > 0) {
-    return Promise.resolve(activities);
-  } else {
-    return Promise.reject("Activity list is empty");
-  }
+  return Promise.resolve(activities);
 };
 
 export const getCompaniesByActivityId = async (

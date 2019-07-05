@@ -1,7 +1,7 @@
 import React, {
   ChangeEvent,
   Fragment,
-  FunctionComponent,
+  FunctionComponent, useContext,
   useEffect,
   useState
 } from "react";
@@ -11,13 +11,14 @@ import Button from "../general/Button";
 import { ListHeader, ListRow } from "../employees/EmployeeList";
 import LoadingIcon from "../../icons/LoadingIcon";
 import { FlexContainer } from "../companies/CompanyList";
-import { ExpenseListItem, ExpenseSort } from "../../types/types";
+import {AuthObject, ExpenseListItem, ExpenseSort} from "../../types/types";
 import ExpenseModal from "./ExpenseModal";
 import ModalPortal from "../general/ModalPortal";
 import _ from "lodash";
-import { getExpenses } from "../../api/expenseApi";
+import {getExpenses, getExpensesByUserId} from "../../api/expenseApi";
 import AttachmentIcon from "../../icons/AttachmentIcon";
 import styled from "styled-components";
+import {AuthContext} from "../../context/authentication/authenticationContext";
 
 const ExpenseList: FunctionComponent = () => {
   const [searchValue, setSearchValue] = useState<string>("");
@@ -34,6 +35,8 @@ const ExpenseList: FunctionComponent = () => {
   );
   const [showExpenseModal, setShowExpenseModal] = useState<boolean>(false);
   const [expenseId, setExpenseId] = useState<string>("");
+
+  const user: AuthObject | boolean = useContext(AuthContext);
 
   const handleSearchChange = (event: ChangeEvent<HTMLInputElement>): void => {
     const { target } = event;
@@ -53,11 +56,18 @@ const ExpenseList: FunctionComponent = () => {
   const _getExpenses = async (): Promise<void> => {
     setLoading(true);
     try {
-      const expenseData: ExpenseListItem[] = await getExpenses();
-      console.log(expenseData);
-      setExpenseList(expenseData);
-      setClonedExpenseList(expenseData);
-      setLoading(false);
+      if (typeof user !== "boolean") {
+        let expenseData: ExpenseListItem[] = [];
+        if (user.isAdmin) {
+          expenseData = await getExpenses();
+        } else {
+          expenseData = await getExpensesByUserId(user.uid as string);
+        }
+        console.log(expenseData);
+        setExpenseList(expenseData);
+        setClonedExpenseList(expenseData);
+        setLoading(false);
+      }
     } catch (error) {
       setLoading(false);
       console.log(error);

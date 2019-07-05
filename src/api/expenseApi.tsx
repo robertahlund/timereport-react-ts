@@ -165,3 +165,44 @@ export const getExpenses = async (): Promise<ExpenseListItem[]> => {
     return Promise.reject("Error retrieving expenses");
   }
 };
+
+export const getExpensesByUserId = async (userId: string): Promise<ExpenseListItem[]> => {
+  try {
+    const expenseCategories: ExpenseCategory[] = await getExpenseCategories();
+    const users: AuthObject[] = await getEmployees();
+    const expenses: ExpenseListItem[] = [];
+    await db
+      .collection("expenses")
+      .where("userId", "==", userId)
+      .get()
+      .then(documents => {
+        documents.forEach(document => {
+          let expenseListItem: ExpenseListItem = document.data() as ExpenseListItem;
+          const expenseCategoryName: string | undefined = _.find(
+            expenseCategories,
+            (category: ExpenseCategory) =>
+              category.id === expenseListItem.expenseCategoryId
+          )!.name;
+          if (expenseCategoryName) {
+            expenseListItem.expenseCategoryName = expenseCategoryName;
+          } else expenseListItem.expenseCategoryName = "Deleted Category";
+          const firstName: string | undefined = _.find(
+            users,
+            (user: AuthObject) => user.uid === expenseListItem.userId
+          )!.firstName;
+          const lastName: string | undefined = _.find(
+            users,
+            (user: AuthObject) => user.uid === expenseListItem.userId
+          )!.lastName;
+          if (firstName && lastName) {
+            expenseListItem.username = `${firstName} ${lastName}`;
+          } else expenseListItem.username = "Deleted User";
+          expenses.push(expenseListItem);
+        });
+      });
+    return Promise.resolve(expenses);
+  } catch (error) {
+    console.log(error);
+    return Promise.reject("Error retrieving expenses");
+  }
+};
